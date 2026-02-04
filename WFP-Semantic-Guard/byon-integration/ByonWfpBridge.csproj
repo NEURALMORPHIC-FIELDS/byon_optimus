@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ByonWfpBridge</AssemblyName>
+    <RootNamespace>WfpSemanticGuard.ByonIntegration</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Lucian Borbeleac</Authors>
+    <Company>Digital Systems Creator</Company>
+    <Product>BYON-WFP Bridge</Product>
+    <Description>Bridge between BYON Optimus and WFP Semantic Guard</Description>
+    <Copyright>Patent: EP25216372.0 - OmniVault</Copyright>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

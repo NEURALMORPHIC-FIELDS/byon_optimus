@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "byon://schema/global-memory-summary/v1",
+  "title": "GlobalMemorySummary v1",
+  "description": "Schema pentru starea globală emergentă a memoriei - NU este rezumat textual, ci stare structurală",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "document_type",
+    "document_version",
+    "timestamp",
+    "system_coherence",
+    "entropy_level",
+    "active_attractors",
+    "dominant_domains",
+    "stagnant_threads"
+  ],
+  "properties": {
+    "document_type": {
+      "type": "string",
+      "const": "GLOBAL_MEMORY_SUMMARY",
+      "description": "Discriminator pentru tipul de document"
+    },
+    "document_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Versiunea schemei"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO8601 al generării summary-ului"
+    },
+    "system_coherence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Coerența globală a sistemului (1 = perfect coerent, 0 = fragmentat)"
+    },
+    "entropy_level": {
+      "type": "string",
+      "enum": ["stable", "rising", "fragmented"],
+      "description": "Nivel calitativ de entropie"
+    },
+    "active_attractors": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attractor_id", "score"],
+        "properties": {
+          "attractor_id": {
+            "type": "string",
+            "minLength": 16,
+            "maxLength": 128
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "description": "Atractorii activi sortați descrescător după scor"
+    },
+    "dominant_domains": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["domain", "weight"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "description": "Domeniile dominante cu ponderile lor"
+    },
+    "stagnant_threads": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "days_inactive"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "days_inactive": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 36500
+          }
+        }
+      },
+      "description": "Fire de lucru stagnante (fără activitate recentă)"
+    }
+  }
+}

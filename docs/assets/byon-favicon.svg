@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#bg)"/>
+
+  <!-- B Letter stylized -->
+  <path d="M18,14 L18,50 L34,50 C42,50 48,44 48,38 C48,33 44,29 39,28
+           C43,27 46,23 46,19 C46,14 41,14 34,14 Z
+           M26,22 L34,22 C37,22 38,24 38,26 C38,28 37,30 34,30 L26,30 Z
+           M26,36 L34,36 C38,36 40,38 40,41 C40,44 38,44 34,44 L26,44 Z"
+        fill="url(#accent)"/>
+
+  <!-- Three dots (agents) -->
+  <circle cx="52" cy="14" r="4" fill="#4facfe"/>
+  <circle cx="52" cy="32" r="4" fill="#667eea"/>
+  <circle cx="52" cy="50" r="4" fill="#00f2fe"/>
+</svg>

@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "agent_role": "worker",
+  "axis": "Test missing fields",
+  "decision": "Test decision",
+  "constraints": ["test constraint"],
+  "options": [],
+  "next_action": {
+    "owner": "user",
+    "action": "Test action",
+    "deadline": "now"
+  },
+  "output": {
+    "format": "text",
+    "content": "This output is valid but options array is empty which violates minItems:1"
+  },
+  "meta": {
+    "created_at": "2026-02-01T05:00:00Z",
+    "language": "ro",
+    "style_flags": {
+      "no_psychology": true,
+      "no_empathy": true,
+      "no_stories": true,
+      "administrative": true,
+      "structured": true
+    }
+  }
+}

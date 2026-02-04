@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "agent_role": "worker",
+  "axis": "Test empathy violation",
+  "decision": "Test decision",
+  "constraints": ["test constraint"],
+  "options": [
+    {
+      "id": "A",
+      "title": "Test option",
+      "steps": ["Test step one"],
+      "risk": "low",
+      "requires_user_approval": true
+    }
+  ],
+  "next_action": {
+    "owner": "user",
+    "action": "Test action",
+    "deadline": "now"
+  },
+  "output": {
+    "format": "text",
+    "content": "Te înțeleg și îmi pare rău pentru situație. Ca asistent, nu pot să rezolv totul, dar imaginează-ți că lucrurile vor fi bine. Happy to help cu orice ai nevoie!"
+  },
+  "meta": {
+    "created_at": "2026-02-01T05:00:00Z",
+    "language": "ro",
+    "style_flags": {
+      "no_psychology": true,
+      "no_empathy": true,
+      "no_stories": true,
+      "administrative": true,
+      "structured": true
+    }
+  }
+}

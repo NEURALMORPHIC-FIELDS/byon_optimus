@@ -1,0 +1,205 @@
+# ============================================================================
+# BYON Optimus - Root .gitignore
+# ============================================================================
+# SECURITY: This file prevents sensitive data from being committed
+# ============================================================================
+
+# ============================================
+# CRITICAL: SECRETS & CREDENTIALS
+# ============================================
+
+# Environment files (contain API keys, tokens)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Cryptographic keys (NEVER COMMIT)
+keys/*
+!keys/.gitkeep
+*.key
+*.pem
+*.pub
+**/private.key
+**/private.pem
+**/auditor.private.*
+**/executor.private.*
+
+# API keys and tokens (common patterns)
+**/credentials.json
+**/service-account*.json
+**/secrets.json
+**/token.json
+
+# ============================================
+# BUILD OUTPUTS
+# ============================================
+
+# Node.js
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+*.tsbuildinfo
+.npm
+.pnpm-store/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+.eggs/
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# .NET / WFP Driver
+bin/
+obj/
+*.dll
+*.exe
+*.sys
+*.pdb
+x64/
+x86/
+
+# ============================================
+# RUNTIME DATA
+# ============================================
+
+# BYON Handoff directories (runtime data)
+handoff/*
+!handoff/.gitkeep
+memory/*
+!memory/.gitkeep
+project/*
+!project/.gitkeep
+
+# OpenClaw runtime workspace
+openclaw-config/workspace/*
+!openclaw-config/workspace/.gitkeep
+
+# OpenClaw credentials (NEVER COMMIT - WhatsApp sessions, tokens, keys)
+openclaw-config/credentials/
+
+# OpenClaw runtime state (auth tokens, device keys, session logs)
+openclaw-config/identity/device-auth.json
+openclaw-config/identity/device.json
+openclaw-config/devices/paired.json
+openclaw-config/devices/pending.json
+openclaw-config/agents/main/sessions/*.jsonl
+openclaw-config/agents/main/sessions/sessions.json
+openclaw-config/update-check.json
+
+# BYON Secure Vault (encrypted sensitive data)
+vault/*
+!vault/.gitkeep
+vault/**/*.vault
+vault/index.json
+vault/audit.log
+
+# Redis data
+*.rdb
+*.aof
+appendonlydir/
+redis-data/
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================
+# IDE & EDITOR
+# ============================================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# ============================================
+# OS FILES
+# ============================================
+
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# TEST & COVERAGE
+# ============================================
+
+coverage/
+.nyc_output/
+*.lcov
+.pytest_cache/
+htmlcov/
+
+# ============================================
+# TEMPORARY FILES
+# ============================================
+
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# ============================================
+# DOCKER
+# ============================================
+
+.docker/
+docker-compose.override.yml
+
+# ============================================
+# JUPYTER
+# ============================================
+
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ============================================
+# MISC
+# ============================================
+
+# Cursor/Claude plans (may contain sensitive context)
+.cursor/
+.claude/
+
+# Package lock files (optional - uncomment if needed)
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
+
+# Source reference folders (not needed in production)
+vibe-coding-prompt-template-main/
+
+# ============================================
+# WFP Driver specific
+# ============================================
+
+WFP-Semantic-Guard/*.sys
+WFP-Semantic-Guard/x64/
+WFP-Semantic-Guard/ARM64/
+WFP-Semantic-Guard/*.cer
+!WFP-Semantic-Guard/DevCert.cer

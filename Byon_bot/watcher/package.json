@@ -1,0 +1,7 @@
+{
+  "name": "@byon-bot/watcher",
+  "version": "1.0.0",
+  "description": "File watcher for handoff directories",
+  "type": "module",
+  "main": "watcher.js"
+}

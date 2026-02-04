@@ -1,0 +1,44 @@
+# Byon Bot - Development Override
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  agent-worker:
+    build:
+      context: .
+      dockerfile: agent-worker/Dockerfile
+      target: base  # Use build stage for hot reload
+    volumes:
+      - ./agent-worker/src:/app/agent-worker/src:ro
+      - ./shared/:/app/shared/:ro
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    command: pnpm dev
+
+  agent-auditor:
+    build:
+      context: .
+      dockerfile: agent-auditor/Dockerfile
+      target: base
+    volumes:
+      - ./agent-auditor/src:/app/agent-auditor/src:ro
+      - ./shared/:/app/shared/:ro
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    command: pnpm dev
+
+  agent-executor:
+    build:
+      context: .
+      dockerfile: agent-executor/Dockerfile
+    # Keep network_mode: none even in dev for safety
+    volumes:
+      - ./agent-executor/src:/app/agent-executor/src:ro
+      - ./shared/:/app/shared/:ro
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - MAX_ITERATIONS=3  # Lower for dev testing

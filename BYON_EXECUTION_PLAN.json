@@ -1,0 +1,1248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "document_type": "BYON_EXECUTION_PLAN",
+  "document_version": "1.0",
+  "meta": {
+    "project_name": "BYON Optimus - OpenClaw Integration",
+    "version": "1.0.0",
+    "created_at": "2026-02-01T00:00:00Z",
+    "author": "Development Team",
+    "objective": "Integrate BYON infinite memory orchestration system into OpenClaw platform while preserving both systems",
+    "patent": "FHRSS/OmniVault - Vasile Lucian Borbeleac - EP25216372.0"
+  },
+  "architecture_overview": {
+    "current_state": {
+      "description": "OpenClaw funcționează ca platformă de messaging cu extensii. FHRSS+FCPE există în INFINIT_MEMORYCONTEXT și parțial integrat ca extensie memory-fhrss-fcpe.",
+      "components": {
+        "openclaw_platform": {
+          "location": "Byon_bot/openclaw-main/",
+          "role": "Platformă principală - gateway, canale, UI, agents",
+          "status": "FUNCTIONAL"
+        },
+        "fhrss_fcpe_python": {
+          "location": "INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py",
+          "role": "Sistem de memorie infinită cu compresie FCPE și recovery FHRSS",
+          "status": "FUNCTIONAL - tested at 50% loss recovery"
+        },
+        "memory_extension": {
+          "location": "Byon_bot/openclaw-main/extensions/memory-fhrss-fcpe/",
+          "role": "Wrapper TypeScript pentru memory store/search",
+          "status": "PARTIAL - necesită integrare completă"
+        }
+      }
+    },
+    "target_state": {
+      "description": "OpenClaw ca PLATFORMĂ + BYON ca ORCHESTRATOR cu memorie infinită și protocol MACP v1.1",
+      "layers": [
+        {
+          "layer": 1,
+          "name": "OpenClaw Platform Layer",
+          "role": "SINGLE communication platform: all inbound/outbound messages go through OpenClaw only. BYON must not implement direct channel IO.",
+          "preservation": "100% - core unchanged",
+          "enforcement": "platform-gate.ts"
+        },
+        {
+          "layer": 2,
+          "name": "BYON Orchestration Layer",
+          "role": "Decision making - primește input, consultă memoria, generează planuri, controlează fluxul",
+          "new_components": [
+            "byon-orchestrator",
+            "evidence-builder",
+            "plan-generator",
+            "memory-context-manager"
+          ]
+        },
+        {
+          "layer": 3,
+          "name": "Security & Validation Layer",
+          "role": "Validare - Ed25519 signing, policy enforcement, user approval checkpoint",
+          "new_components": [
+            "auditor-service",
+            "signature-manager",
+            "policy-enforcer",
+            "approval-ui"
+          ]
+        },
+        {
+          "layer": 4,
+          "name": "Execution Layer",
+          "role": "SINGLE execution engine: byon-executor (air-gapped). No other component executes code, edits files, or runs tests.",
+          "new_components": [
+            "byon-executor",
+            "action-handlers",
+            "receipt-generator"
+          ],
+          "enforcement": "execution-gate.ts"
+        },
+        {
+          "layer": 5,
+          "name": "Memory & Persistence Layer",
+          "role": "Memorie infinită - FHRSS+FCPE storage, audit trail, calendar indexing, global memory state",
+          "components": [
+            "fhrss-fcpe-service",
+            "audit-trail",
+            "calendar-index",
+            "global-memory-vitalizer"
+          ]
+        },
+        {
+          "layer": 6,
+          "name": "Kernel Enforcement Layer (Dual Gate)",
+          "role": "WFP Semantic Guard - OS Kernel level enforcement of BYON intents. The 'Physical' gate.",
+          "new_components": [
+            "wfp-callout-driver",
+            "wfp-controller",
+            "semantic-bridge"
+          ],
+          "enforcement": "kernel-driver.sys"
+        }
+      ]
+    }
+  },
+  "phases": [
+    {
+      "phase_id": "PHASE_1",
+      "name": "Foundation Setup",
+      "description": "Crearea structurii de directoare și configurarea de bază pentru BYON orchestrator",
+      "duration_estimate": "2-3 days",
+      "priority": "CRITICAL",
+      "tasks": [
+        {
+          "task_id": "1.1",
+          "name": "Create BYON directory structure",
+          "description": "Creare structură separată pentru BYON orchestrator în proiect",
+          "files_to_create": [
+            "byon-orchestrator/package.json",
+            "byon-orchestrator/tsconfig.json",
+            "byon-orchestrator/src/index.ts",
+            "byon-orchestrator/src/types/protocol.ts",
+            "byon-orchestrator/src/types/memory.ts",
+            "byon-orchestrator/src/types/audit.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T15:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/package.json",
+            "byon-orchestrator/tsconfig.json",
+            "byon-orchestrator/src/index.ts",
+            "byon-orchestrator/src/types/protocol.ts",
+            "byon-orchestrator/src/types/memory.ts",
+            "byon-orchestrator/src/types/audit.ts",
+            "byon-orchestrator/src/types/index.ts",
+            "byon-orchestrator/src/protocol/evidence-pack.ts",
+            "byon-orchestrator/src/agents/worker/evidence-builder.ts",
+            "byon-orchestrator/src/agents/auditor/validator.ts"
+          ]
+        },
+        {
+          "task_id": "1.2",
+          "name": "Configure BYON-OpenClaw integration points",
+          "description": "Definirea punctelor de integrare între BYON și OpenClaw",
+          "files_to_create": [
+            "byon-orchestrator/src/integration/openclaw-bridge.ts",
+            "byon-orchestrator/src/integration/channel-adapter.ts",
+            "byon-orchestrator/src/integration/memory-bridge.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T18:45:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/integration/openclaw-bridge.ts",
+            "byon-orchestrator/src/integration/channel-adapter.ts",
+            "byon-orchestrator/src/integration/memory-bridge.ts",
+            "byon-orchestrator/src/integration/index.ts"
+          ],
+          "implementation_notes": "OpenClawBridge (SINGLE platform constraint), ChannelAdapter (normalize all channel types), MemoryBridge (FHRSS+FCPE primary, memory-core fallback)"
+        },
+        {
+          "task_id": "1.3",
+          "name": "Create unified configuration",
+          "description": "Configurație unificată pentru întregul sistem BYON+OpenClaw",
+          "files_to_create": [
+            "byon-config.ts"
+          ],
+          "config_schema": {
+            "system": {
+              "name": "string",
+              "version": "string",
+              "mode": "development | production"
+            },
+            "openclaw": {
+              "enabled": "boolean",
+              "gateway_port": "number",
+              "channels": "object"
+            },
+            "byon": {
+              "enabled": "boolean",
+              "orchestrator_mode": "full | light",
+              "memory_provider": "fhrss-fcpe | memory-core | lancedb",
+              "auto_approve_risk_level": "low | medium | none"
+            },
+            "security": {
+              "ed25519_enabled": "boolean",
+              "keys_path": "string",
+              "user_approval_required": "boolean"
+            }
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T18:45:00Z",
+          "files_created_actual": [
+            "byon-config.ts"
+          ],
+          "implementation_notes": "Full ByonSystemConfig type with system, openclaw, byon, security, audit, executor sections. Environment variable overrides supported."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_2",
+      "name": "Memory System Integration",
+      "description": "Integrarea completă a sistemului FHRSS+FCPE cu BYON orchestrator",
+      "duration_estimate": "3-4 days",
+      "priority": "CRITICAL",
+      "depends_on": [
+        "PHASE_1"
+      ],
+      "tasks": [
+        {
+          "task_id": "2.1",
+          "name": "Create Python memory service",
+          "description": "Serviciu Python HTTP pentru FHRSS+FCPE care rulează ca microserviciu",
+          "files_to_create": [
+            "byon-orchestrator/memory-service/server.py",
+            "byon-orchestrator/memory-service/handlers.py",
+            "byon-orchestrator/memory-service/requirements.txt",
+            "byon-orchestrator/memory-service/Dockerfile"
+          ],
+          "source_reference": "INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py",
+          "status": "done",
+          "completed_at": "2026-02-01T19:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/memory-service/server.py",
+            "byon-orchestrator/memory-service/handlers.py",
+            "byon-orchestrator/memory-service/requirements.txt",
+            "byon-orchestrator/memory-service/Dockerfile"
+          ],
+          "implementation_notes": "FastAPI server wrapping FHRSS+FCPE. Supports store (code/conversation/fact), search, test_recovery, stats. SimpleEmbedder placeholder for production sentence-transformers."
+        },
+        {
+          "task_id": "2.2",
+          "name": "Enhance TypeScript memory client",
+          "description": "Îmbunătățirea clientului TypeScript cu suport complet pentru AgentMemory API",
+          "files_to_modify": [
+            "byon-orchestrator/src/memory/client.ts"
+          ],
+          "features": [
+            "storeCode(code, file, line, tags)",
+            "storeConversation(content, role)",
+            "storeFact(fact, source, tags)",
+            "searchCode(query, topK)",
+            "searchConversation(query, topK)",
+            "searchFacts(query, topK)",
+            "testRecovery(ctxId, lossPercent)",
+            "getStats()"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T19:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/memory/client.ts"
+          ],
+          "implementation_notes": "Full MemoryClient implementing MemoryServiceAPI. Retry logic, timeout handling, searchAll for combined queries."
+        },
+        {
+          "task_id": "2.3",
+          "name": "Implement memory context manager",
+          "description": "Manager pentru contextul semantic în fluxul BYON",
+          "files_to_create": [
+            "byon-orchestrator/src/memory/context-manager.ts",
+            "byon-orchestrator/src/memory/fact-extractor.ts",
+            "byon-orchestrator/src/memory/similarity-search.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T19:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/memory/context-manager.ts",
+            "byon-orchestrator/src/memory/fact-extractor.ts",
+            "byon-orchestrator/src/memory/similarity-search.ts"
+          ],
+          "implementation_notes": "ContextManager builds MemoryContext for EvidencePacks. FactExtractor uses regex patterns for code/text. SimilaritySearch supports semantic/keyword/hybrid strategies."
+        },
+        {
+          "task_id": "2.4",
+          "name": "Create memory initialization and health checks",
+          "description": "Inițializare obligatorie a memoriei și health checks",
+          "files_to_create": [
+            "byon-orchestrator/src/memory/initializer.ts",
+            "byon-orchestrator/src/memory/health.ts"
+          ],
+          "requirement": "BYON orchestrator MUST NOT START without memory service",
+          "status": "done",
+          "completed_at": "2026-02-01T19:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/memory/initializer.ts",
+            "byon-orchestrator/src/memory/health.ts",
+            "byon-orchestrator/src/memory/index.ts"
+          ],
+          "implementation_notes": "initializeMemory() with HARD STOP (exit 10) if memory unavailable. MemoryHealth for continuous monitoring with alert callbacks."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_3",
+      "name": "MACP Protocol Implementation",
+      "description": "Implementarea Multi-Agent Control Protocol v1.1 pentru BYON",
+      "duration_estimate": "4-5 days",
+      "priority": "HIGH",
+      "depends_on": [
+        "PHASE_2"
+      ],
+      "tasks": [
+        {
+          "task_id": "3.1",
+          "name": "Implement EvidencePack builder",
+          "description": "Constructor pentru EvidencePack cu facts, quotes, codebase context și memory context IDs",
+          "files_to_create": [
+            "byon-orchestrator/src/protocol/evidence-pack.ts",
+            "byon-orchestrator/src/protocol/fact-extractor.ts",
+            "byon-orchestrator/src/protocol/quote-extractor.ts"
+          ],
+          "schema": {
+            "evidence_id": "UUID",
+            "timestamp": "ISO8601",
+            "task_type": "coding | scheduling | messaging | general",
+            "sources": "Source[]",
+            "extracted_facts": "ExtractedFact[]",
+            "raw_quotes": "RawQuote[]",
+            "codebase_context": "CodebaseContext",
+            "memory_context": {
+              "conversation_ctx_id": "number",
+              "relevant_code_ctx_ids": "number[]",
+              "relevant_fact_ctx_ids": "number[]",
+              "similar_past_ctx_ids": "number[]"
+            },
+            "forbidden_data_present": "boolean",
+            "hash": "SHA256"
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T20:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/protocol/evidence-pack.ts (enhanced)",
+            "byon-orchestrator/src/protocol/protocol-fact-extractor.ts",
+            "byon-orchestrator/src/protocol/quote-extractor.ts"
+          ],
+          "implementation_notes": "Enhanced EvidencePackBuilder with auto-extraction methods, memory integration, codebase context helpers, and forbidden data detection"
+        },
+        {
+          "task_id": "3.2",
+          "name": "Implement PlanDraft generator",
+          "description": "Generator pentru PlanDraft cu acțiuni și evaluare risc",
+          "files_to_create": [
+            "byon-orchestrator/src/protocol/plan-draft.ts",
+            "byon-orchestrator/src/protocol/action-generator.ts",
+            "byon-orchestrator/src/protocol/risk-assessor.ts"
+          ],
+          "schema": {
+            "plan_id": "UUID",
+            "timestamp": "ISO8601",
+            "based_on_evidence": "UUID",
+            "intent": "string",
+            "actions": "Action[]",
+            "risk_level": "low | medium | high",
+            "rollback_possible": "boolean",
+            "estimated_iterations": "number",
+            "memory_context": "MemoryContext",
+            "hash": "SHA256"
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T20:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/protocol/plan-draft.ts",
+            "byon-orchestrator/src/protocol/action-generator.ts",
+            "byon-orchestrator/src/protocol/risk-assessor.ts"
+          ],
+          "implementation_notes": "PlanDraftBuilder with auto risk level calculation, ActionGenerator with intent parsing, RiskAssessor with factor-based scoring"
+        },
+        {
+          "task_id": "3.3",
+          "name": "Implement ApprovalRequest creator",
+          "description": "Creator pentru ApprovalRequest cu summary și security checks",
+          "files_to_create": [
+            "byon-orchestrator/src/protocol/approval-request.ts",
+            "byon-orchestrator/src/protocol/security-checker.ts"
+          ],
+          "security_checks": [
+            "path_traversal",
+            "command_injection",
+            "forbidden_code_patterns",
+            "resource_limits"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T20:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/protocol/approval-request.ts",
+            "byon-orchestrator/src/protocol/security-checker.ts"
+          ],
+          "implementation_notes": "ApprovalRequestBuilder with plan integration, SecurityChecker with forbidden patterns, dangerous commands, path traversal, injection detection"
+        },
+        {
+          "task_id": "3.4",
+          "name": "Implement ExecutionOrder with Ed25519 signing",
+          "description": "Creator pentru ExecutionOrder cu semnătură criptografică",
+          "files_to_create": [
+            "byon-orchestrator/src/protocol/execution-order.ts",
+            "byon-orchestrator/src/crypto/ed25519-signer.ts",
+            "byon-orchestrator/src/crypto/key-manager.ts"
+          ],
+          "signing_algorithm": "Ed25519",
+          "status": "done",
+          "completed_at": "2026-02-01T20:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/protocol/execution-order.ts",
+            "byon-orchestrator/src/protocol/crypto/ed25519-signer.ts",
+            "byon-orchestrator/src/protocol/crypto/key-manager.ts",
+            "byon-orchestrator/src/protocol/crypto/index.ts"
+          ],
+          "implementation_notes": "Ed25519Signer with key generation and verification, KeyManager with encrypted storage, ExecutionOrderBuilder requiring signed orders"
+        },
+        {
+          "task_id": "3.5",
+          "name": "Implement JohnsonReceipt generator",
+          "description": "Generator pentru receipt-uri de execuție",
+          "files_to_create": [
+            "byon-orchestrator/src/protocol/johnson-receipt.ts"
+          ],
+          "schema": {
+            "receipt_id": "UUID",
+            "timestamp": "ISO8601",
+            "based_on_order": "UUID",
+            "execution_summary": {
+              "status": "success | partial | failed | rejected",
+              "actions_total": "number",
+              "actions_completed": "number",
+              "actions_failed": "number",
+              "iterations_used": "number",
+              "duration_ms": "number"
+            },
+            "action_results": "ActionResult[]",
+            "errors": "ExecutionError[]",
+            "changes_made": {
+              "files_modified": "string[]",
+              "files_created": "string[]",
+              "files_deleted": "string[]"
+            },
+            "verification": {
+              "tests_passing": "boolean",
+              "lint_passing": "boolean",
+              "build_passing": "boolean"
+            },
+            "hash": "SHA256"
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T20:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/protocol/johnson-receipt.ts",
+            "byon-orchestrator/src/protocol/index.ts"
+          ],
+          "implementation_notes": "JohnsonReceiptBuilder with action result tracking, error handling, verification status, and execution summary generation"
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_4",
+      "name": "Security & Policy Layer",
+      "description": "Implementarea layer-ului de securitate cu policies și whitelist-uri",
+      "duration_estimate": "2-3 days",
+      "priority": "HIGH",
+      "depends_on": [
+        "PHASE_3"
+      ],
+      "tasks": [
+        {
+          "task_id": "4.1",
+          "name": "Implement action whitelist",
+          "description": "Whitelist pentru acțiuni permise și forbidden patterns",
+          "files_to_create": [
+            "byon-orchestrator/src/policy/whitelist.ts",
+            "byon-orchestrator/src/policy/forbidden-paths.ts",
+            "byon-orchestrator/src/policy/forbidden-patterns.ts"
+          ],
+          "allowed_actions": [
+            "code_edit",
+            "file_create",
+            "file_delete",
+            "test_run",
+            "lint_run",
+            "build_run"
+          ],
+          "forbidden_paths": [
+            "/etc",
+            "/usr",
+            "C:\\Windows",
+            ".env*",
+            "credentials*",
+            "secrets*",
+            ".git",
+            "node_modules",
+            ".ssh",
+            "package-lock.json",
+            "pnpm-lock.yaml"
+          ],
+          "forbidden_code_patterns": [
+            "fetch(",
+            "http.request",
+            "axios",
+            "exec(",
+            "spawn(",
+            "child_process",
+            "../",
+            "eval(",
+            "new Function("
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T21:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/policy/whitelist.ts",
+            "byon-orchestrator/src/policy/forbidden-paths.ts",
+            "byon-orchestrator/src/policy/forbidden-patterns.ts"
+          ],
+          "implementation_notes": "ActionWhitelist with configurable policies, ForbiddenPathsChecker with system/credential/vcs/package/lock_file/build categories, ForbiddenPatternsChecker with network/process/eval/traversal/filesystem patterns"
+        },
+        {
+          "task_id": "4.2",
+          "name": "Implement risk assessment",
+          "description": "Sistem de evaluare a riscului pentru acțiuni",
+          "files_to_create": [
+            "byon-orchestrator/src/policy/risk-assessment.ts"
+          ],
+          "risk_factors": {
+            "file_deletes": 3,
+            "file_creates": 1,
+            "code_edits": 2,
+            "action_count_gt_10": 3,
+            "action_count_gt_5": 1,
+            "iterations_gt_5": 2
+          },
+          "thresholds": {
+            "low": "score <= 3",
+            "medium": "score <= 7",
+            "high": "score > 7"
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T21:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/policy/risk-assessment.ts"
+          ],
+          "implementation_notes": "RiskAssessmentSystem with weighted factor scoring (fileDeletes: 0.20, fileCreates: 0.10, codeEdits: 0.15, actionCount: 0.15, iterations: 0.10, rollback: 0.15, sensitivity: 0.15). Thresholds: low ≤30, medium ≤60, high >60"
+        },
+        {
+          "task_id": "4.3",
+          "name": "Implement resource limits by risk",
+          "description": "Limite de resurse bazate pe nivel de risc",
+          "files_to_create": [
+            "byon-orchestrator/src/policy/resource-limits.ts"
+          ],
+          "limits_by_risk": {
+            "low": {
+              "max_iterations": 10,
+              "timeout_minutes": 30,
+              "memory_limit_mb": 1024,
+              "disk_limit_mb": 100
+            },
+            "medium": {
+              "max_iterations": 5,
+              "timeout_minutes": 15,
+              "memory_limit_mb": 512,
+              "disk_limit_mb": 50
+            },
+            "high": {
+              "max_iterations": 3,
+              "timeout_minutes": 10,
+              "memory_limit_mb": 256,
+              "disk_limit_mb": 25
+            }
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T21:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/policy/resource-limits.ts"
+          ],
+          "implementation_notes": "ResourceLimitsManager tracks iterations, time, memory, disk, file operations. Supports real-time limit checking, usage percentage calculation, remaining resource queries"
+        },
+        {
+          "task_id": "4.4",
+          "name": "Implement BYON Style Contract validator",
+          "description": "Validator pentru stilul output-ului BYON",
+          "files_to_create": [
+            "byon-orchestrator/src/style/byon-validator.ts",
+            "byon-orchestrator/src/style/validate-or-regenerate.ts",
+            "byon-orchestrator/src/style/byon-contract.schema.json"
+          ],
+          "forbidden_patterns": {
+            "psychology": [
+              "anxiety",
+              "stress",
+              "cope",
+              "therapy"
+            ],
+            "empathy": [
+              "I understand",
+              "with pleasure",
+              "I feel"
+            ],
+            "stories": [
+              "imagine",
+              "let me tell you",
+              "picture this"
+            ],
+            "meta": [
+              "as an AI",
+              "my limitations",
+              "I cannot"
+            ]
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T21:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/style/byon-validator.ts",
+            "byon-orchestrator/src/style/validate-or-regenerate.ts",
+            "byon-orchestrator/src/style/byon-contract.schema.json",
+            "byon-orchestrator/src/style/index.ts",
+            "byon-orchestrator/src/policy/index.ts"
+          ],
+          "implementation_notes": "BYONStyleValidator with 7 forbidden categories (psychology, empathy, stories, meta, filler, hedging, apologetic). ValidateOrRegenerateController with auto-fix and regeneration callback. JSON Schema for style contract. CompositePolicyChecker combining all policy checks."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_5",
+      "name": "Audit Trail & Indexing",
+      "description": "Implementarea sistemului de audit imutabil cu indexare calendar",
+      "duration_estimate": "2-3 days",
+      "priority": "MEDIUM",
+      "depends_on": [
+        "PHASE_4"
+      ],
+      "tasks": [
+        {
+          "task_id": "5.1",
+          "name": "Implement immutable audit trail",
+          "description": "Sistem de audit imutabil cu hash-chain",
+          "files_to_create": [
+            "byon-orchestrator/src/audit/audit-service.ts",
+            "byon-orchestrator/src/audit/hash-chain.ts",
+            "byon-orchestrator/src/audit/document-states.ts"
+          ],
+          "document_states": {
+            "draft": "can be deleted by user",
+            "pending": "awaiting approval",
+            "approved": "ready for execution",
+            "executed": "immutable - soft delete only",
+            "failed": "immutable - soft delete only"
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T21:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/audit/hash-chain.ts",
+            "byon-orchestrator/src/audit/document-states.ts",
+            "byon-orchestrator/src/audit/audit-service.ts"
+          ],
+          "implementation_notes": "HashChain with SHA-256, tamper-evident verification. DocumentStateManager with lifecycle states (draft, pending, approved, executed, failed, cancelled). AuditService combining both with auto-checkpoints."
+        },
+        {
+          "task_id": "5.2",
+          "name": "Implement calendar indexing",
+          "description": "Indexare bazată pe calendar pentru query-uri rapide",
+          "files_to_create": [
+            "byon-orchestrator/src/audit/calendar-index.ts"
+          ],
+          "index_levels": [
+            "year",
+            "month",
+            "week",
+            "day",
+            "hour"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T21:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/audit/calendar-index.ts"
+          ],
+          "implementation_notes": "CalendarIndex with hierarchical year/month/week/day/hour indexing. Supports time range queries, today/week/month shortcuts, statistics by document type and event type."
+        },
+        {
+          "task_id": "5.3",
+          "name": "Implement daily digest generator",
+          "description": "Generator pentru sumarizări zilnice",
+          "files_to_create": [
+            "byon-orchestrator/src/audit/daily-digest.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T21:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/audit/daily-digest.ts",
+            "byon-orchestrator/src/audit/index.ts"
+          ],
+          "implementation_notes": "DailyDigestGenerator with summary metrics, hourly activity, document digests, state changes, errors, and highlights. IntegratedAuditSystem combining AuditService, CalendarIndex, and DailyDigestGenerator."
+        },
+        {
+          "task_id": "5.4",
+          "name": "Implement Global Memory Vitalizer (GMV)",
+          "description": "Daemon local care consumă read-only FHRSS+FCPE + audit trail și produce metadata (Attractors + GlobalMemorySummary). Non-neuronal, low-CPU, zero acces executor/canale.",
+          "files_to_create": [
+            "byon-orchestrator/src/memory/vitalizer/types.ts",
+            "byon-orchestrator/src/memory/vitalizer/store.ts",
+            "byon-orchestrator/src/memory/vitalizer/attractor-engine.ts",
+            "byon-orchestrator/src/memory/vitalizer/coherence-calculator.ts",
+            "byon-orchestrator/src/memory/vitalizer/daemon.ts"
+          ],
+          "constraints": {
+            "read_only_sources": [
+              "FHRSS+FCPE",
+              "audit-trail"
+            ],
+            "write_only_outputs": [
+              "metadata",
+              "attractors",
+              "summary"
+            ],
+            "zero_access": [
+              "executor",
+              "channels",
+              "network"
+            ],
+            "cpu_profile": "low"
+          },
+          "status": "done",
+          "completed_at": "2026-02-01T16:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/memory/vitalizer/types.ts",
+            "byon-orchestrator/src/memory/vitalizer/store.ts",
+            "byon-orchestrator/src/memory/vitalizer/attractor-engine.ts",
+            "byon-orchestrator/src/memory/vitalizer/coherence-calculator.ts",
+            "byon-orchestrator/src/memory/vitalizer/daemon.ts",
+            "byon-orchestrator/src/memory/vitalizer/index.ts"
+          ],
+          "implementation_notes": "Complete GMV implementation with attractor engine, coherence calculator, and daemon. Zero executor/channel/network access enforced."
+        },
+        {
+          "task_id": "5.5",
+          "name": "Add JSON Schemas for GMV outputs",
+          "description": "Schema oficială (Draft 2020-12) pentru Attractor și GlobalMemorySummary cu document_type discriminator.",
+          "files_to_create": [
+            "byon-orchestrator/shared/schemas/attractor.schema.json",
+            "byon-orchestrator/shared/schemas/global_memory_summary.schema.json"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T16:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/shared/schemas/attractor.schema.json",
+            "byon-orchestrator/shared/schemas/global_memory_summary.schema.json"
+          ],
+          "implementation_notes": "JSON Schema Draft 2020-12 with document_type discriminator for Attractor and GlobalMemorySummary"
+        },
+        {
+          "task_id": "5.6",
+          "name": "Add TS validators for GMV schemas",
+          "description": "Validator TypeScript (Ajv) pentru Attractor și GlobalMemorySummary.",
+          "files_to_create": [
+            "byon-orchestrator/shared/validators/attractor-validator.ts",
+            "byon-orchestrator/shared/validators/global-memory-summary-validator.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T16:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/shared/validators/attractor-validator.ts",
+            "byon-orchestrator/shared/validators/global-memory-summary-validator.ts"
+          ],
+          "implementation_notes": "Ajv-based validators for GMV schemas with TypeScript type guards"
+        },
+        {
+          "task_id": "5.7",
+          "name": "Integrate GMV read-only in EvidencePack",
+          "description": "Worker include referință la GlobalMemorySummary + top attractors IDs în EvidencePack (metadata-only, bias structural).",
+          "files_to_modify": [
+            "byon-orchestrator/src/protocol/evidence-pack.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T15:00:00Z",
+          "implementation_notes": "GlobalMemoryHint type added, EvidencePackBuilder with GMV validation, Auditor GMV gate for metadata-only enforcement"
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_6",
+      "name": "BYON Orchestrator Core",
+      "description": "Implementarea nucleului orchestratorului BYON",
+      "duration_estimate": "4-5 days",
+      "priority": "CRITICAL",
+      "depends_on": [
+        "PHASE_5"
+      ],
+      "tasks": [
+        {
+          "task_id": "6.1",
+          "name": "Implement Worker Agent",
+          "description": "Agent principal care citește inbox și generează evidence + plan",
+          "files_to_create": [
+            "byon-orchestrator/src/agents/worker/index.ts",
+            "byon-orchestrator/src/agents/worker/inbox-watcher.ts",
+            "byon-orchestrator/src/agents/worker/evidence-builder.ts",
+            "byon-orchestrator/src/agents/worker/plan-generator.ts",
+            "byon-orchestrator/src/agents/worker/memory-handler.ts"
+          ],
+          "responsibilities": [
+            "Monitor inbox for messages",
+            "Parse events and extract facts",
+            "Search memory for context",
+            "Generate evidence packs",
+            "Create plan drafts",
+            "Store information in memory"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T22:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/agents/worker/index.ts",
+            "byon-orchestrator/src/agents/worker/inbox-watcher.ts",
+            "byon-orchestrator/src/agents/worker/plan-generator.ts",
+            "byon-orchestrator/src/agents/worker/memory-handler.ts"
+          ],
+          "implementation_notes": "WorkerAgent with InboxWatcher, PlanGenerator, MemoryHandler, GMV integration. evidence-builder.ts already exists from session 006."
+        },
+        {
+          "task_id": "6.2",
+          "name": "Implement Auditor Agent",
+          "description": "Agent de validare și semnare",
+          "files_to_create": [
+            "byon-orchestrator/src/agents/auditor/index.ts",
+            "byon-orchestrator/src/agents/auditor/validator.ts",
+            "byon-orchestrator/src/agents/auditor/signer.ts",
+            "byon-orchestrator/src/agents/auditor/approval-manager.ts"
+          ],
+          "responsibilities": [
+            "Validate evidence packs",
+            "Validate plan drafts",
+            "Run security checks",
+            "Create approval requests",
+            "Sign execution orders with Ed25519",
+            "Watch for user approvals"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T22:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/agents/auditor/index.ts",
+            "byon-orchestrator/src/agents/auditor/signer.ts",
+            "byon-orchestrator/src/agents/auditor/approval-manager.ts"
+          ],
+          "implementation_notes": "AuditorAgent with Ed25519 signing, ApprovalManager with auto-approve for low risk. validator.ts already exists from session 006."
+        },
+        {
+          "task_id": "6.3",
+          "name": "Implement Executor Agent",
+          "description": "Agent de execuție air-gapped",
+          "files_to_create": [
+            "byon-orchestrator/src/agents/executor/index.ts",
+            "byon-orchestrator/src/agents/executor/signature-verifier.ts",
+            "byon-orchestrator/src/agents/executor/action-handlers.ts",
+            "byon-orchestrator/src/agents/executor/receipt-generator.ts"
+          ],
+          "responsibilities": [
+            "Verify Ed25519 signatures",
+            "Execute actions with retry logic",
+            "Track all file changes",
+            "Handle errors locally (no network)",
+            "Generate johnson receipts"
+          ],
+          "air_gap_requirement": "NO NETWORK ACCESS - all errors reported back to Worker",
+          "status": "done",
+          "completed_at": "2026-02-01T22:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/agents/executor/index.ts",
+            "byon-orchestrator/src/agents/executor/signature-verifier.ts",
+            "byon-orchestrator/src/agents/executor/action-handlers.ts",
+            "byon-orchestrator/src/agents/executor/receipt-generator.ts"
+          ],
+          "implementation_notes": "ExecutorAgent AIR-GAPPED - shell_exec disabled, path traversal prevention, signature verification required. JohnsonReceipt for all execution results."
+        },
+        {
+          "task_id": "6.4",
+          "name": "Implement handoff system",
+          "description": "Sistem de comunicare între agenți bazat pe fișiere",
+          "files_to_create": [
+            "byon-orchestrator/src/handoff/manager.ts",
+            "byon-orchestrator/src/handoff/file-watcher.ts",
+            "byon-orchestrator/src/handoff/serializer.ts"
+          ],
+          "handoff_directories": [
+            "handoff/inbox/",
+            "handoff/worker_to_auditor/",
+            "handoff/auditor_to_user/",
+            "handoff/auditor_to_executor/",
+            "handoff/executor_to_worker/"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T22:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/handoff/manager.ts",
+            "byon-orchestrator/src/handoff/file-watcher.ts",
+            "byon-orchestrator/src/handoff/serializer.ts",
+            "byon-orchestrator/src/handoff/index.ts"
+          ],
+          "implementation_notes": "HandoffManager with file-based channels, FileWatcher for polling, Serializer with hash verification, OrchestratorHandoffController for high-level coordination."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_7",
+      "name": "OpenClaw Integration",
+      "description": "Integrarea BYON orchestrator cu OpenClaw platform",
+      "duration_estimate": "3-4 days",
+      "priority": "HIGH",
+      "depends_on": [
+        "PHASE_6"
+      ],
+      "tasks": [
+        {
+          "task_id": "7.1",
+          "name": "Create OpenClaw-BYON bridge",
+          "description": "Bridge între OpenClaw channels și BYON orchestrator",
+          "files_to_create": [
+            "byon-orchestrator/src/integration/openclaw-bridge.ts",
+            "byon-orchestrator/src/integration/message-adapter.ts"
+          ],
+          "flow": "OpenClaw Channel -> Message Adapter -> BYON Inbox -> Orchestrator -> Response -> Channel",
+          "status": "done",
+          "completed_at": "2026-02-01T22:55:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/integration/message-adapter.ts"
+          ],
+          "implementation_notes": "MessageAdapter orchestrates full flow: OpenClaw -> Worker -> Auditor -> Executor -> Response. Includes auto-approve for low risk, approval request generation, response formatting per channel."
+        },
+        {
+          "task_id": "7.2",
+          "name": "Integrate with OpenClaw memory system",
+          "description": "Înlocuirea/augmentarea sistemului de memorie OpenClaw cu FHRSS+FCPE",
+          "files_to_modify": [
+            "Byon_bot/openclaw-main/src/memory/manager.ts"
+          ],
+          "strategy": "BYON memory becomes primary, OpenClaw memory-core as fallback",
+          "status": "done",
+          "completed_at": "2026-02-01T23:15:00Z",
+          "files_created_actual": [
+            "Byon_bot/openclaw-main/src/memory/byon-memory-provider.ts"
+          ],
+          "files_modified_actual": [
+            "Byon_bot/openclaw-main/src/memory/index.ts"
+          ],
+          "implementation_notes": "ByonMemoryProvider wraps FHRSS+FCPE as primary with OpenClaw MemoryIndexManager fallback. Unified search interface, evidence building support, recovery testing capabilities."
+        },
+        {
+          "task_id": "7.3",
+          "name": "Create approval UI in OpenClaw",
+          "description": "Interfață pentru aprobarea planurilor în UI-ul OpenClaw",
+          "files_to_create": [
+            "Byon_bot/openclaw-main/ui/src/components/ApprovalPanel.tsx",
+            "Byon_bot/openclaw-main/ui/src/components/PlanPreview.tsx",
+            "Byon_bot/openclaw-main/ui/src/hooks/useApprovals.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T23:30:00Z",
+          "files_created_actual": [
+            "Byon_bot/openclaw-main/ui/src/ui/controllers/byon-approvals.ts",
+            "Byon_bot/openclaw-main/ui/src/ui/views/byon-approvals.ts"
+          ],
+          "implementation_notes": "Created Lit Element components following OpenClaw patterns. Controller handles state management and gateway communication. View renders approval cards, detail overlay, and action buttons. Includes risk level badges, security checks display, and expiration countdown."
+        },
+        {
+          "task_id": "7.4",
+          "name": "Create CLI commands for BYON",
+          "description": "Comenzi CLI pentru interacțiunea cu BYON",
+          "files_to_create": [
+            "byon-orchestrator/src/cli/approve.ts",
+            "byon-orchestrator/src/cli/watch.ts",
+            "byon-orchestrator/src/cli/status.ts",
+            "byon-orchestrator/src/cli/history.ts",
+            "byon-orchestrator/src/cli/inbox.ts"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-01T23:45:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/src/cli/types.ts",
+            "byon-orchestrator/src/cli/approve.ts",
+            "byon-orchestrator/src/cli/watch.ts",
+            "byon-orchestrator/src/cli/status.ts",
+            "byon-orchestrator/src/cli/history.ts",
+            "byon-orchestrator/src/cli/inbox.ts",
+            "byon-orchestrator/src/cli/index.ts"
+          ],
+          "implementation_notes": "Full CLI with approve (list/approve/reject/auto), watch (real-time monitoring), status (memory/agents/handoff), history (audit trail), inbox (messages). Supports --json output and color-coded terminal display."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_8",
+      "name": "Docker & Deployment",
+      "description": "Containerizare și deployment configuration",
+      "duration_estimate": "2-3 days",
+      "priority": "MEDIUM",
+      "depends_on": [
+        "PHASE_7"
+      ],
+      "tasks": [
+        {
+          "task_id": "8.1",
+          "name": "Create Docker configuration",
+          "description": "Dockerfile și docker-compose pentru întregul stack",
+          "files_to_create": [
+            "docker-compose.yml",
+            "docker-compose.dev.yml",
+            "byon-orchestrator/Dockerfile",
+            "byon-orchestrator/memory-service/Dockerfile"
+          ],
+          "services": {
+            "memory-service": {
+              "required": true,
+              "health_check": true,
+              "resources": "2 CPU, 4GB RAM"
+            },
+            "byon-worker": {
+              "depends_on": "memory-service:healthy",
+              "network": "default"
+            },
+            "byon-auditor": {
+              "depends_on": "memory-service",
+              "network": "default"
+            },
+            "byon-executor": {
+              "network_mode": "none",
+              "air_gapped": true
+            },
+            "openclaw-gateway": {
+              "depends_on": "byon-worker",
+              "ports": "3000, 8080"
+            }
+          },
+          "status": "done",
+          "completed_at": "2026-02-02T10:00:00Z",
+          "files_created_actual": [
+            "docker-compose.yml",
+            "docker-compose.dev.yml",
+            "byon-orchestrator/Dockerfile",
+            "byon-orchestrator/memory-service/Dockerfile",
+            ".env.example",
+            ".dockerignore",
+            "byon-orchestrator/.dockerignore"
+          ],
+          "implementation_notes": "Multi-stage Dockerfile with --target for worker/auditor/executor. Memory-service uses FastAPI with mounted FHRSS+FCPE. Executor runs air-gapped with network_mode:none. Redis and watcher included. Development override with hot-reload support."
+        },
+        {
+          "task_id": "8.2",
+          "name": "Create startup scripts",
+          "description": "Scripturi pentru pornirea și monitorizarea sistemului",
+          "files_to_create": [
+            "scripts/start-byon.sh",
+            "scripts/stop-byon.sh",
+            "scripts/health-check.sh",
+            "scripts/setup-keys.sh"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-02T10:30:00Z",
+          "files_created_actual": [
+            "scripts/start-byon.sh",
+            "scripts/stop-byon.sh",
+            "scripts/health-check.sh",
+            "scripts/setup-keys.sh"
+          ],
+          "implementation_notes": "start-byon.sh with pre-flight checks, directory setup, key generation, health wait. stop-byon.sh with graceful/hard stop, volume cleanup options. health-check.sh with JSON output, watch mode, container health inspection. setup-keys.sh with Ed25519 generation, RSA fallback, sign/verify testing."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE_9",
+      "name": "Testing & Documentation",
+      "description": "Testare comprehensivă și documentație",
+      "duration_estimate": "3-4 days",
+      "priority": "HIGH",
+      "depends_on": [
+        "PHASE_8"
+      ],
+      "tasks": [
+        {
+          "task_id": "9.1",
+          "name": "Create unit tests",
+          "description": "Teste unitare pentru toate componentele BYON",
+          "test_coverage_target": "80%",
+          "status": "done",
+          "completed_at": "2026-02-02T11:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/tests/unit/protocol.test.ts",
+            "byon-orchestrator/tests/unit/policy.test.ts",
+            "byon-orchestrator/tests/unit/memory.test.ts",
+            "byon-orchestrator/tests/unit/crypto.test.ts",
+            "byon-orchestrator/vitest.config.ts"
+          ],
+          "implementation_notes": "Unit tests for EvidencePack, PlanDraft, ExecutionOrder, JohnsonReceipt, HashChain, ActionWhitelist, ForbiddenPaths, ForbiddenPatterns, RiskAssessment, ResourceLimits, MemoryClient, FactExtractor, ContextManager, Ed25519Signer, HashComputation, KeyManager. Vitest configuration with 70% coverage thresholds."
+        },
+        {
+          "task_id": "9.2",
+          "name": "Create integration tests",
+          "description": "Teste de integrare pentru fluxul complet BYON -> OpenClaw",
+          "status": "done",
+          "completed_at": "2026-02-02T11:30:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/tests/integration/worker-auditor.test.ts",
+            "byon-orchestrator/tests/integration/executor-flow.test.ts",
+            "byon-orchestrator/tests/integration/memory-system.test.ts",
+            "byon-orchestrator/tests/integration/handoff-system.test.ts",
+            "byon-orchestrator/tests/integration/full-flow.test.ts"
+          ],
+          "implementation_notes": "Integration tests covering: Worker->Auditor flow (evidence to execution order), Executor flow (signature verification, action execution, receipt generation), Memory system (store/search/recovery), Handoff system (file-based communication between agents), Full message flow (OpenClaw -> Worker -> Auditor -> Executor -> Response)"
+        },
+        {
+          "task_id": "9.3",
+          "name": "Create security tests",
+          "description": "Teste de securitate pentru politici și semnături",
+          "status": "done",
+          "completed_at": "2026-02-02T12:00:00Z",
+          "files_created_actual": [
+            "byon-orchestrator/tests/security/signature.test.ts",
+            "byon-orchestrator/tests/security/path-traversal.test.ts",
+            "byon-orchestrator/tests/security/policy-enforcement.test.ts",
+            "byon-orchestrator/tests/security/hash-chain.test.ts"
+          ],
+          "implementation_notes": "Security tests covering: Ed25519 signature verification (key generation, signing, tamper detection, replay prevention), Path traversal prevention (directory escape, URL encoding, forbidden paths), Policy enforcement (forbidden patterns, action whitelist, air-gap isolation), Hash chain integrity (tamper detection, audit trail, chain verification)"
+        },
+        {
+          "task_id": "9.4",
+          "name": "Create documentation",
+          "description": "Documentație tehnică și ghiduri de utilizare",
+          "files_to_create": [
+            "docs/BYON_ARCHITECTURE.md",
+            "docs/BYON_QUICKSTART.md",
+            "docs/BYON_SECURITY.md",
+            "docs/BYON_API.md"
+          ],
+          "status": "done",
+          "completed_at": "2026-02-02T12:30:00Z",
+          "files_created_actual": [
+            "docs/BYON_ARCHITECTURE.md",
+            "docs/BYON_QUICKSTART.md",
+            "docs/BYON_SECURITY.md",
+            "docs/BYON_API.md"
+          ],
+          "implementation_notes": "Complete technical documentation: Architecture (layered design, MACP protocol, component overview), Quick Start (installation, configuration, usage), Security (Ed25519, air-gap, policies, threat model), API (Memory Service endpoints, Protocol types, CLI commands, Handoff formats)"
+        }
+      ]
+    }
+  ],
+  "key_technical_decisions": {
+    "memory_provider": {
+      "decision": "FHRSS+FCPE ca provider principal de memorie",
+      "rationale": "Compresie 73,000x, recovery 100% la 40% pierdere, fault-tolerant",
+      "fallback": "memory-core din OpenClaw pentru backward compatibility"
+    },
+    "orchestration_protocol": {
+      "decision": "MACP v1.1 (Multi-Agent Control Protocol)",
+      "rationale": "Separare clară între agenți, file-based handoff, user approval checkpoint"
+    },
+    "security_model": {
+      "decision": "Air-gapped executor cu Ed25519 signing",
+      "rationale": "Securitate maximă - executorul nu are acces la rețea, toate comenzile sunt semnate"
+    },
+    "integration_strategy": {
+      "decision": "Bridge pattern - OpenClaw rămâne intact, BYON se conectează prin adaptori",
+      "rationale": "Preservarea funcționalității OpenClaw, upgrade path clar"
+    },
+    "communication_platform": {
+      "decision": "OpenClaw is the SINGLE communication platform",
+      "rationale": "Single gateway for all channels; BYON must not implement direct channel IO.",
+      "enforcement": "platform-gate.ts policy at runtime"
+    },
+    "execution_engine": {
+      "decision": "byon-executor is the SINGLE execution engine",
+      "rationale": "Air-gapped executor; deterministic receipts; no side-channel execution.",
+      "enforcement": "execution-gate.ts policy at runtime"
+    },
+    "global_memory_vitalizer": {
+      "decision": "GMV is a non-decision metadata daemon",
+      "rationale": "Maintains emergent global memory state without autonomy. Read-only on FHRSS+FCPE, write-only metadata.",
+      "constraints": {
+        "zero_executor_access": true,
+        "zero_channel_access": true,
+        "zero_network_access": true,
+        "zero_text_generation": true,
+        "cpu_profile": "low",
+        "role": "memory_state_daemon"
+      }
+    }
+  },
+  "file_structure_target": {
+    "root": "c:\\Users\\Lucian\\Desktop\\byon_optimus",
+    "structure": [
+      "byon-orchestrator/",
+      "  ├── src/",
+      "  │   ├── agents/",
+      "  │   │   ├── worker/",
+      "  │   │   ├── auditor/",
+      "  │   │   └── executor/",
+      "  │   ├── protocol/",
+      "  │   ├── memory/",
+      "  │   │   └── vitalizer/",
+      "  │   ├── policy/",
+      "  │   ├── crypto/",
+      "  │   ├── audit/",
+      "  │   ├── style/",
+      "  │   ├── handoff/",
+      "  │   ├── integration/",
+      "  │   ├── cli/",
+      "  │   └── types/",
+      "  ├── memory-service/",
+      "  │   ├── server.py",
+      "  │   ├── handlers.py",
+      "  │   └── Dockerfile",
+      "  ├── package.json",
+      "  └── tsconfig.json",
+      "Byon_bot/openclaw-main/ (PRESERVED)",
+      "INFINIT_MEMORYCONTEXT/ (SOURCE for FHRSS+FCPE)",
+      "handoff/",
+      "  ├── inbox/",
+      "  ├── worker_to_auditor/",
+      "  ├── auditor_to_user/",
+      "  ├── auditor_to_executor/",
+      "  └── executor_to_worker/",
+      "keys/",
+      "  ├── auditor.private.pem",
+      "  └── auditor.public.pem",
+      "memory/",
+      "  └── fhrss/",
+      "byon-config.ts",
+      "docker-compose.yml",
+      "BYON_EXECUTION_PLAN.json (this file)",
+      "BYON_PROGRESSION.json (tracking file)"
+    ]
+  },
+  "success_criteria": {
+    "functional": [
+      "BYON orchestrator pornește și inițializează memoria",
+      "Mesajele din OpenClaw channels ajung la BYON inbox",
+      "Worker generează evidence packs cu memory context",
+      "Auditor validează și semnează execution orders",
+      "User poate aproba/respinge planuri",
+      "Executor execută acțiuni în modul air-gapped",
+      "Receipts se întorc la Worker pentru analiză"
+    ],
+    "performance": [
+      "Memory search < 100ms pentru top-5",
+      "Plan generation < 5 seconds",
+      "Signature verification < 10ms"
+    ],
+    "security": [
+      "Executor nu poate accesa rețeaua",
+      "Toate execution orders sunt semnate",
+      "Policy-urile blochează forbidden patterns",
+      "Audit trail este imutabil"
+    ],
+    "integration": [
+      "OpenClaw funcționează identic cu/fără BYON",
+      "Fallback la OpenClaw memory când BYON nu e disponibil",
+      "CLI commands funcționează în ambele moduri"
+    ]
+  }
+}

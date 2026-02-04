@@ -1,0 +1,55 @@
+;
+; WFP Semantic Guard Driver
+; INF file for driver installation
+;
+; Copyright (c) 2025 - Network Execution Guard Project
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = NetService
+ClassGuid   = {4D36E974-E325-11CE-BFC1-08002BE10318}
+Provider    = %Provider%
+CatalogFile = wfp_guard.cat
+DriverVer   = 01/01/2025,1.0.0.0
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir          = 12         ; %WinDir%\System32\drivers
+WfpGuard.DriverFiles    = 12
+
+[SourceDisksNames]
+1 = %DiskName%
+
+[SourceDisksFiles]
+WfpGuardDriver.sys = 1
+
+[DefaultInstall.NTamd64]
+CopyFiles = WfpGuard.DriverFiles
+
+[DefaultInstall.NTamd64.Services]
+AddService = WfpGuard,0x800,WfpGuard.Service
+
+[DefaultUninstall.NTamd64]
+DelFiles = WfpGuard.DriverFiles
+LegacyUninstall = 1
+
+[DefaultUninstall.NTamd64.Services]
+DelService = WfpGuard,0x200
+
+[WfpGuard.DriverFiles]
+WfpGuardDriver.sys,,,0x00004000  ; COPYFLG_IN_USE_RENAME
+
+[WfpGuard.Service]
+DisplayName    = %ServiceName%
+Description    = %ServiceDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\WfpGuardDriver.sys
+
+[Strings]
+Provider       = "Network Execution Guard Project"
+DiskName       = "WFP Semantic Guard Installation Disk"
+ServiceName    = "WFP Semantic Guard"
+ServiceDesc    = "Network execution guard using behavioral traffic analysis"

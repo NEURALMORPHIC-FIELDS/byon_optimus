@@ -1,0 +1,431 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:byon-optimus-sbom-2026-02-02",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-02-02T00:00:00Z",
+    "tools": [
+      {
+        "vendor": "BYON",
+        "name": "Manual SBOM Generator",
+        "version": "1.0.0"
+      }
+    ],
+    "authors": [
+      {
+        "name": "Vasile Lucian Borbeleac",
+        "email": "patent-holder@byon-optimus.eu"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "byon-optimus",
+      "name": "BYON Optimus",
+      "version": "1.0.0",
+      "description": "Multi-Agent Orchestration System with Infinite Memory (FHRSS+FCPE)",
+      "licenses": [
+        {
+          "license": {
+            "id": "LicenseRef-PROPRIETARY",
+            "name": "BYON Proprietary License",
+            "url": "file://LICENSE"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2025-2026 Vasile Lucian Borbeleac. All Rights Reserved.",
+      "externalReferences": [
+        {
+          "type": "documentation",
+          "url": "file://README.md"
+        },
+        {
+          "type": "license",
+          "url": "file://LICENSE"
+        }
+      ],
+      "properties": [
+        {
+          "name": "patent:number",
+          "value": "EP25216372.0"
+        },
+        {
+          "name": "patent:title",
+          "value": "OmniVault - FHRSS+FCPE"
+        }
+      ]
+    },
+    "manufacture": {
+      "name": "BYON Project",
+      "url": "https://byon-optimus.eu"
+    }
+  },
+  "components": [
+    {
+      "type": "application",
+      "bom-ref": "byon-orchestrator",
+      "name": "byon-orchestrator",
+      "version": "0.1.0",
+      "description": "BYON Orchestrator - Multi-Agent Control Protocol with infinite memory",
+      "licenses": [
+        {
+          "license": {
+            "id": "LicenseRef-PROPRIETARY"
+          }
+        }
+      ],
+      "purl": "pkg:npm/byon-orchestrator@0.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/ajv@8.12.0",
+      "name": "ajv",
+      "version": "8.12.0",
+      "description": "Another JSON Schema Validator",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/ajv@8.12.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://ajv.js.org"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/ajv-formats@2.1.1",
+      "name": "ajv-formats",
+      "version": "2.1.1",
+      "description": "JSON Schema formats for Ajv",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/ajv-formats@2.1.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/better-sqlite3@11.0.0",
+      "name": "better-sqlite3",
+      "version": "11.0.0",
+      "description": "The fastest and simplest library for SQLite3 in Node.js",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/better-sqlite3@11.0.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/sql.js@1.10.0",
+      "name": "sql.js",
+      "version": "1.10.0",
+      "description": "SQLite compiled to JavaScript",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/sql.js@1.10.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/typescript@5.3.3",
+      "name": "typescript",
+      "version": "5.3.3",
+      "description": "TypeScript language compiler",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:npm/typescript@5.3.3",
+      "scope": "optional"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/vitest@1.2.0",
+      "name": "vitest",
+      "version": "1.2.0",
+      "description": "Vite-native test framework",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/vitest@1.2.0",
+      "scope": "optional"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/eslint@8.56.0",
+      "name": "eslint",
+      "version": "8.56.0",
+      "description": "JavaScript/TypeScript linter",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/eslint@8.56.0",
+      "scope": "optional"
+    },
+    {
+      "type": "application",
+      "bom-ref": "memory-service",
+      "name": "byon-memory-service",
+      "version": "1.0.0",
+      "description": "FHRSS+FCPE Memory Service (Python/FastAPI)",
+      "licenses": [
+        {
+          "license": {
+            "id": "LicenseRef-PROPRIETARY"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/fastapi",
+      "name": "fastapi",
+      "version": "0.109.0",
+      "description": "FastAPI framework for Python",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/fastapi@0.109.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/uvicorn",
+      "name": "uvicorn",
+      "version": "0.27.0",
+      "description": "ASGI server for Python",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/uvicorn@0.27.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic",
+      "name": "pydantic",
+      "version": "2.6.0",
+      "description": "Data validation using Python type annotations",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/pydantic@2.6.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/numpy",
+      "name": "numpy",
+      "version": "1.26.0",
+      "description": "Numerical computing library",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/numpy@1.26.0"
+    },
+    {
+      "type": "application",
+      "bom-ref": "openclaw",
+      "name": "OpenClaw",
+      "version": "1.0.0",
+      "description": "Communication gateway for multiple channels",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2025 Peter Steinberger"
+    },
+    {
+      "type": "application",
+      "bom-ref": "wfp-semantic-guard",
+      "name": "WFP-Semantic-Guard",
+      "version": "1.0.0",
+      "description": "Windows Kernel Driver for network filtering",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "container",
+      "bom-ref": "docker:node:22-alpine",
+      "name": "node",
+      "version": "22-alpine",
+      "description": "Node.js Alpine Linux container image",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:docker/node@22-alpine"
+    },
+    {
+      "type": "container",
+      "bom-ref": "docker:redis:7-alpine",
+      "name": "redis",
+      "version": "7-alpine",
+      "description": "Redis Alpine Linux container image",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:docker/redis@7-alpine"
+    },
+    {
+      "type": "container",
+      "bom-ref": "docker:python:3.11-slim",
+      "name": "python",
+      "version": "3.11-slim",
+      "description": "Python Slim container image",
+      "licenses": [
+        {
+          "license": {
+            "id": "PSF-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:docker/python@3.11-slim"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "byon-optimus",
+      "dependsOn": [
+        "byon-orchestrator",
+        "memory-service",
+        "openclaw",
+        "wfp-semantic-guard"
+      ]
+    },
+    {
+      "ref": "byon-orchestrator",
+      "dependsOn": [
+        "pkg:npm/ajv@8.12.0",
+        "pkg:npm/ajv-formats@2.1.1",
+        "pkg:npm/better-sqlite3@11.0.0",
+        "pkg:npm/sql.js@1.10.0",
+        "docker:node:22-alpine"
+      ]
+    },
+    {
+      "ref": "memory-service",
+      "dependsOn": [
+        "pkg:pypi/fastapi",
+        "pkg:pypi/uvicorn",
+        "pkg:pypi/pydantic",
+        "pkg:pypi/numpy",
+        "docker:python:3.11-slim"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "bom-ref": "service:memory-service",
+      "name": "byon-memory-service",
+      "description": "FHRSS+FCPE infinite memory API",
+      "endpoints": [
+        "http://memory-service:8000",
+        "http://localhost:8001"
+      ],
+      "authenticated": false,
+      "x-trust-boundary": true
+    },
+    {
+      "bom-ref": "service:openclaw-gateway",
+      "name": "openclaw-gateway",
+      "description": "Multi-channel communication gateway",
+      "endpoints": [
+        "http://openclaw-gateway:3000",
+        "http://localhost:3000"
+      ],
+      "authenticated": true,
+      "x-trust-boundary": true
+    },
+    {
+      "bom-ref": "service:redis",
+      "name": "byon-redis",
+      "description": "Message queue for inter-agent communication",
+      "endpoints": [
+        "redis://redis:6379"
+      ],
+      "authenticated": false,
+      "x-trust-boundary": false
+    }
+  ],
+  "vulnerabilities": [],
+  "annotations": [
+    {
+      "subjects": ["byon-optimus"],
+      "annotator": {
+        "organization": {
+          "name": "BYON Project"
+        }
+      },
+      "timestamp": "2026-02-02T00:00:00Z",
+      "text": "This SBOM was generated manually and should be regenerated using automated tooling (e.g., npm audit, cyclonedx-npm) for production deployments."
+    },
+    {
+      "subjects": ["byon-optimus"],
+      "annotator": {
+        "organization": {
+          "name": "BYON Project"
+        }
+      },
+      "timestamp": "2026-02-02T00:00:00Z",
+      "text": "Patent EP25216372.0 (OmniVault - FHRSS+FCPE) protects the memory system technology. Any use requires explicit authorization from the patent holder."
+    }
+  ]
+}

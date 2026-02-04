@@ -1,0 +1,273 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://byon.dev/schemas/style-contract.json",
+  "title": "BYON Style Contract",
+  "description": "Schema for BYON executor output style validation contract. Defines forbidden patterns and required style attributes.",
+  "type": "object",
+  "required": ["version", "forbiddenPatterns", "requiredAttributes"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version in semver format"
+    },
+    "forbiddenPatterns": {
+      "type": "object",
+      "description": "Categories of forbidden patterns",
+      "required": ["psychology", "empathy", "stories", "meta"],
+      "properties": {
+        "psychology": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "Psychology/therapy related language"
+        },
+        "empathy": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "Empathy and emotional phrases"
+        },
+        "stories": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "Narrative and storytelling language"
+        },
+        "meta": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "AI self-reference phrases"
+        },
+        "filler": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "Filler words and phrases"
+        },
+        "hedging": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "Uncertainty and hedging language"
+        },
+        "apologetic": {
+          "$ref": "#/definitions/patternCategory",
+          "description": "Apologetic phrases"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/patternCategory"
+      }
+    },
+    "requiredAttributes": {
+      "type": "object",
+      "description": "Required style attributes for valid output",
+      "properties": {
+        "factual": {
+          "type": "boolean",
+          "description": "Output must be factual and verifiable"
+        },
+        "technical": {
+          "type": "boolean",
+          "description": "Output must use technical language"
+        },
+        "actionOriented": {
+          "type": "boolean",
+          "description": "Output must be action-oriented"
+        },
+        "precise": {
+          "type": "boolean",
+          "description": "Output must be precise and specific"
+        },
+        "professional": {
+          "type": "boolean",
+          "description": "Output must be professional in tone"
+        }
+      }
+    },
+    "validationRules": {
+      "type": "object",
+      "description": "Validation configuration",
+      "properties": {
+        "minScore": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 80,
+          "description": "Minimum score to pass validation"
+        },
+        "maxWarnings": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 5,
+          "description": "Maximum allowed warnings"
+        },
+        "failOnWarnings": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to fail validation on warnings"
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 3,
+          "description": "Maximum regeneration attempts"
+        },
+        "autoFix": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic fixing of simple violations"
+        }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "description": "Scoring configuration",
+      "properties": {
+        "baseScore": {
+          "type": "integer",
+          "default": 100,
+          "description": "Starting score"
+        },
+        "errorPenalty": {
+          "type": "integer",
+          "default": 10,
+          "description": "Points deducted per error"
+        },
+        "warningPenalty": {
+          "type": "integer",
+          "default": 2,
+          "description": "Points deducted per warning"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "patternCategory": {
+      "type": "object",
+      "required": ["patterns", "severity"],
+      "properties": {
+        "patterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/pattern"
+          },
+          "description": "List of forbidden patterns"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["warning", "error"],
+          "description": "Default severity for this category"
+        },
+        "description": {
+          "type": "string",
+          "description": "Category description"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether category is enabled"
+        }
+      }
+    },
+    "pattern": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Simple string pattern"
+        },
+        {
+          "type": "object",
+          "required": ["pattern"],
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "description": "Pattern string or regex"
+            },
+            "isRegex": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether pattern is a regex"
+            },
+            "caseSensitive": {
+              "type": "boolean",
+              "default": false,
+              "description": "Case-sensitive matching"
+            },
+            "severity": {
+              "type": "string",
+              "enum": ["warning", "error"],
+              "description": "Override severity for this pattern"
+            },
+            "suggestion": {
+              "type": "string",
+              "description": "Suggested replacement or fix"
+            },
+            "description": {
+              "type": "string",
+              "description": "Pattern description"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "version": "1.0.0",
+      "forbiddenPatterns": {
+        "psychology": {
+          "patterns": [
+            "anxiety",
+            "stress",
+            "cope",
+            "therapy",
+            { "pattern": "\\b(overwhelm|overwhelming)\\b", "isRegex": true }
+          ],
+          "severity": "error",
+          "description": "Psychology and therapy related terms"
+        },
+        "empathy": {
+          "patterns": [
+            "I understand",
+            "with pleasure",
+            "I feel",
+            { "pattern": "\\bI appreciate\\b", "isRegex": true, "severity": "warning" }
+          ],
+          "severity": "error",
+          "description": "Empathy and emotional validation phrases"
+        },
+        "stories": {
+          "patterns": [
+            "imagine",
+            "let me tell you",
+            "picture this",
+            "once upon a time"
+          ],
+          "severity": "error",
+          "description": "Narrative and storytelling language"
+        },
+        "meta": {
+          "patterns": [
+            "as an AI",
+            "my limitations",
+            { "pattern": "I cannot", "severity": "warning" },
+            "I was programmed"
+          ],
+          "severity": "error",
+          "description": "AI self-reference phrases"
+        }
+      },
+      "requiredAttributes": {
+        "factual": true,
+        "technical": true,
+        "actionOriented": true,
+        "precise": true,
+        "professional": true
+      },
+      "validationRules": {
+        "minScore": 80,
+        "maxWarnings": 5,
+        "failOnWarnings": false,
+        "maxAttempts": 3,
+        "autoFix": true
+      },
+      "scoring": {
+        "baseScore": 100,
+        "errorPenalty": 10,
+        "warningPenalty": 2
+      }
+    }
+  ]
+}

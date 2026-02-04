@@ -1,0 +1,284 @@
+{
+  "name": "FHRSS+FCPE v3.0 Enterprise Benchmark",
+  "version": "3.0.0",
+  "started_at": "2026-02-04T01:21:42.197492",
+  "completed_at": "2026-02-04T01:21:43.511620",
+  "summary": {
+    "total": 27,
+    "passed": 14,
+    "warnings": 5,
+    "failed": 8
+  },
+  "results": [
+    {
+      "name": "health_check",
+      "category": "Functional",
+      "status": "PASS",
+      "value": "healthy",
+      "unit": "status",
+      "threshold": null,
+      "details": "Uptime: 706.6s",
+      "duration_ms": 1.9993782043457031
+    },
+    {
+      "name": "stats_retrieval",
+      "category": "Functional",
+      "status": "FAIL",
+      "value": 0,
+      "unit": "contexts",
+      "threshold": null,
+      "details": "FHRSS: N/A",
+      "duration_ms": 2.000093460083008
+    },
+    {
+      "name": "store_fact",
+      "category": "Functional",
+      "status": "FAIL",
+      "value": null,
+      "unit": "ctx_id",
+      "threshold": "< 1000ms",
+      "details": "Type: N/A",
+      "duration_ms": 24.785518646240234
+    },
+    {
+      "name": "store_code",
+      "category": "Functional",
+      "status": "FAIL",
+      "value": null,
+      "unit": "ctx_id",
+      "threshold": "< 1000ms",
+      "details": "",
+      "duration_ms": 15.810251235961914
+    },
+    {
+      "name": "store_conversation",
+      "category": "Functional",
+      "status": "FAIL",
+      "value": null,
+      "unit": "ctx_id",
+      "threshold": null,
+      "details": "",
+      "duration_ms": 15.992164611816406
+    },
+    {
+      "name": "search_facts",
+      "category": "Functional",
+      "status": "FAIL",
+      "value": 0,
+      "unit": "results",
+      "threshold": "< 500ms",
+      "details": "Search time: 0.00ms",
+      "duration_ms": 16.18647575378418
+    },
+    {
+      "name": "search_all_types",
+      "category": "Functional",
+      "status": "FAIL",
+      "value": 0,
+      "unit": "total_results",
+      "threshold": null,
+      "details": "",
+      "duration_ms": 2.008676528930664
+    },
+    {
+      "name": "store_latency_avg",
+      "category": "Performance",
+      "status": "PASS",
+      "value": 10.44,
+      "unit": "ms",
+      "threshold": "< 500ms",
+      "details": "P95: 16.10ms, samples: 10",
+      "duration_ms": 0
+    },
+    {
+      "name": "search_latency_avg",
+      "category": "Performance",
+      "status": "PASS",
+      "value": 4.52,
+      "unit": "ms",
+      "threshold": "< 200ms",
+      "details": "Min: 2.00ms, Max: 13.60ms",
+      "duration_ms": 0
+    },
+    {
+      "name": "store_throughput",
+      "category": "Performance",
+      "status": "PASS",
+      "value": 54.97,
+      "unit": "ops/sec",
+      "threshold": "> 10 ops/sec",
+      "details": "20 operations in 0.36s",
+      "duration_ms": 0
+    },
+    {
+      "name": "health_check_latency",
+      "category": "Performance",
+      "status": "PASS",
+      "value": 12.42,
+      "unit": "ms",
+      "threshold": "< 50ms",
+      "details": "",
+      "duration_ms": 0
+    },
+    {
+      "name": "fault_tolerance_skip",
+      "category": "FaultTolerance",
+      "status": "WARN",
+      "value": "No contexts",
+      "unit": "",
+      "threshold": null,
+      "details": "Need contexts to test recovery",
+      "duration_ms": 0
+    },
+    {
+      "name": "bulk_insert_50",
+      "category": "Scalability",
+      "status": "WARN",
+      "value": 0,
+      "unit": "successful",
+      "threshold": "= 50",
+      "details": "Rate: 104.6 ops/sec",
+      "duration_ms": 478.23143005371094
+    },
+    {
+      "name": "concurrent_requests_10",
+      "category": "Scalability",
+      "status": "WARN",
+      "value": 0,
+      "unit": "successful",
+      "threshold": ">= 9",
+      "details": "Parallel execution with 5 workers",
+      "duration_ms": 30.394315719604492
+    },
+    {
+      "name": "large_result_set",
+      "category": "Scalability",
+      "status": "FAIL",
+      "value": 0,
+      "unit": "results",
+      "threshold": null,
+      "details": "Query: 'test', threshold: 0.1",
+      "duration_ms": 2.007722854614258
+    },
+    {
+      "name": "store_retrieve_consistency",
+      "category": "DataIntegrity",
+      "status": "WARN",
+      "value": "Not found",
+      "unit": "",
+      "threshold": null,
+      "details": "Stored ctx_id: None",
+      "duration_ms": 0
+    },
+    {
+      "name": "stats_consistency",
+      "category": "DataIntegrity",
+      "status": "PASS",
+      "value": null,
+      "unit": "contexts",
+      "threshold": null,
+      "details": "Two consecutive calls returned same count",
+      "duration_ms": 0
+    },
+    {
+      "name": "type_index_coverage",
+      "category": "DataIntegrity",
+      "status": "PASS",
+      "value": 0,
+      "unit": "indexed",
+      "threshold": null,
+      "details": "Total: 0, Code: 0, Conv: 0, Fact: 0",
+      "duration_ms": 0
+    },
+    {
+      "name": "storage_efficiency",
+      "category": "Compression",
+      "status": "PASS",
+      "value": 0,
+      "unit": "x overhead",
+      "threshold": "< 5x",
+      "details": "0 bytes/context, 0 contexts",
+      "duration_ms": 0
+    },
+    {
+      "name": "fcpe_dimension",
+      "category": "Compression",
+      "status": "PASS",
+      "value": 384,
+      "unit": "dimensions",
+      "threshold": "= 384",
+      "details": "MiniLM embedding dimension",
+      "duration_ms": 0
+    },
+    {
+      "name": "total_storage",
+      "category": "Compression",
+      "status": "PASS",
+      "value": 0,
+      "unit": "MB",
+      "threshold": null,
+      "details": "0 contexts stored",
+      "duration_ms": 0
+    },
+    {
+      "name": "fhrss_profile",
+      "category": "Compression",
+      "status": "PASS",
+      "value": "FULL",
+      "unit": "profile",
+      "threshold": null,
+      "details": "Expected overhead: 2.125x",
+      "duration_ms": 0
+    },
+    {
+      "name": "empty_query_handling",
+      "category": "Stress",
+      "status": "PASS",
+      "value": "Error",
+      "unit": "",
+      "threshold": null,
+      "details": "",
+      "duration_ms": 15.521049499511719
+    },
+    {
+      "name": "large_content_10kb",
+      "category": "Stress",
+      "status": "FAIL",
+      "value": "Failed",
+      "unit": "ctx_id",
+      "threshold": null,
+      "details": "10KB text content",
+      "duration_ms": 2.0062923431396484
+    },
+    {
+      "name": "special_characters",
+      "category": "Stress",
+      "status": "WARN",
+      "value": "Failed",
+      "unit": "",
+      "threshold": null,
+      "details": "Unicode, emojis, HTML entities",
+      "duration_ms": 0
+    },
+    {
+      "name": "invalid_context_handling",
+      "category": "Stress",
+      "status": "PASS",
+      "value": "Handled",
+      "unit": "",
+      "threshold": null,
+      "details": "Non-existent context ID",
+      "duration_ms": 0
+    },
+    {
+      "name": "zero_loss_recovery",
+      "category": "Stress",
+      "status": "PASS",
+      "value": 0,
+      "unit": "similarity",
+      "threshold": null,
+      "details": "0% loss should have perfect recovery",
+      "duration_ms": 0
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# This directory is used for inter-agent file-based communication
+# Contents are runtime data and are gitignored
+# Structure:
+#   inbox/              - Incoming messages
+#   worker_to_auditor/  - EvidencePack + PlanDraft
+#   auditor_to_user/    - ApprovalRequest
+#   auditor_to_executor/ - ExecutionOrder (signed)
+#   executor_to_worker/ - JohnsonReceipt

@@ -1,0 +1,269 @@
+/*
+ * WFP SEMANTIC GUARD - Kernel Driver Header
+ * 
+ * Internal structures and function declarations for the WFP callout driver.
+ * 
+ * Copyright (c) 2025 - Network Execution Guard Project
+ */
+
+#ifndef WFP_GUARD_DRIVER_H
+#define WFP_GUARD_DRIVER_H
+
+#include <ntddk.h>
+#include <wdf.h>
+#include <fwpsk.h>
+#include <fwpmk.h>
+#include <mstcpip.h>
+#include "../common/wfp_guard_common.h"
+
+// ============================================================================
+// POOL TAGS
+// ============================================================================
+
+#define WFP_GUARD_TAG_GENERIC       'GFPW'
+#define WFP_GUARD_TAG_APP           'AFPW'
+#define WFP_GUARD_TAG_EVENT         'EFPW'
+#define WFP_GUARD_TAG_FLOW          'FFPW'
+
+// ============================================================================
+// WFP GUIDs
+// ============================================================================
+
+// {A7B32E8C-1234-5678-9ABC-DEF012345678}
+DEFINE_GUID(WFP_GUARD_PROVIDER_KEY,
+    0xa7b32e8c, 0x1234, 0x5678, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78);
+
+// {B8C43F9D-2345-6789-ABCD-EF0123456789}
+DEFINE_GUID(WFP_GUARD_SUBLAYER_KEY,
+    0xb8c43f9d, 0x2345, 0x6789, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89);
+
+// {C9D54A0E-3456-789A-BCDE-F01234567890}
+DEFINE_GUID(WFP_GUARD_CALLOUT_CONNECT_V4_KEY,
+    0xc9d54a0e, 0x3456, 0x789a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78, 0x90);
+
+// {DAE65B1F-4567-89AB-CDEF-012345678901}
+DEFINE_GUID(WFP_GUARD_CALLOUT_FLOW_V4_KEY,
+    0xdae65b1f, 0x4567, 0x89ab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01);
+
+// {EBF76C20-5678-9ABC-DEF0-123456789012}
+DEFINE_GUID(WFP_GUARD_FILTER_CONNECT_V4_KEY,
+    0xebf76c20, 0x5678, 0x9abc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12);
+
+// {FC087D31-6789-ABCD-EF01-234567890123}
+DEFINE_GUID(WFP_GUARD_FILTER_FLOW_V4_KEY,
+    0xfc087d31, 0x6789, 0xabcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23);
+
+// ============================================================================
+// INTERNAL STRUCTURES
+// ============================================================================
+
+//
+// Pending event waiting for user-mode verdict
+//
+typedef struct _WFP_PENDING_EVENT {
+    LIST_ENTRY          ListEntry;
+    WFP_GUARD_EVENT     Event;
+    KEVENT              CompletionEvent;
+    WFP_GUARD_VERDICT   Verdict;
+    BOOLEAN             Completed;
+} WFP_PENDING_EVENT, *PWFP_PENDING_EVENT;
+
+//
+// Application tracking entry (kernel-resident)
+//
+typedef struct _WFP_APP_ENTRY {
+    LIST_ENTRY              ListEntry;
+    WFP_GUARD_APP_METRICS   Metrics;
+    KSPIN_LOCK              Lock;
+    
+    // Flow tracking (simplified in kernel)
+    UINT32                  FlowCount;
+    WFP_GUARD_FLOW_CONTEXT  Flows[MAX_FLOWS_PER_APP];
+    
+    // Recent timestamps for interval calculation
+    UINT64                  RecentTimestamps[16];
+    UINT8                   TimestampIndex;
+    UINT8                   TimestampCount;
+} WFP_APP_ENTRY, *PWFP_APP_ENTRY;
+
+//
+// Global driver context
+//
+typedef struct _WFP_GUARD_CONTEXT {
+    // Device & WDF
+    WDFDEVICE               Device;
+    WDFQUEUE                IoQueue;
+    
+    // WFP handles
+    HANDLE                  EngineHandle;
+    UINT32                  CalloutIdConnectV4;
+    UINT32                  CalloutIdFlowV4;
+    UINT64                  FilterIdConnectV4;
+    UINT64                  FilterIdFlowV4;
+    
+    // Application tracking
+    LIST_ENTRY              AppListHead;
+    KSPIN_LOCK              AppListLock;
+    UINT32                  AppCount;
+    LOOKASIDE_LIST_EX       AppLookaside;
+    
+    // Pending events queue
+    LIST_ENTRY              PendingEventListHead;
+    KSPIN_LOCK              PendingEventLock;
+    UINT32                  PendingEventCount;
+    KEVENT                  PendingEventAvailable;
+    LOOKASIDE_LIST_EX       EventLookaside;
+    
+    // Statistics
+    WFP_GUARD_STATISTICS    Stats;
+    KSPIN_LOCK              StatsLock;
+    
+    // Configuration
+    WFP_GUARD_CONFIG        Config;
+    
+    // State
+    BOOLEAN                 Initialized;
+    BOOLEAN                 Filtering;
+    LARGE_INTEGER           StartTime;
+    
+} WFP_GUARD_CONTEXT, *PWFP_GUARD_CONTEXT;
+
+// Global context pointer
+extern PWFP_GUARD_CONTEXT g_Context;
+
+// ============================================================================
+// FUNCTION DECLARATIONS - Driver Entry/Exit
+// ============================================================================
+
+DRIVER_INITIALIZE DriverEntry;
+EVT_WDF_DRIVER_UNLOAD WfpGuardEvtDriverUnload;
+EVT_WDF_DEVICE_FILE_CREATE WfpGuardEvtDeviceFileCreate;
+EVT_WDF_FILE_CLOSE WfpGuardEvtFileClose;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL WfpGuardEvtIoDeviceControl;
+
+// ============================================================================
+// FUNCTION DECLARATIONS - WFP Management
+// ============================================================================
+
+NTSTATUS
+WfpGuardRegisterCallouts(
+    _In_ PDEVICE_OBJECT DeviceObject
+    );
+
+VOID
+WfpGuardUnregisterCallouts(
+    VOID
+    );
+
+// ============================================================================
+// FUNCTION DECLARATIONS - Callout Functions
+// ============================================================================
+
+VOID NTAPI
+WfpGuardConnectClassify(
+    _In_ const FWPS_INCOMING_VALUES0* InFixedValues,
+    _In_ const FWPS_INCOMING_METADATA_VALUES0* InMetaValues,
+    _Inout_opt_ void* LayerData,
+    _In_opt_ const void* ClassifyContext,
+    _In_ const FWPS_FILTER3* Filter,
+    _In_ UINT64 FlowContext,
+    _Inout_ FWPS_CLASSIFY_OUT0* ClassifyOut
+    );
+
+NTSTATUS NTAPI
+WfpGuardConnectNotify(
+    _In_ FWPS_CALLOUT_NOTIFY_TYPE NotifyType,
+    _In_ const GUID* FilterKey,
+    _Inout_ FWPS_FILTER3* Filter
+    );
+
+VOID NTAPI
+WfpGuardFlowClassify(
+    _In_ const FWPS_INCOMING_VALUES0* InFixedValues,
+    _In_ const FWPS_INCOMING_METADATA_VALUES0* InMetaValues,
+    _Inout_opt_ void* LayerData,
+    _In_opt_ const void* ClassifyContext,
+    _In_ const FWPS_FILTER3* Filter,
+    _In_ UINT64 FlowContext,
+    _Inout_ FWPS_CLASSIFY_OUT0* ClassifyOut
+    );
+
+VOID NTAPI
+WfpGuardFlowDelete(
+    _In_ UINT16 LayerId,
+    _In_ UINT32 CalloutId,
+    _In_ UINT64 FlowContext
+    );
+
+// ============================================================================
+// FUNCTION DECLARATIONS - Application Tracking
+// ============================================================================
+
+PWFP_APP_ENTRY
+WfpGuardFindOrCreateApp(
+    _In_ PCWSTR AppPath
+    );
+
+PWFP_APP_ENTRY
+WfpGuardFindApp(
+    _In_ UINT32 AppHash
+    );
+
+VOID
+WfpGuardUpdateAppMetrics(
+    _Inout_ PWFP_APP_ENTRY AppEntry,
+    _In_ PWFP_GUARD_EVENT Event
+    );
+
+WFP_GUARD_ACTION
+WfpGuardQuickClassify(
+    _In_ PWFP_APP_ENTRY AppEntry
+    );
+
+// ============================================================================
+// FUNCTION DECLARATIONS - Event Queue
+// ============================================================================
+
+PWFP_PENDING_EVENT
+WfpGuardAllocateEvent(
+    VOID
+    );
+
+VOID
+WfpGuardFreeEvent(
+    _In_ PWFP_PENDING_EVENT Event
+    );
+
+NTSTATUS
+WfpGuardQueueEvent(
+    _In_ PWFP_PENDING_EVENT Event
+    );
+
+PWFP_PENDING_EVENT
+WfpGuardDequeueEvent(
+    VOID
+    );
+
+NTSTATUS
+WfpGuardCompleteEvent(
+    _In_ UINT64 EventId,
+    _In_ PWFP_GUARD_VERDICT Verdict
+    );
+
+// ============================================================================
+// FUNCTION DECLARATIONS - Utilities
+// ============================================================================
+
+UINT8
+WfpGuardEstimateEntropy(
+    _In_reads_bytes_(Length) const UINT8* Data,
+    _In_ UINT32 Length
+    );
+
+VOID
+WfpGuardGetProcessPath(
+    _In_ HANDLE ProcessId,
+    _Out_writes_(MAX_APP_PATH_LENGTH) PWCHAR PathBuffer
+    );
+
+#endif // WFP_GUARD_DRIVER_H

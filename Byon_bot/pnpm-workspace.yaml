@@ -1,0 +1,9 @@
+packages:
+  - 'shared'
+  - 'shared/memory'
+  - 'agent-worker'
+  - 'agent-auditor'
+  - 'agent-executor'
+  - 'watcher'
+  - 'cli'
+  - 'ui'

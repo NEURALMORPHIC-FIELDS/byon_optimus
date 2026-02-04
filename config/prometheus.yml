@@ -1,0 +1,65 @@
+# ============================================================================
+# BYON Optimus - Prometheus Configuration
+# ============================================================================
+# Metrics collection for monitoring and alerting
+# ============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'byon-optimus'
+
+# Alertmanager configuration (optional - uncomment when AlertManager is set up)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Rule files (optional - add alerting rules)
+# rule_files:
+#   - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: /metrics
+
+  # BYON Memory Service
+  - job_name: 'memory-service'
+    static_configs:
+      - targets: ['memory-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # BYON Worker Agent - requires Prometheus client integration
+  # Uncomment when /metrics endpoint is added to byon-worker
+  # - job_name: 'byon-worker'
+  #   static_configs:
+  #     - targets: ['byon-worker:3002']
+  #   metrics_path: /metrics
+  #   scrape_interval: 30s
+
+  # BYON Auditor Agent - requires Prometheus client integration
+  # Uncomment when /metrics endpoint is added to byon-auditor
+  # - job_name: 'byon-auditor'
+  #   static_configs:
+  #     - targets: ['byon-auditor:3003']
+  #   metrics_path: /metrics
+  #   scrape_interval: 30s
+
+  # OpenClaw Gateway - requires Prometheus client integration
+  # Uncomment when /metrics endpoint is added to openclaw-gateway
+  # - job_name: 'openclaw-gateway'
+  #   static_configs:
+  #     - targets: ['openclaw-gateway:3000']
+  #   metrics_path: /metrics
+  #   scrape_interval: 30s
+
+  # Redis (if redis_exporter is added)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']

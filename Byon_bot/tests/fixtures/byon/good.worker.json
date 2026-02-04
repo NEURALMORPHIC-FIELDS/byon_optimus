@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "agent_role": "worker",
+  "axis": "Sortare proiecte și construire structură home",
+  "decision": "Generez 3 opțiuni de organizare + un pas următor unic.",
+  "constraints": [
+    "fără psihologie",
+    "fără empatie",
+    "fără povești",
+    "max 3 opțiuni"
+  ],
+  "options": [
+    {
+      "id": "A",
+      "title": "Structură pe domenii",
+      "steps": [
+        "Extrage taguri din repo-uri și documente",
+        "Grupează în 6-10 categorii",
+        "Generează homepage cu secțiuni"
+      ],
+      "risk": "low",
+      "requires_user_approval": true
+    },
+    {
+      "id": "B",
+      "title": "Structură pe produse (pipeline)",
+      "steps": [
+        "Identifică input→proces→output pentru fiecare proiect",
+        "Construiește graf relațional",
+        "Generează homepage + harta dependențelor"
+      ],
+      "risk": "medium",
+      "requires_user_approval": true
+    }
+  ],
+  "next_action": {
+    "owner": "user",
+    "action": "Alege opțiunea A sau B.",
+    "deadline": "now"
+  },
+  "output": {
+    "format": "markdown",
+    "content": "## Axa\nSortare proiecte și construire structură home\n\n## Opțiuni\n- A: Structură pe domenii\n- B: Structură pe produse (pipeline)\n\n## Next\nAlege A sau B."
+  },
+  "meta": {
+    "created_at": "2026-02-01T05:00:00Z",
+    "language": "ro",
+    "style_flags": {
+      "no_psychology": true,
+      "no_empathy": true,
+      "no_stories": true,
+      "administrative": true,
+      "structured": true
+    }
+  }
+}

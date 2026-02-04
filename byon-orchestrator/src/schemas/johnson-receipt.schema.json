@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "johnson-receipt.schema.json",
+  "title": "JohnsonReceipt",
+  "description": "Execution result receipt from air-gapped Executor",
+  "type": "object",
+  "required": [
+    "receipt_id",
+    "timestamp",
+    "based_on_order",
+    "execution_summary",
+    "action_results",
+    "errors",
+    "changes_made",
+    "verification",
+    "hash"
+  ],
+  "properties": {
+    "document_type": { "type": "string", "const": "JOHNSON_RECEIPT" },
+    "document_version": { "type": "string", "const": "1.0" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "based_on_order": { "type": "string", "minLength": 1 },
+    "execution_summary": {
+      "type": "object",
+      "required": ["status", "actions_total", "actions_completed", "actions_failed", "iterations_used", "duration_ms"],
+      "properties": {
+        "status": { "type": "string", "enum": ["success", "partial", "failed", "aborted"] },
+        "actions_total": { "type": "integer", "minimum": 0 },
+        "actions_completed": { "type": "integer", "minimum": 0 },
+        "actions_failed": { "type": "integer", "minimum": 0 },
+        "iterations_used": { "type": "integer", "minimum": 0 },
+        "duration_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "action_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action_id"],
+        "properties": {
+          "action_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["success", "failed", "skipped"] },
+          "action_type": { "type": "string" },
+          "success": { "type": "boolean" },
+          "output": { "type": "string" },
+          "error": { "type": "string" },
+          "duration_ms": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action_id", "error_type", "message", "recoverable"],
+        "properties": {
+          "action_id": { "type": "string" },
+          "error_type": { "type": "string" },
+          "message": { "type": "string" },
+          "stack": { "type": "string" },
+          "recoverable": { "type": "boolean" }
+        }
+      }
+    },
+    "changes_made": {
+      "type": "object",
+      "required": ["files_modified", "files_created", "files_deleted"],
+      "properties": {
+        "files_modified": { "type": "array", "items": { "type": "string" } },
+        "files_created": { "type": "array", "items": { "type": "string" } },
+        "files_deleted": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["tests_passing", "lint_passing", "build_passing"],
+      "properties": {
+        "tests_passing": { "type": ["boolean", "null"] },
+        "lint_passing": { "type": ["boolean", "null"] },
+        "build_passing": { "type": ["boolean", "null"] }
+      }
+    },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

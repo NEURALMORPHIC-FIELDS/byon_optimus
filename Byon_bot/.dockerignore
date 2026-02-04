@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+*.tsbuildinfo
+
+# Development
+.git
+.gitignore
+*.md
+!README.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test
+coverage
+.nyc_output
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+handoff/
+memory/
+keys/
+project/
+
+# Documentation
+docs/
+*.docx
+descrierea proiectului.docx
+JOHNSON_*.md
+JOHNSON_*.json
+vibe-coding-prompt-template-main/
+openclaw-main/

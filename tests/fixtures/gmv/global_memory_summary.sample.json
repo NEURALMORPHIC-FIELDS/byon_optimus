@@ -1,0 +1,27 @@
+{
+  "document_type": "GLOBAL_MEMORY_SUMMARY",
+  "document_version": "1.0",
+  "timestamp": "2026-02-01T18:45:00Z",
+  "system_coherence": 0.79,
+  "entropy_level": "stable",
+  "active_attractors": [
+    {
+      "attractor_id": "a3f1c2d4e5f60718293a4b5c6d7e8f90a3f1c2d4e5f60718293a4b5c6d7e8f90",
+      "score": 0.87
+    },
+    {
+      "attractor_id": "b4e2d3c5f6a70829314b5c6d7e8f90a1b4e2d3c5f6a70829314b5c6d7e8f90a1",
+      "score": 0.63
+    }
+  ],
+  "dominant_domains": [
+    { "domain": "BYON", "weight": 0.41 },
+    { "domain": "OpenClaw", "weight": 0.29 },
+    { "domain": "FHRSS", "weight": 0.18 },
+    { "domain": "security", "weight": 0.12 }
+  ],
+  "stagnant_threads": [
+    { "label": "Patent validation", "days_inactive": 12 },
+    { "label": "Legacy migration", "days_inactive": 8 }
+  ]
+}

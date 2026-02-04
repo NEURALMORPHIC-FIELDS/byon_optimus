@@ -1,0 +1,112 @@
+{
+  "conversation_memory": {
+    "num_turns": 10,
+    "retrieval_accuracy": 1.0,
+    "queries_tested": 3
+  },
+  "semantic_similarity": {
+    "accuracy": 1.0,
+    "correct": 6,
+    "total": 6,
+    "pairs": [
+      {
+        "text1": "What is deep learning?",
+        "text2": "Explain neural networks and deep learning",
+        "original_similarity": 0.7603232264518738,
+        "stored_similarity": 0.7603232860565186,
+        "should_be_similar": true,
+        "preserved": true
+      },
+      {
+        "text1": "How do transformers work?",
+        "text2": "Explain the transformer architecture",
+        "original_similarity": 0.6770385503768921,
+        "stored_similarity": 0.6770385503768921,
+        "should_be_similar": true,
+        "preserved": true
+      },
+      {
+        "text1": "What is Python used for?",
+        "text2": "Python programming applications",
+        "original_similarity": 0.7759495377540588,
+        "stored_similarity": 0.7759494781494141,
+        "should_be_similar": true,
+        "preserved": true
+      },
+      {
+        "text1": "What is machine learning?",
+        "text2": "Recipe for chocolate cake",
+        "original_similarity": 0.09659138321876526,
+        "stored_similarity": 0.09659138321876526,
+        "should_be_similar": false,
+        "preserved": true
+      },
+      {
+        "text1": "Explain neural networks",
+        "text2": "History of ancient Rome",
+        "original_similarity": 0.09703702479600906,
+        "stored_similarity": 0.09703700244426727,
+        "should_be_similar": false,
+        "preserved": true
+      },
+      {
+        "text1": "How does BERT work?",
+        "text2": "Weather forecast for tomorrow",
+        "original_similarity": 0.027539245784282684,
+        "stored_similarity": 0.027539245784282684,
+        "should_be_similar": false,
+        "preserved": true
+      }
+    ]
+  },
+  "rag_retrieval": {
+    "num_documents": 8,
+    "retrieval_accuracy": 0.8,
+    "queries_tested": 5
+  },
+  "context_compression": {
+    "original_bytes": 23040,
+    "compressed_bytes": 1536,
+    "compression_ratio": 15.0,
+    "num_sentences": 15,
+    "is_normalized": true,
+    "has_variance": true,
+    "quality_ok": true
+  },
+  "corruption_recovery": {
+    "recovery_results": [
+      {
+        "loss_percent": 10.0,
+        "cosine_similarity": 1.0,
+        "hash_match": true,
+        "recovered": true
+      },
+      {
+        "loss_percent": 20.0,
+        "cosine_similarity": 1.0,
+        "hash_match": true,
+        "recovered": true
+      },
+      {
+        "loss_percent": 30.0,
+        "cosine_similarity": 1.0,
+        "hash_match": true,
+        "recovered": true
+      },
+      {
+        "loss_percent": 40.0,
+        "cosine_similarity": 1.0,
+        "hash_match": true,
+        "recovered": true
+      }
+    ],
+    "success_at_30_percent": true
+  },
+  "long_context": {
+    "num_turns": 100,
+    "avg_encode_time_ms": 3.6284232139587402,
+    "retrieve_time_ms": 1.0008811950683594,
+    "found_relevant": true,
+    "mega_compressed_dim": 384
+  }
+}

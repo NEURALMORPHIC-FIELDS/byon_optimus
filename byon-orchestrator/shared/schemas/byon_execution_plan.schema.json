@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "byon://schema/execution-plan/v1",
+  "title": "BYON Execution Plan v1",
+  "description": "Schema pentru documentul de plan de execuție BYON - folosit de dezvoltatori, nu de agenți runtime",
+  "type": "object",
+  "required": [
+    "meta",
+    "architecture_overview",
+    "phases",
+    "key_technical_decisions",
+    "file_structure_target",
+    "success_criteria"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema draft reference"
+    },
+    "document_type": {
+      "type": "string",
+      "const": "BYON_EXECUTION_PLAN",
+      "description": "Discriminator pentru tipul de document"
+    },
+    "document_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "Versiunea schemei documentului"
+    },
+
+    "meta": {
+      "type": "object",
+      "required": ["project_name", "version", "created_at", "author", "objective"],
+      "properties": {
+        "project_name": { "type": "string", "minLength": 3 },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 timestamp"
+        },
+        "author": { "type": "string" },
+        "objective": { "type": "string", "minLength": 10 },
+        "patent": { "type": "string" }
+      }
+    },
+
+    "architecture_overview": {
+      "type": "object",
+      "required": ["current_state", "target_state"],
+      "properties": {
+        "current_state": {
+          "type": "object",
+          "required": ["description", "components"],
+          "properties": {
+            "description": { "type": "string" },
+            "components": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "required": ["location", "role", "status"],
+                "properties": {
+                  "location": { "type": "string" },
+                  "role": { "type": "string" },
+                  "status": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "target_state": {
+          "type": "object",
+          "required": ["description", "layers"],
+          "properties": {
+            "description": { "type": "string" },
+            "layers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["layer", "name", "role"],
+                "properties": {
+                  "layer": { "type": "integer", "minimum": 1 },
+                  "name": { "type": "string" },
+                  "role": { "type": "string" },
+                  "preservation": { "type": "string" },
+                  "new_components": { "type": "array", "items": { "type": "string" } },
+                  "components": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["phase_id", "name", "description", "priority", "tasks"],
+        "properties": {
+          "phase_id": {
+            "type": "string",
+            "pattern": "^PHASE_[0-9]+$",
+            "description": "Identificator unic pentru fază"
+          },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "duration_estimate": { "type": "string" },
+          "priority": {
+            "type": "string",
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+          },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^PHASE_[0-9]+$" },
+            "description": "Faze de care depinde această fază"
+          },
+          "tasks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["task_id", "name", "description", "status"],
+              "additionalProperties": true,
+              "properties": {
+                "task_id": { "type": "string" },
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "status": {
+                  "type": "string",
+                  "enum": ["pending", "in_progress", "done", "blocked"]
+                },
+                "files_to_create": { "type": "array", "items": { "type": "string" } },
+                "files_to_modify": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "key_technical_decisions": {
+      "type": "object",
+      "description": "Decizii tehnice cheie - structură flexibilă"
+    },
+
+    "file_structure_target": {
+      "type": "object",
+      "description": "Structura țintă a fișierelor"
+    },
+
+    "success_criteria": {
+      "type": "object",
+      "required": ["functional", "performance", "security", "integration"],
+      "properties": {
+        "functional": { "type": "array", "items": { "type": "string" } },
+        "performance": { "type": "array", "items": { "type": "string" } },
+        "security": { "type": "array", "items": { "type": "string" } },
+        "integration": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

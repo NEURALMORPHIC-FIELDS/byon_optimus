@@ -1,0 +1,34 @@
+{
+  "name": "@byon-bot/cli",
+  "version": "1.0.0",
+  "description": "Byon Bot CLI - User Interface for approval and monitoring",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "byon": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@byon-bot/shared": "workspace:*",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "inquirer": "^9.2.0",
+    "ora": "^8.0.0",
+    "chokidar": "^3.5.0",
+    "cli-table3": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
