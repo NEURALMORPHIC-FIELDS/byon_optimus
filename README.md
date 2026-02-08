@@ -1,12 +1,16 @@
-# BYON Optimus - Multi-Agent Orchestration System
+<div align="center">
+  <img src="WFP%20logo.png" alt="BYON Optimus" width="400" />
 
-[![CI](https://github.com/YOUR_USERNAME/byon-optimus/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/byon-optimus/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
-[![Patent](https://img.shields.io/badge/Patent-EP25216372.0-blue.svg)](LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](docker-compose.yml)
+  # BYON Optimus - Multi-Agent Orchestration System
 
-**Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+  [![CI](https://github.com/NEURALMORPHIC-FIELDS/byon_optimus/actions/workflows/ci.yml/badge.svg)](https://github.com/NEURALMORPHIC-FIELDS/byon_optimus/actions/workflows/ci.yml)
+  [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+  [![Patent](https://img.shields.io/badge/Patent-EP25216372.0-blue.svg)](LICENSE)
+  [![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+  [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](docker-compose.yml)
+
+  **Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+</div>
 
 > Semantic Intelligence + Kernel Performance = Autonomous Execution with Infinite Memory
 
