@@ -270,7 +270,7 @@ export class SimilaritySearch {
      * Score keyword matches in content
      */
     private scoreKeywordMatch(content: string, keywords: string[]): number {
-        if (keywords.length === 0) return 0;
+        if (keywords.length === 0) {return 0;}
 
         const contentLower = content.toLowerCase();
         let matches = 0;

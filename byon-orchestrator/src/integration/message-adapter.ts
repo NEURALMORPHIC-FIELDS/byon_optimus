@@ -325,8 +325,8 @@ export class MessageAdapter {
      * Process message queue
      */
     private async processQueue(): Promise<void> {
-        if (this.processing) return;
-        if (this.messageQueue.length === 0) return;
+        if (this.processing) {return;}
+        if (this.messageQueue.length === 0) {return;}
 
         this.processing = true;
 

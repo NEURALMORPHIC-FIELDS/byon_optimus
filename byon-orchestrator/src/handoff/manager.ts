@@ -258,9 +258,9 @@ export class HandoffManager {
         const pending: PendingHandoff[] = [];
 
         for (const channel of this.channels.values()) {
-            if (channel.to !== forAgent) continue;
+            if (channel.to !== forAgent) {continue;}
 
-            if (!fs.existsSync(channel.path)) continue;
+            if (!fs.existsSync(channel.path)) {continue;}
 
             const files = fs.readdirSync(channel.path)
                 .filter(f => f.endsWith(".json"))
@@ -354,15 +354,15 @@ export class HandoffManager {
     private getDocumentId(document: MACPDocument): string {
         switch (document.document_type) {
             case "EVIDENCE_PACK":
-                return (document as EvidencePack).evidence_id;
+                return (document).evidence_id;
             case "PLAN_DRAFT":
-                return (document as PlanDraft).plan_id;
+                return (document).plan_id;
             case "APPROVAL_REQUEST":
-                return (document as ApprovalRequest).request_id;
+                return (document).request_id;
             case "EXECUTION_ORDER":
-                return (document as ExecutionOrder).order_id;
+                return (document).order_id;
             case "JOHNSON_RECEIPT":
-                return (document as JohnsonReceipt).receipt_id;
+                return (document).receipt_id;
             default:
                 return "unknown";
         }

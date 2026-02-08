@@ -208,11 +208,11 @@ export function parseDocument(json: string): DeserializationResult<MACPDocument>
  * Type guard for documents
  */
 export function getDocumentType(document: unknown): DocumentType | null {
-    if (isEvidencePack(document)) return "EVIDENCE_PACK";
-    if (isPlanDraft(document)) return "PLAN_DRAFT";
-    if (isApprovalRequest(document)) return "APPROVAL_REQUEST";
-    if (isExecutionOrder(document)) return "EXECUTION_ORDER";
-    if (isJohnsonReceipt(document)) return "JOHNSON_RECEIPT";
+    if (isEvidencePack(document)) {return "EVIDENCE_PACK";}
+    if (isPlanDraft(document)) {return "PLAN_DRAFT";}
+    if (isApprovalRequest(document)) {return "APPROVAL_REQUEST";}
+    if (isExecutionOrder(document)) {return "EXECUTION_ORDER";}
+    if (isJohnsonReceipt(document)) {return "JOHNSON_RECEIPT";}
     return null;
 }
 
@@ -237,37 +237,37 @@ export function validateDocument(document: MACPDocument): {
     // Type-specific validation
     switch (document.document_type) {
         case "EVIDENCE_PACK":
-            if (!(document as EvidencePack).evidence_id) {
+            if (!(document).evidence_id) {
                 errors.push("Missing evidence_id");
             }
             break;
 
         case "PLAN_DRAFT":
-            if (!(document as PlanDraft).plan_id) {
+            if (!(document).plan_id) {
                 errors.push("Missing plan_id");
             }
-            if (!(document as PlanDraft).based_on_evidence) {
+            if (!(document).based_on_evidence) {
                 errors.push("Missing based_on_evidence");
             }
             break;
 
         case "APPROVAL_REQUEST":
-            if (!(document as ApprovalRequest).request_id) {
+            if (!(document).request_id) {
                 errors.push("Missing request_id");
             }
             break;
 
         case "EXECUTION_ORDER":
-            if (!(document as ExecutionOrder).order_id) {
+            if (!(document).order_id) {
                 errors.push("Missing order_id");
             }
-            if (!(document as ExecutionOrder).signature) {
+            if (!(document).signature) {
                 errors.push("Missing signature");
             }
             break;
 
         case "JOHNSON_RECEIPT":
-            if (!(document as JohnsonReceipt).receipt_id) {
+            if (!(document).receipt_id) {
                 errors.push("Missing receipt_id");
             }
             break;

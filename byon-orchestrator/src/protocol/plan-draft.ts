@@ -303,11 +303,11 @@ export function validatePlanDraft(plan: PlanDraft): {
     const errors: string[] = [];
 
     // Check required fields
-    if (!plan.plan_id) errors.push("Missing plan_id");
-    if (!plan.timestamp) errors.push("Missing timestamp");
-    if (!plan.based_on_evidence) errors.push("Missing based_on_evidence");
-    if (!plan.intent) errors.push("Missing intent");
-    if (!plan.hash) errors.push("Missing hash");
+    if (!plan.plan_id) {errors.push("Missing plan_id");}
+    if (!plan.timestamp) {errors.push("Missing timestamp");}
+    if (!plan.based_on_evidence) {errors.push("Missing based_on_evidence");}
+    if (!plan.intent) {errors.push("Missing intent");}
+    if (!plan.hash) {errors.push("Missing hash");}
 
     // Validate document type
     if (plan.document_type !== "PLAN_DRAFT") {
@@ -323,9 +323,9 @@ export function validatePlanDraft(plan: PlanDraft): {
     if (plan.actions) {
         for (let i = 0; i < plan.actions.length; i++) {
             const action = plan.actions[i];
-            if (!action.action_id) errors.push(`Action ${i}: missing action_id`);
-            if (!action.type) errors.push(`Action ${i}: missing type`);
-            if (!action.target) errors.push(`Action ${i}: missing target`);
+            if (!action.action_id) {errors.push(`Action ${i}: missing action_id`);}
+            if (!action.type) {errors.push(`Action ${i}: missing type`);}
+            if (!action.target) {errors.push(`Action ${i}: missing target`);}
         }
     }
 

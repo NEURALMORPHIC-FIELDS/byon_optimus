@@ -402,10 +402,10 @@ export function validateJohnsonReceipt(receipt: JohnsonReceipt): {
     const errors: string[] = [];
 
     // Check required fields
-    if (!receipt.receipt_id) errors.push("Missing receipt_id");
-    if (!receipt.timestamp) errors.push("Missing timestamp");
-    if (!receipt.based_on_order) errors.push("Missing based_on_order");
-    if (!receipt.hash) errors.push("Missing hash");
+    if (!receipt.receipt_id) {errors.push("Missing receipt_id");}
+    if (!receipt.timestamp) {errors.push("Missing timestamp");}
+    if (!receipt.based_on_order) {errors.push("Missing based_on_order");}
+    if (!receipt.hash) {errors.push("Missing hash");}
 
     // Validate document type
     if (receipt.document_type !== "JOHNSON_RECEIPT") {

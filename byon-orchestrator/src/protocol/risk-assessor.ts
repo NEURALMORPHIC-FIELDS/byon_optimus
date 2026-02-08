@@ -341,7 +341,7 @@ export class RiskAssessor {
 
         // Check for content (large changes)
         if (params.content && typeof params.content === "string") {
-            const contentLength = (params.content as string).length;
+            const contentLength = (params.content).length;
             complexity += Math.min(contentLength / 100, 30);
         }
 
@@ -361,8 +361,8 @@ export class RiskAssessor {
      * Convert score to risk level
      */
     private scoreToLevel(score: number): RiskLevel {
-        if (score <= this.config.lowThreshold) return "low";
-        if (score <= this.config.mediumThreshold) return "medium";
+        if (score <= this.config.lowThreshold) {return "low";}
+        if (score <= this.config.mediumThreshold) {return "medium";}
         return "high";
     }
 

@@ -319,7 +319,7 @@ export class RiskAssessmentSystem {
      * Calculate sensitivity score for action targets
      */
     private calculateSensitivityScore(actions: Action[]): number {
-        if (actions.length === 0) return 0;
+        if (actions.length === 0) {return 0;}
 
         let totalSensitivity = 0;
         for (const action of actions) {
@@ -348,8 +348,8 @@ export class RiskAssessmentSystem {
      * Convert score to risk level
      */
     private scoreToLevel(score: number): RiskLevel {
-        if (score <= this.config.lowThreshold) return "low";
-        if (score <= this.config.mediumThreshold) return "medium";
+        if (score <= this.config.lowThreshold) {return "low";}
+        if (score <= this.config.mediumThreshold) {return "medium";}
         return "high";
     }
 
@@ -357,7 +357,7 @@ export class RiskAssessmentSystem {
      * Check if approval is required
      */
     private requiresApproval(level: RiskLevel): boolean {
-        if (this.config.autoApproveLevel === "none") return true;
+        if (this.config.autoApproveLevel === "none") {return true;}
 
         const levelOrder = { low: 0, medium: 1, high: 2 };
         const autoApproveOrder = levelOrder[this.config.autoApproveLevel];

@@ -439,13 +439,13 @@ export class OpenClawBridge {
     }
 
     private validateMessageStructure(msg: OpenClawMessage): void {
-        if (!msg.message_id || typeof msg.message_id !== 'string') throw new Error("Missing message_id");
-        if (!msg.content || typeof msg.content !== 'object') throw new Error("Missing content");
-        if (typeof msg.content.text !== 'string') throw new Error("Missing content.text");
+        if (!msg.message_id || typeof msg.message_id !== 'string') {throw new Error("Missing message_id");}
+        if (!msg.content || typeof msg.content !== 'object') {throw new Error("Missing content");}
+        if (typeof msg.content.text !== 'string') {throw new Error("Missing content.text");}
     }
 
     private signPayload(payload: any): string {
-        if (!this.config.shared_secret) return "";
+        if (!this.config.shared_secret) {return "";}
         // Remove existing signature to sign content
         const { signature, ...data } = payload;
         return crypto
@@ -455,7 +455,7 @@ export class OpenClawBridge {
     }
 
     private verifySignature(message: OpenClawMessage): boolean {
-        if (!message.signature) return false;
+        if (!message.signature) {return false;}
         const calculated = this.signPayload(message);
         // Constant time comparison to prevent timing attacks
         return crypto.timingSafeEqual(

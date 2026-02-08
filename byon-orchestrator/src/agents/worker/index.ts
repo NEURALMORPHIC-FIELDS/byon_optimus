@@ -1079,7 +1079,7 @@ async function main(): Promise<void> {
     // Graceful shutdown handler
     let isShuttingDown = false;
     const shutdown = async (signal: string) => {
-        if (isShuttingDown) return;
+        if (isShuttingDown) {return;}
         isShuttingDown = true;
 
         console.log(`[Worker] Received ${signal}, shutting down gracefully...`);

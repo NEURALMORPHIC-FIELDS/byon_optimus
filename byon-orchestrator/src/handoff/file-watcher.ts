@@ -271,7 +271,7 @@ export class HandoffFileWatcher {
      * Archive processed file
      */
     private archiveFile(filePath: string): void {
-        if (!this.config.archive_path) return;
+        if (!this.config.archive_path) {return;}
 
         const fileName = path.basename(filePath);
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-");

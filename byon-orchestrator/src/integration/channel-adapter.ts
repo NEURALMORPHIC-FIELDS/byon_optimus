@@ -304,7 +304,7 @@ export class ChannelAdapter {
      */
     channelSupports(channelId: string, feature: keyof ChannelCapabilities): boolean {
         const meta = this.channelProfiles.get(channelId);
-        if (!meta) return false;
+        if (!meta) {return false;}
 
         const value = meta.capabilities[feature];
         return typeof value === "boolean" ? value : value > 0;
@@ -391,9 +391,9 @@ function detectFormat(text: string): "plain" | "markdown" | "html" {
  */
 function normalizeAttachmentType(type: string): NormalizedAttachment["type"] {
     const lower = type.toLowerCase();
-    if (lower.includes("image") || lower.includes("photo")) return "image";
-    if (lower.includes("video")) return "video";
-    if (lower.includes("audio") || lower.includes("voice")) return "audio";
-    if (lower.includes("code")) return "code";
+    if (lower.includes("image") || lower.includes("photo")) {return "image";}
+    if (lower.includes("video")) {return "video";}
+    if (lower.includes("audio") || lower.includes("voice")) {return "audio";}
+    if (lower.includes("code")) {return "code";}
     return "file";
 }

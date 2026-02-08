@@ -487,7 +487,7 @@ export class PlanGenerator {
      * Calculate overall risk level for plan
      */
     private calculateRisk(actions: Action[]): RiskLevel {
-        if (actions.length === 0) return "low";
+        if (actions.length === 0) {return "low";}
 
         // Calculate weighted average risk
         let totalWeight = 0;
@@ -506,7 +506,7 @@ export class PlanGenerator {
             return "high";
         }
 
-        if (avgRisk > 1.5) return "medium";
+        if (avgRisk > 1.5) {return "medium";}
         return "low";
     }
 
@@ -534,8 +534,8 @@ export class PlanGenerator {
         const hasTests = actions.some(a => a.type === "test_run");
         const hasBuild = actions.some(a => a.type === "build_run");
 
-        if (hasTests) estimate += 1;
-        if (hasBuild) estimate += 1;
+        if (hasTests) {estimate += 1;}
+        if (hasBuild) {estimate += 1;}
 
         // Cap at max
         return Math.min(estimate, max);

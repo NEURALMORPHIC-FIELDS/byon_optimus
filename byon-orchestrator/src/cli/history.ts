@@ -146,7 +146,7 @@ async function loadHistory(
             .sort((a, b) => b.localeCompare(a)); // Newest first
 
         for (const file of jsonFiles) {
-            if (entries.length >= options.limit) break;
+            if (entries.length >= options.limit) {break;}
 
             try {
                 const content = await fs.readFile(path.join(auditPath, file), "utf-8");
@@ -154,18 +154,18 @@ async function loadHistory(
 
                 // Parse the record based on type
                 const entry = parseAuditRecord(record);
-                if (!entry) continue;
+                if (!entry) {continue;}
 
                 // Filter by timestamp
                 if (options.sinceMs) {
                     const entryTime = new Date(entry.timestamp).getTime();
-                    if (entryTime < options.sinceMs) continue;
+                    if (entryTime < options.sinceMs) {continue;}
                 }
 
                 // Filter by status
                 if (options.status && options.status !== "all") {
-                    if (options.status === "approved" && entry.status !== "success") continue;
-                    if (options.status === "rejected" && entry.status !== "rejected" && entry.status !== "failed") continue;
+                    if (options.status === "approved" && entry.status !== "success") {continue;}
+                    if (options.status === "rejected" && entry.status !== "rejected" && entry.status !== "failed") {continue;}
                 }
 
                 entries.push(entry);
@@ -181,7 +181,7 @@ async function loadHistory(
 }
 
 function parseAuditRecord(record: unknown): HistoryEntry | null {
-    if (!record || typeof record !== "object") return null;
+    if (!record || typeof record !== "object") {return null;}
     const r = record as Record<string, unknown>;
 
     // Try to identify record type
@@ -246,10 +246,10 @@ function parseStatus(status: unknown): HistoryEntry["status"] {
 // ============================================================================
 
 function parseSince(since?: string): number | undefined {
-    if (!since) return undefined;
+    if (!since) {return undefined;}
 
     const match = since.match(/^(\d+)([hdwm])$/);
-    if (!match) return undefined;
+    if (!match) {return undefined;}
 
     const value = parseInt(match[1], 10);
     const unit = match[2];

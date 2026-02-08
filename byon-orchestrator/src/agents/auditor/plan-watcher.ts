@@ -182,7 +182,7 @@ export class PlanWatcher {
         // Categorize files by timestamp
         for (const file of files) {
             // Skip archive directory
-            if (file === "archive") continue;
+            if (file === "archive") {continue;}
 
             const planMatch = file.match(/^plan_(\d+)\.json$/);
             const evidenceMatch = file.match(/^evidence_(\d+)\.json$/);
@@ -253,7 +253,7 @@ export class PlanWatcher {
      * Archive processed files (or just log if read-only)
      */
     private archiveFiles(planPath: string, evidencePath: string): void {
-        if (!this.config.archive_path) return;
+        if (!this.config.archive_path) {return;}
 
         try {
             const archivePlan = path.join(

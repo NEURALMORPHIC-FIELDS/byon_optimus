@@ -471,7 +471,7 @@ export class AuditorAgent {
      * Log action
      */
     private log(action: string, planId?: string, details?: string): void {
-        if (!this.config.enable_audit_logging) return;
+        if (!this.config.enable_audit_logging) {return;}
 
         this.auditLog.push({
             timestamp: new Date().toISOString(),
@@ -787,7 +787,7 @@ async function main(): Promise<void> {
     // Graceful shutdown handler
     let isShuttingDown = false;
     const shutdown = async (signal: string) => {
-        if (isShuttingDown) return;
+        if (isShuttingDown) {return;}
         isShuttingDown = true;
 
         console.log(`[Auditor] Received ${signal}, shutting down gracefully...`);

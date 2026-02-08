@@ -92,8 +92,8 @@ async function listMessages(
 
         // Load messages
         for (const file of files) {
-            if (!file.endsWith(".json")) continue;
-            if (messages.length >= limit) break;
+            if (!file.endsWith(".json")) {continue;}
+            if (messages.length >= limit) {break;}
 
             try {
                 const filePath = path.join(inboxPath, file);
@@ -101,7 +101,7 @@ async function listMessages(
                 const msg = JSON.parse(content) as Partial<InboxMessage>;
 
                 // Filter unread if requested
-                if (options.unread && msg.processed) continue;
+                if (options.unread && msg.processed) {continue;}
 
                 messages.push({
                     message_id: msg.message_id || file.replace(".json", ""),
@@ -186,7 +186,7 @@ async function showMessage(
         let found: InboxMessage | null = null;
 
         for (const file of files) {
-            if (!file.endsWith(".json")) continue;
+            if (!file.endsWith(".json")) {continue;}
 
             try {
                 const filePath = path.join(inboxPath, file);

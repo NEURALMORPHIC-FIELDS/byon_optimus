@@ -355,12 +355,12 @@ export function validateApprovalRequest(request: ApprovalRequest): {
     const errors: string[] = [];
 
     // Check required fields
-    if (!request.request_id) errors.push("Missing request_id");
-    if (!request.timestamp) errors.push("Missing timestamp");
-    if (!request.based_on_plan) errors.push("Missing based_on_plan");
-    if (!request.summary) errors.push("Missing summary");
-    if (!request.expires_at) errors.push("Missing expires_at");
-    if (!request.hash) errors.push("Missing hash");
+    if (!request.request_id) {errors.push("Missing request_id");}
+    if (!request.timestamp) {errors.push("Missing timestamp");}
+    if (!request.based_on_plan) {errors.push("Missing based_on_plan");}
+    if (!request.summary) {errors.push("Missing summary");}
+    if (!request.expires_at) {errors.push("Missing expires_at");}
+    if (!request.hash) {errors.push("Missing hash");}
 
     // Validate document type
     if (request.document_type !== "APPROVAL_REQUEST") {

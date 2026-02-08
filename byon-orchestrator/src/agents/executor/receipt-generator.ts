@@ -195,7 +195,7 @@ export class ReceiptGenerator {
         changeType: "modified" | "created" | "deleted",
         filePath: string
     ): void {
-        if (!this.config.track_changes) return;
+        if (!this.config.track_changes) {return;}
 
         switch (changeType) {
             case "modified":

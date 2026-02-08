@@ -251,7 +251,7 @@ export class ActionGenerator {
             ) {
                 // Match action target to analyzed files
                 const matchingFile = evidence.codebase_context.files_analyzed.find(
-                    f => f.includes(action.target as string) ||
+                    f => f.includes(action.target) ||
                         (action.parameters.filename as string)?.includes(f)
                 );
                 if (matchingFile) {

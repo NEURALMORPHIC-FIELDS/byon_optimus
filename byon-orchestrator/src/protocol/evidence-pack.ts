@@ -530,10 +530,10 @@ export function validateEvidencePack(pack: EvidencePack): {
     const errors: string[] = [];
 
     // Check required fields
-    if (!pack.evidence_id) errors.push("Missing evidence_id");
-    if (!pack.timestamp) errors.push("Missing timestamp");
-    if (!pack.task_type) errors.push("Missing task_type");
-    if (!pack.hash) errors.push("Missing hash");
+    if (!pack.evidence_id) {errors.push("Missing evidence_id");}
+    if (!pack.timestamp) {errors.push("Missing timestamp");}
+    if (!pack.task_type) {errors.push("Missing task_type");}
+    if (!pack.hash) {errors.push("Missing hash");}
 
     // Validate document type
     if (pack.document_type !== "EVIDENCE_PACK") {
@@ -541,9 +541,9 @@ export function validateEvidencePack(pack: EvidencePack): {
     }
 
     // Validate arrays exist
-    if (!Array.isArray(pack.sources)) errors.push("sources must be array");
-    if (!Array.isArray(pack.extracted_facts)) errors.push("extracted_facts must be array");
-    if (!Array.isArray(pack.raw_quotes)) errors.push("raw_quotes must be array");
+    if (!Array.isArray(pack.sources)) {errors.push("sources must be array");}
+    if (!Array.isArray(pack.extracted_facts)) {errors.push("extracted_facts must be array");}
+    if (!Array.isArray(pack.raw_quotes)) {errors.push("raw_quotes must be array");}
 
     // Validate GMV hint if present
     if (pack.global_memory_hint) {

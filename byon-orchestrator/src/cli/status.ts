@@ -185,7 +185,7 @@ async function getAgentStatus(config: ReturnType<typeof getDefaultConfig>): Prom
         try {
             const fullPath = path.resolve(basePath, dir);
             const files = await fs.readdir(fullPath);
-            if (files.length === 0) return undefined;
+            if (files.length === 0) {return undefined;}
 
             // Get most recent file
             let latest = 0;
@@ -263,7 +263,7 @@ function formatTimeAgo(iso: string): string {
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
 
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
+    if (hours > 0) {return `${hours}h ago`;}
+    if (minutes > 0) {return `${minutes}m ago`;}
     return `${seconds}s ago`;
 }

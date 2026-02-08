@@ -237,7 +237,7 @@ export class CalendarIndex {
      */
     remove(entryId: string): boolean {
         const entry = this.allEntries.get(entryId);
-        if (!entry) return false;
+        if (!entry) {return false;}
 
         const date = new Date(entry.timestamp);
         const year = date.getFullYear();
@@ -291,26 +291,26 @@ export class CalendarIndex {
         // Start with most specific level
         if (query.year !== undefined) {
             const yearIndex = this.years.get(query.year);
-            if (!yearIndex) return [];
+            if (!yearIndex) {return [];}
 
             if (query.month !== undefined) {
                 const monthIndex = yearIndex.months.get(query.month);
-                if (!monthIndex) return [];
+                if (!monthIndex) {return [];}
 
                 if (query.day !== undefined) {
                     const dayIndex = monthIndex.days.get(query.day);
-                    if (!dayIndex) return [];
+                    if (!dayIndex) {return [];}
 
                     if (query.hour !== undefined) {
                         const hourIndex = dayIndex.hours.get(query.hour);
-                        if (!hourIndex) return [];
+                        if (!hourIndex) {return [];}
                         entries = Array.from(hourIndex.entries.values());
                     } else {
                         entries = Array.from(dayIndex.entries.values());
                     }
                 } else if (query.week !== undefined) {
                     const weekIndex = monthIndex.weeks.get(query.week);
-                    if (!weekIndex) return [];
+                    if (!weekIndex) {return [];}
                     entries = Array.from(weekIndex.entries.values());
                 } else {
                     entries = Array.from(monthIndex.entries.values());
@@ -445,7 +445,7 @@ export class CalendarIndex {
      */
     getMonths(year: number): number[] {
         const yearIndex = this.years.get(year);
-        if (!yearIndex) return [];
+        if (!yearIndex) {return [];}
         return Array.from(yearIndex.months.keys()).sort((a, b) => b - a);
     }
 
@@ -454,7 +454,7 @@ export class CalendarIndex {
      */
     getDays(year: number, month: number): number[] {
         const monthIndex = this.years.get(year)?.months.get(month);
-        if (!monthIndex) return [];
+        if (!monthIndex) {return [];}
         return Array.from(monthIndex.days.keys()).sort((a, b) => b - a);
     }
 

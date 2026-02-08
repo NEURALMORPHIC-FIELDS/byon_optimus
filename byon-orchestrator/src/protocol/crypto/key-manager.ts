@@ -157,7 +157,7 @@ export class KeyManager {
      * Get active signing key
      */
     getActiveKey(): KeyPair | null {
-        if (!this.activeKeyId) return null;
+        if (!this.activeKeyId) {return null;}
         return this.keys.get(this.activeKeyId) || null;
     }
 
@@ -165,13 +165,13 @@ export class KeyManager {
      * Get signer for active key
      */
     getActiveSigner(): Ed25519Signer | null {
-        if (!this.activeKeyId) return null;
+        if (!this.activeKeyId) {return null;}
 
         const privateKey = this.getDecryptedPrivateKey(this.activeKeyId);
-        if (!privateKey) return null;
+        if (!privateKey) {return null;}
 
         const keyPair = this.keys.get(this.activeKeyId);
-        if (!keyPair) return null;
+        if (!keyPair) {return null;}
 
         return createEd25519Signer(privateKey, keyPair.publicKey);
     }
@@ -181,10 +181,10 @@ export class KeyManager {
      */
     getSigner(keyId: string): Ed25519Signer | null {
         const privateKey = this.getDecryptedPrivateKey(keyId);
-        if (!privateKey) return null;
+        if (!privateKey) {return null;}
 
         const keyPair = this.keys.get(keyId);
-        if (!keyPair) return null;
+        if (!keyPair) {return null;}
 
         return createEd25519Signer(privateKey, keyPair.publicKey);
     }
@@ -260,7 +260,7 @@ export class KeyManager {
      */
     isKeyExpired(keyId: string): boolean {
         const keyPair = this.keys.get(keyId);
-        if (!keyPair?.expiresAt) return false;
+        if (!keyPair?.expiresAt) {return false;}
 
         return new Date() > new Date(keyPair.expiresAt);
     }
@@ -270,7 +270,7 @@ export class KeyManager {
      */
     needsRotation(keyId: string): boolean {
         const keyPair = this.keys.get(keyId);
-        if (!keyPair?.expiresAt) return false;
+        if (!keyPair?.expiresAt) {return false;}
 
         const expiresAt = new Date(keyPair.expiresAt);
         const rotateThreshold = new Date(
@@ -369,7 +369,7 @@ export class KeyManager {
 
         // Decrypt from storage
         const keyPair = this.keys.get(keyId);
-        if (!keyPair) return null;
+        if (!keyPair) {return null;}
 
         try {
             const decrypted = this.decryptPrivateKey(keyPair.privateKeyEncrypted);

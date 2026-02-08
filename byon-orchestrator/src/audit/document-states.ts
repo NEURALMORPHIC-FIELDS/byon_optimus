@@ -242,7 +242,7 @@ export class DocumentStateManager {
      */
     canTransition(documentId: string, targetState: DocumentState): boolean {
         const document = this.documents.get(documentId);
-        if (!document) return false;
+        if (!document) {return false;}
 
         const currentStateInfo = STATE_INFO[document.state];
         return currentStateInfo.allowedTransitions.includes(targetState);
@@ -313,7 +313,7 @@ export class DocumentStateManager {
      */
     canHardDelete(documentId: string): boolean {
         const document = this.documents.get(documentId);
-        if (!document) return false;
+        if (!document) {return false;}
 
         return STATE_INFO[document.state].canHardDelete;
     }
@@ -323,7 +323,7 @@ export class DocumentStateManager {
      */
     canModify(documentId: string): boolean {
         const document = this.documents.get(documentId);
-        if (!document) return false;
+        if (!document) {return false;}
 
         return STATE_INFO[document.state].canModify && !document.is_deleted;
     }
@@ -333,7 +333,7 @@ export class DocumentStateManager {
      */
     hardDelete(documentId: string, actor: string): boolean {
         const document = this.documents.get(documentId);
-        if (!document) return false;
+        if (!document) {return false;}
 
         if (!this.canHardDelete(documentId)) {
             return false;

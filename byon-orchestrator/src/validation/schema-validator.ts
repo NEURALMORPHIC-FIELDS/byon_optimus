@@ -63,7 +63,7 @@ export interface ValidationError {
 // VALIDATOR
 // ============================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type AjvValidateFunction = (data: unknown) => boolean & { errors?: Array<{ instancePath?: string; message?: string; keyword?: string }> | null };
 
 export class SchemaValidator {
@@ -160,11 +160,11 @@ export class SchemaValidator {
         }
 
         // Heuristic detection by unique fields
-        if ("evidence_id" in doc && "extracted_facts" in doc) return "EVIDENCE_PACK";
-        if ("plan_id" in doc && "based_on_evidence" in doc) return "PLAN_DRAFT";
-        if ("request_id" in doc && "actions_preview" in doc) return "APPROVAL_REQUEST";
-        if ("order_id" in doc && "signature" in doc) return "EXECUTION_ORDER";
-        if ("receipt_id" in doc && "execution_summary" in doc) return "JOHNSON_RECEIPT";
+        if ("evidence_id" in doc && "extracted_facts" in doc) {return "EVIDENCE_PACK";}
+        if ("plan_id" in doc && "based_on_evidence" in doc) {return "PLAN_DRAFT";}
+        if ("request_id" in doc && "actions_preview" in doc) {return "APPROVAL_REQUEST";}
+        if ("order_id" in doc && "signature" in doc) {return "EXECUTION_ORDER";}
+        if ("receipt_id" in doc && "execution_summary" in doc) {return "JOHNSON_RECEIPT";}
 
         return null;
     }

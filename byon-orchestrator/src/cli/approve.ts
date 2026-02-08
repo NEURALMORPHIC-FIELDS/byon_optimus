@@ -90,7 +90,7 @@ async function listPendingRequests(
         const now = Date.now();
 
         for (const file of files) {
-            if (!file.endsWith(".json")) continue;
+            if (!file.endsWith(".json")) {continue;}
 
             try {
                 const content = await fs.readFile(path.join(handoffPath, file), "utf-8");
@@ -98,7 +98,7 @@ async function listPendingRequests(
 
                 // Skip expired
                 const expiresAt = new Date(request.expires_at).getTime();
-                if (expiresAt <= now) continue;
+                if (expiresAt <= now) {continue;}
 
                 pending.push({
                     request_id: request.request_id,
@@ -243,7 +243,7 @@ async function findPendingRequest(
         const files = await fs.readdir(handoffPath);
 
         for (const file of files) {
-            if (!file.endsWith(".json")) continue;
+            if (!file.endsWith(".json")) {continue;}
 
             try {
                 const filePath = path.join(handoffPath, file);
@@ -279,7 +279,7 @@ async function findPendingRequest(
 
 function formatTimeRemaining(expiresAt: string): string {
     const remaining = new Date(expiresAt).getTime() - Date.now();
-    if (remaining <= 0) return "expired";
+    if (remaining <= 0) {return "expired";}
 
     const minutes = Math.floor(remaining / 60000);
     const seconds = Math.floor((remaining % 60000) / 1000);
@@ -318,7 +318,7 @@ export async function autoApproveCommand(options: ApproveOptions): Promise<CliRe
         const now = Date.now();
 
         for (const file of files) {
-            if (!file.endsWith(".json")) continue;
+            if (!file.endsWith(".json")) {continue;}
 
             try {
                 const filePath = path.join(handoffPath, file);

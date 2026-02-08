@@ -150,7 +150,7 @@ export class SentinelBridge {
 
     /** Check if WFP Sentinel is installed (status file exists) */
     async isInstalled(): Promise<boolean> {
-        if (this._installed !== null) return this._installed;
+        if (this._installed !== null) {return this._installed;}
         try {
             await stat(join(this.sentinelDir, "status.json"));
             this._installed = true;
@@ -239,7 +239,8 @@ export class SentinelBridge {
 
         let signatureBase64: string;
         try {
-            const signatureBytes = await sign(signedDataBytes, privateKeyBytes);
+            const signResult = sign(signedDataBytes, privateKeyBytes);
+            const signatureBytes = signResult instanceof Promise ? await signResult : signResult;
             signatureBase64 = Buffer.from(signatureBytes).toString("base64");
         } catch (err) {
             console.error("[Sentinel] Failed to sign intent:", err);
@@ -675,7 +676,7 @@ export function extractNetworkPermissions(
 
     for (const action of actions) {
         const actionType = action.type?.toLowerCase() ?? "";
-        const target = (action.target ?? "") as string;
+        const target = (action.target ?? "");
 
         // HTTP/API calls
         if (actionType.includes("http") || actionType.includes("api") || actionType.includes("fetch")) {
@@ -736,7 +737,7 @@ export function extractNetworkPermissions(
     const seen = new Set<string>();
     return permissions.filter(p => {
         const key = `${p.protocol}:${p.host}:${p.port}:${p.direction}`;
-        if (seen.has(key)) return false;
+        if (seen.has(key)) {return false;}
         seen.add(key);
         return true;
     });

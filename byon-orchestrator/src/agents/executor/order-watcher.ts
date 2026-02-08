@@ -214,7 +214,7 @@ export class OrderWatcher {
      * Archive processed file
      */
     private archiveFile(filePath: string): void {
-        if (!this.config.archive_path) return;
+        if (!this.config.archive_path) {return;}
 
         try {
             const archivePath = path.join(

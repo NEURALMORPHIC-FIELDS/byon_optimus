@@ -126,8 +126,8 @@ async function checkNewFiles(
         const seenSet = seen.get(key) || new Set();
 
         for (const file of files) {
-            if (!file.endsWith(".json")) continue;
-            if (seenSet.has(file)) continue;
+            if (!file.endsWith(".json")) {continue;}
+            if (seenSet.has(file)) {continue;}
 
             // New file detected
             try {

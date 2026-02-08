@@ -645,7 +645,7 @@ export class AuditService {
      * Save to persistence
      */
     private saveToPersistence(): void {
-        if (!this.config.persistencePath) return;
+        if (!this.config.persistencePath) {return;}
 
         try {
             if (!fs.existsSync(this.config.persistencePath)) {
@@ -669,11 +669,11 @@ export class AuditService {
      * Load from persistence
      */
     private loadFromPersistence(): void {
-        if (!this.config.persistencePath) return;
+        if (!this.config.persistencePath) {return;}
 
         try {
             const filePath = path.join(this.config.persistencePath, "audit_log.json");
-            if (!fs.existsSync(filePath)) return;
+            if (!fs.existsSync(filePath)) {return;}
 
             const content = fs.readFileSync(filePath, "utf-8");
             const snapshot = JSON.parse(content) as AuditSnapshot;
@@ -852,11 +852,11 @@ export class AuditService {
      * Check if rotation is needed and perform it
      */
     private checkAndRotate(): void {
-        if (!this.config.persistencePath) return;
+        if (!this.config.persistencePath) {return;}
 
         try {
             const logPath = path.join(this.config.persistencePath, "audit_log.json");
-            if (!fs.existsSync(logPath)) return;
+            if (!fs.existsSync(logPath)) {return;}
 
             const stats = fs.statSync(logPath);
             const maxSize = this.config.maxLogSizeBytes || 10 * 1024 * 1024;
@@ -873,11 +873,11 @@ export class AuditService {
      * Rotate the audit log
      */
     rotateLog(): void {
-        if (!this.config.persistencePath) return;
+        if (!this.config.persistencePath) {return;}
 
         try {
             const logPath = path.join(this.config.persistencePath, "audit_log.json");
-            if (!fs.existsSync(logPath)) return;
+            if (!fs.existsSync(logPath)) {return;}
 
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
             const archivePath = path.join(
@@ -913,7 +913,7 @@ export class AuditService {
      * Clean up old rotated logs
      */
     private cleanupOldLogs(): void {
-        if (!this.config.persistencePath) return;
+        if (!this.config.persistencePath) {return;}
 
         try {
             const files = fs.readdirSync(this.config.persistencePath)
@@ -939,7 +939,7 @@ export class AuditService {
      * Get list of rotated log files
      */
     getRotatedLogs(): { filename: string; size: number; created: Date }[] {
-        if (!this.config.persistencePath) return [];
+        if (!this.config.persistencePath) {return [];}
 
         try {
             return fs.readdirSync(this.config.persistencePath)

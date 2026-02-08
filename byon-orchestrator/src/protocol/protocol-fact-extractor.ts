@@ -78,7 +78,7 @@ const FACT_PATTERNS: FactPattern[] = [
         builder: (match) => {
             const subject = match.groups?.subject?.trim();
             const predicate = match.groups?.predicate?.trim();
-            if (!subject || !predicate) return null;
+            if (!subject || !predicate) {return null;}
             return `${subject} is ${predicate}`;
         }
     },
@@ -92,7 +92,7 @@ const FACT_PATTERNS: FactPattern[] = [
         builder: (match) => {
             const term = match.groups?.term?.trim();
             const definition = match.groups?.definition?.trim();
-            if (!term || !definition) return null;
+            if (!term || !definition) {return null;}
             return `${term}: ${definition}`;
         }
     },
@@ -107,7 +107,7 @@ const FACT_PATTERNS: FactPattern[] = [
             const subject = match.groups?.subject?.trim();
             const modal = match.groups?.modal?.toLowerCase();
             const requirement = match.groups?.requirement?.trim();
-            if (!subject || !modal || !requirement) return null;
+            if (!subject || !modal || !requirement) {return null;}
             return `${subject} ${modal} ${requirement}`;
         }
     },
@@ -122,7 +122,7 @@ const FACT_PATTERNS: FactPattern[] = [
             const subject = match.groups?.subject?.trim();
             const constraint = match.groups?.constraint?.toLowerCase();
             const action = match.groups?.action?.trim();
-            if (!subject || !constraint || !action) return null;
+            if (!subject || !constraint || !action) {return null;}
             return `${subject} ${constraint} ${action}`;
         }
     },
@@ -135,7 +135,7 @@ const FACT_PATTERNS: FactPattern[] = [
         tags: ["assertion", "verified"],
         builder: (match) => {
             const assertion = match.groups?.assertion?.trim();
-            if (!assertion) return null;
+            if (!assertion) {return null;}
             return `Confirmed: ${assertion}`;
         }
     },
@@ -149,7 +149,7 @@ const FACT_PATTERNS: FactPattern[] = [
         builder: (match) => {
             const subject = match.groups?.subject?.trim();
             const value = match.groups?.value?.trim();
-            if (!subject || !value) return null;
+            if (!subject || !value) {return null;}
             return `${subject} equals ${value}`;
         }
     },
@@ -162,7 +162,7 @@ const FACT_PATTERNS: FactPattern[] = [
         tags: ["code", "function"],
         builder: (match) => {
             const name = match.groups?.name;
-            if (!name) return null;
+            if (!name) {return null;}
             return `Function defined: ${name}`;
         }
     },
@@ -176,7 +176,7 @@ const FACT_PATTERNS: FactPattern[] = [
         builder: (match) => {
             const name = match.groups?.name;
             const ext = match.groups?.extends;
-            if (!name) return null;
+            if (!name) {return null;}
             return ext ? `Type defined: ${name} extends ${ext}` : `Type defined: ${name}`;
         }
     },
@@ -189,7 +189,7 @@ const FACT_PATTERNS: FactPattern[] = [
         tags: ["code", "export"],
         builder: (match) => {
             const name = match.groups?.name;
-            if (!name) return null;
+            if (!name) {return null;}
             return `Export: ${name}`;
         }
     },
@@ -202,7 +202,7 @@ const FACT_PATTERNS: FactPattern[] = [
         tags: ["code", "dependency"],
         builder: (match) => {
             const module = match.groups?.module;
-            if (!module) return null;
+            if (!module) {return null;}
             return `Import from: ${module}`;
         }
     },
@@ -215,7 +215,7 @@ const FACT_PATTERNS: FactPattern[] = [
         tags: ["api", "endpoint"],
         builder: (match) => {
             const endpoint = match.groups?.endpoint;
-            if (!endpoint) return null;
+            if (!endpoint) {return null;}
             return `API endpoint: ${match[0].trim()}`;
         }
     },
@@ -228,7 +228,7 @@ const FACT_PATTERNS: FactPattern[] = [
         tags: ["error", "issue"],
         builder: (match) => {
             const message = match.groups?.message?.trim();
-            if (!message) return null;
+            if (!message) {return null;}
             return `Error: ${message}`;
         }
     }
@@ -277,7 +277,7 @@ export class ProtocolFactExtractor {
                 try {
                     const content = factPattern.builder(match);
 
-                    if (!content) continue;
+                    if (!content) {continue;}
 
                     // Validate length
                     if (

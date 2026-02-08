@@ -198,7 +198,7 @@ export class MemoryBridge {
                 this.health.fallback.latency_ms = latency;
             }
 
-            if (!response.ok) return false;
+            if (!response.ok) {return false;}
 
             const data = await response.json() as { success?: boolean };
             return data.success === true;
@@ -239,7 +239,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; ctx_id?: number; error?: string };
-            if (!result.success) throw new Error(result.error || "Store failed");
+            if (!result.success) {throw new Error(result.error || "Store failed");}
             return result.ctx_id!;
         });
     }
@@ -263,7 +263,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; ctx_id?: number; error?: string };
-            if (!result.success) throw new Error(result.error || "Store failed");
+            if (!result.success) {throw new Error(result.error || "Store failed");}
             return result.ctx_id!;
         });
     }
@@ -288,7 +288,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; ctx_id?: number; error?: string };
-            if (!result.success) throw new Error(result.error || "Store failed");
+            if (!result.success) {throw new Error(result.error || "Store failed");}
             return result.ctx_id!;
         });
     }
@@ -318,7 +318,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; results?: SearchResult[]; error?: string };
-            if (!result.success) throw new Error(result.error || "Search failed");
+            if (!result.success) {throw new Error(result.error || "Search failed");}
             return result.results || [];
         });
     }
@@ -344,7 +344,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; results?: SearchResult[]; error?: string };
-            if (!result.success) throw new Error(result.error || "Search failed");
+            if (!result.success) {throw new Error(result.error || "Search failed");}
             return result.results || [];
         });
     }
@@ -370,7 +370,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; results?: SearchResult[]; error?: string };
-            if (!result.success) throw new Error(result.error || "Search failed");
+            if (!result.success) {throw new Error(result.error || "Search failed");}
             return result.results || [];
         });
     }
@@ -405,7 +405,7 @@ export class MemoryBridge {
                 facts?: SearchResult[];
                 error?: string;
             };
-            if (!result.success) throw new Error(result.error || "Search failed");
+            if (!result.success) {throw new Error(result.error || "Search failed");}
             return {
                 code: result.code || [],
                 conversation: result.conversation || [],
@@ -442,7 +442,7 @@ export class MemoryBridge {
                 similarity?: number;
                 error?: string;
             };
-            if (!result.success) throw new Error(result.error || "Recovery test failed");
+            if (!result.success) {throw new Error(result.error || "Recovery test failed");}
             return {
                 recovered: result.recovered || false,
                 similarity: result.similarity || 0
@@ -462,7 +462,7 @@ export class MemoryBridge {
             });
 
             const result = await response.json() as { success: boolean; stats?: MemoryStats; error?: string };
-            if (!result.success) throw new Error(result.error || "Stats failed");
+            if (!result.success) {throw new Error(result.error || "Stats failed");}
             return result.stats!;
         });
     }

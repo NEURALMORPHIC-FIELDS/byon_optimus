@@ -321,7 +321,7 @@ export class ApprovalManager {
      */
     shouldAutoApprove(requestId: string): boolean {
         const pending = this.pendingApprovals.get(requestId);
-        if (!pending) return false;
+        if (!pending) {return false;}
 
         return !pending.request.requires_approval;
     }
