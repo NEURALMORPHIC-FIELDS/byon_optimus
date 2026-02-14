@@ -152,6 +152,18 @@ coverage/
 .pytest_cache/
 htmlcov/
 
+# Test outputs (generated, not tracked)
+tests/*_output.txt
+tests/*_results.json
+test_smoke_storage/
+test-results/
+
+# FHRSS runtime storage
+fhrss_fcpe_multiscale_storage/
+
+# Benchmark results (regenerated on demand)
+**/benchmark_results_*.json
+
 # ============================================
 # TEMPORARY FILES
 # ============================================

@@ -11,7 +11,7 @@
  * Worker AI Processor
  * ===================
  *
- * Integrates Claude AI for intelligent task processing.
+ * Integrates Claude AI or Local LLM for intelligent task processing.
  * Generates actual code, analysis, and plans based on user requests.
  */
 
@@ -22,7 +22,9 @@ import Anthropic from "@anthropic-ai/sdk";
 // ============================================================================
 
 export interface AIProcessorConfig {
-    apiKey: string;
+    apiKey?: string;
+    provider: "anthropic" | "openai_compatible";
+    baseUrl?: string;
     model: string;
     maxTokens: number;
     temperature: number;
@@ -57,12 +59,103 @@ export interface AIResponse {
 }
 
 // ============================================================================
+// LLM CLIENT INTERFACE
+// ============================================================================
+
+interface LLMClient {
+    chat(system: string, user: string, maxTokens: number, temperature: number): Promise<{ content: string; inputTokens: number; outputTokens: number }>;
+}
+
+class AnthropicClient implements LLMClient {
+    private client: Anthropic;
+    private model: string;
+
+    constructor(apiKey: string, model: string) {
+        this.client = new Anthropic({ apiKey });
+        this.model = model;
+    }
+
+    async chat(system: string, user: string, maxTokens: number, temperature: number): Promise<{ content: string; inputTokens: number; outputTokens: number }> {
+        const response = await this.client.messages.create({
+            model: this.model,
+            max_tokens: maxTokens,
+            temperature: temperature,
+            system: system,
+            messages: [
+                { role: "user", content: user }
+            ]
+        });
+
+        const textContent = response.content
+            .filter(block => block.type === "text")
+            .map(block => (block as { type: "text"; text: string }).text)
+            .join("\n");
+
+        return {
+            content: textContent,
+            inputTokens: response.usage.input_tokens,
+            outputTokens: response.usage.output_tokens
+        };
+    }
+}
+
+class OpenAICompatibleClient implements LLMClient {
+    private baseUrl: string;
+    private model: string;
+    private apiKey: string; // Optional for some local servers
+
+    constructor(baseUrl: string, model: string, apiKey: string = "not-needed") {
+        this.baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+        this.model = model;
+        this.apiKey = apiKey;
+    }
+
+    async chat(system: string, user: string, maxTokens: number, temperature: number): Promise<{ content: string; inputTokens: number; outputTokens: number }> {
+        const payload = {
+            model: this.model,
+            messages: [
+                { role: "system", content: system },
+                { role: "user", content: user }
+            ],
+            max_tokens: maxTokens,
+            temperature: temperature,
+            stream: false
+        };
+
+        const response = await fetch(`${this.baseUrl}/chat/completions`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.apiKey}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`LLM API Error ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json() as any;
+        const textContent = data.choices?.[0]?.message?.content || "";
+
+        return {
+            content: textContent,
+            inputTokens: data.usage?.prompt_tokens || 0,
+            outputTokens: data.usage?.completion_tokens || 0
+        };
+    }
+}
+
+// ============================================================================
 // DEFAULT CONFIG
 // ============================================================================
 
 const DEFAULT_CONFIG: AIProcessorConfig = {
-    apiKey: process.env["ANTHROPIC_API_KEY"] || "",
-    model: "claude-3-haiku-20240307",  // Only model available with current API key
+    apiKey: process.env["ANTHROPIC_API_KEY"],
+    provider: (process.env["LLM_PROVIDER"] as "anthropic" | "openai_compatible") || (process.env["ANTHROPIC_API_KEY"] ? "anthropic" : "openai_compatible"),
+    baseUrl: process.env["LLM_BASE_URL"] || "http://localhost:11434/v1",
+    model: process.env["LLM_MODEL"] || "claude-3-haiku-20240307",
     maxTokens: 4096,
     temperature: 0.3
 };
@@ -129,17 +222,20 @@ Format your response with:
 // ============================================================================
 
 export class AIProcessor {
-    private client: Anthropic | null = null;
+    private client: LLMClient | null = null;
     private config: AIProcessorConfig;
 
     constructor(config: Partial<AIProcessorConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
 
-        if (this.config.apiKey) {
-            this.client = new Anthropic({ apiKey: this.config.apiKey });
+        if (this.config.provider === "anthropic" && this.config.apiKey) {
+            this.client = new AnthropicClient(this.config.apiKey, this.config.model);
             console.log("[AIProcessor] Initialized with Claude API");
+        } else if (this.config.provider === "openai_compatible" && this.config.baseUrl) {
+            this.client = new OpenAICompatibleClient(this.config.baseUrl, this.config.model);
+            console.log(`[AIProcessor] Initialized with OpenAI Compatible API (${this.config.baseUrl})`);
         } else {
-            console.warn("[AIProcessor] No API key - AI features disabled");
+            console.warn("[AIProcessor] No valid provider config - AI features disabled");
         }
     }
 
@@ -158,9 +254,9 @@ export class AIProcessor {
             return {
                 success: false,
                 taskType: context.taskType,
-                result: { content: "AI processing not available - no API key configured" },
+                result: { content: "AI processing not available - configured incorrectly" },
                 tokens: { input: 0, output: 0 },
-                error: "NO_API_KEY"
+                error: "NO_VALID_PROVIDER"
             };
         }
 
@@ -169,38 +265,30 @@ export class AIProcessor {
         // Build user message with context
         let userMessage = context.content;
 
-        if (context.memoryContext?.relevantFacts.length) {
+        if (context.memoryContext?.relevantFacts?.length) {
             userMessage = `Context from memory:\n${context.memoryContext.relevantFacts.join("\n")}\n\n---\n\nTask:\n${context.content}`;
         }
 
         try {
-            console.log(`[AIProcessor] Processing ${context.taskType} task: ${context.taskId}`);
+            console.log(`[AIProcessor] Processing ${context.taskType} task: ${context.taskId} via ${this.config.provider}`);
 
-            const response = await this.client.messages.create({
-                model: this.config.model,
-                max_tokens: this.config.maxTokens,
-                temperature: this.config.temperature,
-                system: systemPrompt,
-                messages: [
-                    { role: "user", content: userMessage }
-                ]
-            });
-
-            const textContent = response.content
-                .filter(block => block.type === "text")
-                .map(block => (block as { type: "text"; text: string }).text)
-                .join("\n");
+            const response = await this.client.chat(
+                systemPrompt,
+                userMessage,
+                this.config.maxTokens,
+                this.config.temperature
+            );
 
             // Parse response based on task type
-            const result = this.parseResponse(context.taskType, textContent);
+            const result = this.parseResponse(context.taskType, response.content);
 
             return {
                 success: true,
                 taskType: context.taskType,
                 result,
                 tokens: {
-                    input: response.usage.input_tokens,
-                    output: response.usage.output_tokens
+                    input: response.inputTokens,
+                    output: response.outputTokens
                 }
             };
 

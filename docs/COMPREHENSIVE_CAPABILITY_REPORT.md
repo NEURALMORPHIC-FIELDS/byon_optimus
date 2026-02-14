@@ -9,11 +9,11 @@
 
 ## 📊 EXECUTIVE SUMMARY
 
-BYON Optimus este un sistem **multi-agent orchestrator** cu capabilități de:
-- **Securitate enterprise** (Ed25519, air-gap, approval flow)
-- **Memorie infinită** (FHRSS+FCPE, 73,000x compression)
-- **Procesare AI** (Claude Sonnet 4.5)
-- **Orchestrare task-uri** (Worker → Auditor → Executor pipeline)
+BYON Optimus is a **multi-agent orchestrator** system with capabilities for:
+- **Enterprise security** (Ed25519, air-gap, approval flow)
+- **Infinite memory** (FHRSS+FCPE, 73,000x compression)
+- **AI processing** (Claude Sonnet 4.5)
+- **Task orchestration** (Worker → Auditor → Executor pipeline)
 
 ---
 
@@ -22,18 +22,18 @@ BYON Optimus este un sistem **multi-agent orchestrator** cu capabilități de:
 ### 1. SECURITY & COMPLIANCE ⭐⭐⭐⭐⭐
 
 #### What It Does
-- **Ed25519 digital signatures** pentru toate comenzile
-- **Air-gapped execution** (Executor fără acces la rețea)
-- **Human-in-the-loop approval** pentru operațiuni cu risc
-- **Complete audit trail** (toate tranzacțiile sunt logate)
-- **Zero-trust architecture** (fiecare component verifică toate inputs)
+- **Ed25519 digital signatures** for all commands
+- **Air-gapped execution** (Executor without network access)
+- **Human-in-the-loop approval** for risky operations
+- **Complete audit trail** (all transactions are logged)
+- **Zero-trust architecture** (each component verifies all inputs)
 
 #### Capabilities
-✅ **Cryptographic verification** — 100% validare semnături  
-✅ **Audit logging** — fiecare acțiune are evidence + receipt  
-✅ **Risk assessment** — clasificare automată low/medium/high  
-✅ **Rollback support** — toate acțiunile sunt reversibile  
-✅ **Approval workflow** — 3-tier validation (Worker → Auditor → User)  
+✅ **Cryptographic verification** — 100% signature validation
+✅ **Audit logging** — each action has evidence + receipt
+✅ **Risk assessment** — automatic classification low/medium/high
+✅ **Rollback support** — all actions are reversible
+✅ **Approval workflow** — 3-tier validation (Worker → Auditor → User)
 
 #### Use Cases
 - **Financial transactions** — banking, crypto, payments
@@ -43,16 +43,16 @@ BYON Optimus este un sistem **multi-agent orchestrator** cu capabilități de:
 - **Critical infrastructure** — power grids, water, transportation
 
 #### Implementation Opportunity: **HIGH** 🔥
-**Reason:** Singura platformă open-source cu Ed25519 + air-gap + approval în același sistem.
+**Reason:** The only open-source platform with Ed25519 + air-gap + approval in the same system.
 
 ---
 
 ### 2. MEMORY & DATA MANAGEMENT ⭐⭐⭐⭐⭐
 
 #### What It Does
-- **FHRSS storage** — 100% data recovery la 40% loss (patent EP25216372.0)
+- **FHRSS storage** — 100% data recovery at 40% loss (patent EP25216372.0)
 - **FCPE compression** — 73,000:1 ratio (2M tokens → 384-dim vector)
-- **Semantic search** — MiniLM embeddings pentru query natural language
+- **Semantic search** — MiniLM embeddings for natural language query
 - **Multi-type storage** — code, conversation, facts
 - **Fault tolerance** — XOR parity, self-healing
 
@@ -74,10 +74,10 @@ BYON Optimus este un sistem **multi-agent orchestrator** cu capabilități de:
 **Compression demo:** 245 contexts = 0.72 MB = **~3 KB per context** (amazing!)
 
 #### Capabilities
-✅ **Infinite memory** — scalează la milioane de contexte  
-✅ **Semantic search** — găsește informații fără keywords exacte  
-✅ **Data recovery** — reconstrucție la 40% data loss  
-✅ **Multi-modal** — suportă text, cod, conversații  
+✅ **Infinite memory** — scales to millions of contexts
+✅ **Semantic search** — finds information without exact keywords
+✅ **Data recovery** — reconstruction at 40% data loss
+✅ **Multi-modal** — supports text, code, conversations
 ✅ **Fast retrieval** — <20ms search latency  
 
 #### Use Cases

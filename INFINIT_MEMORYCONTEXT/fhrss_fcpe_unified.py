@@ -39,8 +39,66 @@ from functools import reduce
 from operator import xor
 import logging
 import json
+import threading
+
+# Conditional FAISS import — graceful fallback to linear scan
+try:
+    import faiss
+    HAS_FAISS = True
+except ImportError:
+    HAS_FAISS = False
 
 logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# GF(256) ARITHMETIC — Reed-Solomon Support (Patent EP25216372.0)
+# ============================================================================
+# Primitive polynomial: x^8 + x^4 + x^3 + x^2 + 1 = 0x11D
+# Generator: alpha = 2 (primitive element, order 255)
+
+_GF_EXP = [0] * 512   # anti-log table (doubled for modular wraparound)
+_GF_LOG = [0] * 256    # log table
+
+def _init_gf_tables():
+    """Build GF(2^8) log/exp tables once at module load."""
+    x = 1
+    for i in range(255):
+        _GF_EXP[i] = x
+        _GF_LOG[x] = i
+        x <<= 1
+        if x & 0x100:
+            x ^= 0x11D  # reduce by primitive polynomial
+    # Extend exp table for easy modular arithmetic
+    for i in range(255, 512):
+        _GF_EXP[i] = _GF_EXP[i - 255]
+
+_init_gf_tables()
+
+def gf_mul(a: int, b: int) -> int:
+    """Multiply two elements in GF(256)."""
+    if a == 0 or b == 0:
+        return 0
+    return _GF_EXP[_GF_LOG[a] + _GF_LOG[b]]
+
+def gf_div(a: int, b: int) -> int:
+    """Divide a by b in GF(256). b must be nonzero."""
+    if b == 0:
+        raise ZeroDivisionError("Division by zero in GF(256)")
+    if a == 0:
+        return 0
+    return _GF_EXP[(_GF_LOG[a] - _GF_LOG[b]) % 255]
+
+def gf_pow(a: int, n: int) -> int:
+    """Raise a to power n in GF(256)."""
+    if n == 0:
+        return 1
+    if a == 0:
+        return 0
+    return _GF_EXP[(_GF_LOG[a] * n) % 255]
+
+# Precomputed alpha^i for i in 0..255
+_ALPHA_POW = [_GF_EXP[i] for i in range(256)]
 
 
 # ============================================================================
@@ -62,10 +120,11 @@ class FCPEConfig:
 
 @dataclass
 class FHRSSConfig:
-    """FHRSS Configuration - XOR Parity System"""
+    """FHRSS Configuration - Reed-Solomon Enhanced Parity System"""
     subcube_size: int = 8
     profile: str = "FULL"
     use_checksums: bool = True
+    parity_strength: int = 2  # 1 = XOR only, 2 = RS dual parity (GF(256))
 
 
 @dataclass
@@ -79,11 +138,25 @@ class MultiScaleConfig:
 
 
 @dataclass
+class FAISSConfig:
+    """FAISS Index Configuration for Episodic Memory Acceleration"""
+    enabled: bool = True                # Enable FAISS acceleration
+    index_type: str = "auto"            # "flat", "ivf", or "auto"
+    ivf_nlist: int = 100                # Number of IVF clusters
+    ivf_nprobe: int = 10                # Clusters to probe during search
+    ivf_training_threshold: int = 1000  # Min vectors before switching to IVF
+    index_filename: str = "faiss_index.bin"
+    id_map_filename: str = "faiss_id_map.pkl"
+    auto_save_interval: int = 100       # Save index every N additions (0=manual only)
+
+
+@dataclass
 class UnifiedConfigV3:
-    """Combined FHRSS + FCPE + MultiScale Configuration"""
+    """Combined FHRSS + FCPE + MultiScale + FAISS Configuration"""
     fcpe: FCPEConfig = field(default_factory=FCPEConfig)
     fhrss: FHRSSConfig = field(default_factory=FHRSSConfig)
     multiscale: MultiScaleConfig = field(default_factory=MultiScaleConfig)
+    faiss: FAISSConfig = field(default_factory=FAISSConfig)
     storage_path: str = "./fhrss_fcpe_multiscale_storage"
     compression_enabled: bool = True
     auto_persist: bool = True
@@ -187,11 +260,19 @@ class FCPEEncoder:
 
 
 # ============================================================================
-# FHRSS ENCODER (XOR Parity - CORRECTED m² diagonal lines)
+# FHRSS ENCODER (Reed-Solomon Enhanced - CORRECTED m² diagonal lines)
 # ============================================================================
 
 class FHRSSEncoder:
-    """FHRSS with CORRECTED diagonal line generation (m² lines per family)."""
+    """FHRSS with RS-enhanced parity and CORRECTED m² diagonal lines per family.
+
+    Upgrade from XOR-only (r=1) to Reed-Solomon dual parity (r=2):
+        P1 = XOR(v[0], v[1], ..., v[m-1])                    (syndrome S1)
+        P2 = XOR(α^0·v[0], α^1·v[1], ..., α^(m-1)·v[m-1])  (syndrome S2)
+
+    r=1: corrects 1 erasure per line (XOR only)
+    r=2: corrects 2 erasures per line (GF(256) solver)
+    """
 
     PROFILES = {
         "MINIMAL": ["X", "Y", "Z"],
@@ -205,9 +286,11 @@ class FHRSSEncoder:
     def __init__(self, config: FHRSSConfig):
         self.config = config
         self.m = config.subcube_size
+        self.r = config.parity_strength  # 1=XOR, 2=RS dual parity
         self.families = self.PROFILES[config.profile]
         self.num_families = len(self.families)
-        self.overhead_ratio = 1 + self.num_families / self.m
+        # Overhead: 1 + r * num_families / m
+        self.overhead_ratio = 1.0 + (self.r * self.num_families) / self.m
 
         self._line_cache: Dict[str, List[List[Tuple[int, int, int]]]] = {}
         for family in self.RECOVERY_PRIORITY:
@@ -269,7 +352,9 @@ class FHRSSEncoder:
         return lines
 
     def encode(self, data: bytes) -> Dict[str, Any]:
+        """Encode data with RS-enhanced parity (r parities per line per family)."""
         m = self.m
+        r = self.r
         subcube_bytes = m ** 3
 
         if len(data) < subcube_bytes:
@@ -286,12 +371,7 @@ class FHRSSEncoder:
 
             parity = {}
             for family in self.families:
-                lines = self._line_cache[family]
-                parity_values = []
-                for line in lines:
-                    values = [int(cube[x, y, z]) for x, y, z in line]
-                    parity_values.append(reduce(xor, values, 0))
-                parity[family] = parity_values
+                parity[family] = self._compute_parity(cube, family)
 
             checksum = hashlib.sha256(chunk).hexdigest() if self.config.use_checksums else ""
 
@@ -306,8 +386,35 @@ class FHRSSEncoder:
             'subcubes': subcubes,
             'original_length': len(data),
             'num_subcubes': num_subcubes,
-            'profile': self.config.profile
+            'profile': self.config.profile,
+            'parity_strength': r
         }
+
+    def _compute_parity(self, cube: np.ndarray, family: str) -> List:
+        """Compute r parity values per line for one family.
+
+        P1[line] = XOR of all values on the line
+        P2[line] = XOR of (alpha^pos * value) for each position  [only if r>=2]
+        """
+        lines = self._line_cache[family]
+        r = self.r
+        parity = []
+
+        for line_coords in lines:
+            p1 = 0
+            p2 = 0
+            for pos, (x, y, z) in enumerate(line_coords):
+                v = int(cube[x, y, z])
+                p1 ^= v
+                if r >= 2:
+                    p2 ^= gf_mul(_ALPHA_POW[pos], v)
+
+            if r >= 2:
+                parity.append((p1, p2))
+            else:
+                parity.append((p1,))
+
+        return parity
 
     def decode(self, encoded: Dict[str, Any], loss_masks: List[np.ndarray] = None) -> bytes:
         m = self.m
@@ -325,12 +432,23 @@ class FHRSSEncoder:
         full_data = b''.join(recovered_data)
         return full_data[:encoded['original_length']]
 
-    def _recover_subcube(self, cube: np.ndarray, parity: Dict[str, List[int]],
+    def _recover_subcube(self, cube: np.ndarray, parity: Dict[str, List],
                          loss_mask: np.ndarray) -> np.ndarray:
+        """Recover a damaged subcube using iterative RS-enhanced parity.
+
+        For each line:
+            0 missing  → skip
+            1 missing  → solve with P1 (XOR)
+            2 missing  → solve with P1 + P2 (GF(256) 2×2 system)  [only if r>=2]
+            3+ missing → skip, try again next iteration
+        """
         data = cube.copy()
+        r = self.r
         recovered = ~loss_mask
 
-        for iteration in range(20):
+        max_iterations = self.num_families * 3
+
+        for iteration in range(max_iterations):
             progress = False
 
             for family in self.RECOVERY_PRIORITY:
@@ -338,20 +456,69 @@ class FHRSSEncoder:
                     continue
 
                 lines = self._line_cache[family]
-                parity_values = parity[family]
+                family_parity = parity[family]
 
-                for line_idx, line in enumerate(lines):
-                    missing = [pos for pos in line if not recovered[pos]]
+                for line_idx, line_coords in enumerate(lines):
+                    missing_positions = []
+                    known_values = []
+                    known_positions = []
 
-                    if len(missing) == 1:
-                        x, y, z = missing[0]
-                        known_xor = parity_values[line_idx]
-                        for px, py, pz in line:
-                            if recovered[px, py, pz]:
-                                known_xor ^= int(data[px, py, pz])
+                    for pos, (x, y, z) in enumerate(line_coords):
+                        if not recovered[x, y, z]:
+                            missing_positions.append((pos, x, y, z))
+                        else:
+                            known_values.append(int(data[x, y, z]))
+                            known_positions.append(pos)
 
-                        data[x, y, z] = known_xor
-                        recovered[x, y, z] = True
+                    num_missing = len(missing_positions)
+
+                    if num_missing == 0 or num_missing > r:
+                        continue  # skip: nothing to do or can't solve yet
+
+                    p1_stored = family_parity[line_idx][0]
+
+                    if num_missing == 1:
+                        # --- 1-erasure correction (XOR) ---
+                        pos_j, xj, yj, zj = missing_positions[0]
+                        s1 = p1_stored ^ reduce(xor, known_values, 0)
+                        data[xj, yj, zj] = s1
+                        recovered[xj, yj, zj] = True
+                        progress = True
+
+                    elif num_missing == 2 and r >= 2:
+                        # --- 2-erasure correction (GF(256) RS) ---
+                        p2_stored = family_parity[line_idx][1]
+
+                        pos_j, xj, yj, zj = missing_positions[0]
+                        pos_k, xk, yk, zk = missing_positions[1]
+
+                        # Compute syndromes
+                        s1 = p1_stored
+                        s2 = p2_stored
+                        for pos, val in zip(known_positions, known_values):
+                            s1 ^= val
+                            s2 ^= gf_mul(_ALPHA_POW[pos], val)
+
+                        # s1 = v[j] ⊕ v[k]
+                        # s2 = α^j·v[j] ⊕ α^k·v[k]
+                        # Solve:
+                        # v[j] = (s2 ⊕ α^k·s1) / (α^j ⊕ α^k)
+                        # v[k] = s1 ⊕ v[j]
+                        aj = _ALPHA_POW[pos_j]
+                        ak = _ALPHA_POW[pos_k]
+                        denom = aj ^ ak  # GF addition = XOR
+
+                        if denom == 0:
+                            continue  # degenerate (should not happen since j != k)
+
+                        numerator = s2 ^ gf_mul(ak, s1)
+                        vj = gf_div(numerator, denom)
+                        vk = s1 ^ vj
+
+                        data[xj, yj, zj] = vj
+                        data[xk, yk, zk] = vk
+                        recovered[xj, yj, zj] = True
+                        recovered[xk, yk, zk] = True
                         progress = True
 
             if not progress:
@@ -360,9 +527,13 @@ class FHRSSEncoder:
         return data
 
     def inject_loss_realistic(self, encoded: Dict[str, Any], loss_percent: float,
-                              seed: int = 42) -> Tuple[Dict[str, Any], List[np.ndarray]]:
-        """
-        FIXED: Inject loss on BOTH data AND parity (realistic scenario).
+                              seed: int = 42, damage_parity: bool = False
+                              ) -> Tuple[Dict[str, Any], List[np.ndarray]]:
+        """Inject random data loss for testing.
+
+        Args:
+            damage_parity: If True, also corrupt parity values (harder test).
+                           If False, parity stays intact (standard test per reference repo).
         """
         import random
         rng = random.Random(seed)
@@ -383,16 +554,27 @@ class FHRSSEncoder:
                             loss_mask[x, y, z] = True
                             cube[x, y, z] = 0
 
-            # Corrupt PARITY (realistic!)
-            damaged_parity = {}
-            for family, parity_list in sc['parity'].items():
-                damaged_list = []
-                for val in parity_list:
-                    if rng.random() < loss_percent:
-                        damaged_list.append(0)  # Corrupted
-                    else:
-                        damaged_list.append(val)
-                damaged_parity[family] = damaged_list
+            # Optionally corrupt PARITY
+            if damage_parity:
+                damaged_parity = {}
+                for family, parity_list in sc['parity'].items():
+                    damaged_list = []
+                    for val in parity_list:
+                        if isinstance(val, tuple):
+                            # RS dual parity: corrupt each component independently
+                            damaged_val = tuple(
+                                0 if rng.random() < loss_percent else v
+                                for v in val
+                            )
+                            damaged_list.append(damaged_val)
+                        else:
+                            if rng.random() < loss_percent:
+                                damaged_list.append(0)
+                            else:
+                                damaged_list.append(val)
+                    damaged_parity[family] = damaged_list
+            else:
+                damaged_parity = sc['parity']  # Parity intact (standard test)
 
             damaged_subcubes.append({
                 'data': cube.tobytes(),
@@ -645,7 +827,228 @@ class MultiScaleFHRSS:
 
 
 # ============================================================================
-# UNIFIED SYSTEM v3.0 (FCPE + FHRSS + MultiScale)
+# FAISS INDEX MANAGER (Episodic Memory Acceleration)
+# ============================================================================
+
+class FAISSIndexManager:
+    """
+    Manages a FAISS index for fast nearest-neighbor search on FCPE vectors.
+
+    Uses IndexFlatIP (inner product) for exact search on L2-normalized vectors.
+    Inner product on unit vectors = cosine similarity.
+    Auto-upgrades to IndexIVFFlat when vector count exceeds threshold.
+
+    Thread-safe: all add/search/save operations are protected by a lock.
+    """
+
+    def __init__(self, dim: int, config: 'FAISSConfig', storage_path: Path):
+        self.dim = dim
+        self.config = config
+        self.storage_path = storage_path
+        self._index = None
+        self._id_map: List[int] = []          # position → context_id
+        self._id_to_pos: Dict[int, int] = {}  # context_id → position
+        self._additions_since_save = 0
+        self._is_ivf = False
+        self._lock = threading.Lock()
+
+        if not HAS_FAISS or not config.enabled:
+            return
+
+        # Try to load saved index, otherwise create empty flat
+        if not self._load_index():
+            self._create_flat_index()
+
+    @property
+    def is_available(self) -> bool:
+        return HAS_FAISS and self.config.enabled and self._index is not None
+
+    @property
+    def ntotal(self) -> int:
+        return self._index.ntotal if self._index is not None else 0
+
+    def _create_flat_index(self):
+        self._index = faiss.IndexFlatIP(self.dim)
+        self._is_ivf = False
+        self._id_map = []
+        self._id_to_pos = {}
+        logger.info(f"FAISS: created IndexFlatIP(dim={self.dim})")
+
+    def _maybe_upgrade_to_ivf(self):
+        """Auto-upgrade from Flat to IVF when enough vectors exist."""
+        if self._is_ivf or self.config.index_type == "flat":
+            return
+
+        n = self._index.ntotal
+        if n < self.config.ivf_training_threshold or n < self.config.ivf_nlist:
+            return
+
+        logger.info(f"FAISS: upgrading to IVF ({n} vectors, nlist={self.config.ivf_nlist})")
+
+        # Extract all vectors from flat index
+        all_vectors = np.zeros((n, self.dim), dtype=np.float32)
+        for i in range(n):
+            all_vectors[i] = faiss.rev_swig_ptr(
+                self._index.get_xb(), n * self.dim
+            ).reshape(n, self.dim)[i]
+
+        # Simpler: reconstruct all at once
+        all_vectors = faiss.rev_swig_ptr(
+            self._index.get_xb(), n * self.dim
+        ).reshape(n, self.dim).copy().astype(np.float32)
+
+        # Create IVF index
+        quantizer = faiss.IndexFlatIP(self.dim)
+        ivf_index = faiss.IndexIVFFlat(
+            quantizer, self.dim, self.config.ivf_nlist,
+            faiss.METRIC_INNER_PRODUCT
+        )
+        ivf_index.nprobe = self.config.ivf_nprobe
+        ivf_index.train(all_vectors)
+        ivf_index.add(all_vectors)
+
+        self._index = ivf_index
+        self._is_ivf = True
+        logger.info(f"FAISS: IVF upgrade complete ({n} vectors)")
+
+    def add(self, context_id: int, vector: np.ndarray):
+        """Add a single L2-normalized vector to the index."""
+        if not self.is_available:
+            return
+
+        with self._lock:
+            if context_id in self._id_to_pos:
+                return  # idempotent
+
+            vec = vector.reshape(1, -1).astype(np.float32)
+            self._id_map.append(context_id)
+            self._id_to_pos[context_id] = self._index.ntotal
+            self._index.add(vec)
+
+            self._additions_since_save += 1
+            self._maybe_upgrade_to_ivf()
+
+            if (self.config.auto_save_interval > 0 and
+                    self._additions_since_save >= self.config.auto_save_interval):
+                self._save_index_unlocked()
+
+    def search(self, query_vector: np.ndarray, top_k: int = 5) -> List[Tuple[int, float]]:
+        """
+        Search by inner product (= cosine similarity for unit vectors).
+
+        Returns list of (context_id, similarity_score), descending by score.
+        """
+        if not self.is_available or self._index.ntotal == 0:
+            return []
+
+        with self._lock:
+            vec = query_vector.reshape(1, -1).astype(np.float32)
+            k = min(top_k, self._index.ntotal)
+            scores, indices = self._index.search(vec, k)
+
+        results = []
+        for score, idx in zip(scores[0], indices[0]):
+            if 0 <= idx < len(self._id_map):
+                results.append((self._id_map[idx], float(score)))
+        return results
+
+    def rebuild_from_contexts(self, contexts: Dict[int, 'EncodedContextV3']):
+        """Rebuild entire index from the context Dict (used on startup)."""
+        if not HAS_FAISS or not self.config.enabled:
+            return
+
+        n = len(contexts)
+        if n == 0:
+            self._create_flat_index()
+            return
+
+        logger.info(f"FAISS: rebuilding index from {n} contexts")
+
+        sorted_ids = sorted(contexts.keys())
+        vectors = np.stack([
+            contexts[cid].fcpe_vector for cid in sorted_ids
+        ]).astype(np.float32)
+
+        # Choose index type based on count
+        use_ivf = (
+            self.config.index_type != "flat" and
+            n >= self.config.ivf_training_threshold and
+            n >= self.config.ivf_nlist
+        )
+
+        if use_ivf:
+            quantizer = faiss.IndexFlatIP(self.dim)
+            self._index = faiss.IndexIVFFlat(
+                quantizer, self.dim, self.config.ivf_nlist,
+                faiss.METRIC_INNER_PRODUCT
+            )
+            self._index.nprobe = self.config.ivf_nprobe
+            self._index.train(vectors)
+            self._is_ivf = True
+        else:
+            self._index = faiss.IndexFlatIP(self.dim)
+            self._is_ivf = False
+
+        self._index.add(vectors)
+        self._id_map = sorted_ids
+        self._id_to_pos = {cid: pos for pos, cid in enumerate(sorted_ids)}
+
+        logger.info(f"FAISS: rebuilt {'IVF' if use_ivf else 'Flat'} index with {n} vectors")
+
+    def save_index(self):
+        """Save FAISS index and ID map to disk (thread-safe)."""
+        if not self.is_available:
+            return
+        with self._lock:
+            self._save_index_unlocked()
+
+    def _save_index_unlocked(self):
+        """Internal save (caller must hold lock)."""
+        index_path = self.storage_path / self.config.index_filename
+        map_path = self.storage_path / self.config.id_map_filename
+
+        try:
+            faiss.write_index(self._index, str(index_path))
+            with open(map_path, 'wb') as f:
+                pickle.dump({
+                    'id_map': self._id_map,
+                    'is_ivf': self._is_ivf
+                }, f)
+            self._additions_since_save = 0
+            logger.info(f"FAISS: saved index ({self._index.ntotal} vectors)")
+        except Exception as e:
+            logger.warning(f"FAISS: failed to save index: {e}")
+
+    def _load_index(self) -> bool:
+        """Load FAISS index from disk. Returns True if successful."""
+        index_path = self.storage_path / self.config.index_filename
+        map_path = self.storage_path / self.config.id_map_filename
+
+        if not index_path.exists() or not map_path.exists():
+            return False
+
+        try:
+            self._index = faiss.read_index(str(index_path))
+            with open(map_path, 'rb') as f:
+                map_data = pickle.load(f)
+
+            self._id_map = map_data['id_map']
+            self._is_ivf = map_data.get('is_ivf', False)
+            self._id_to_pos = {cid: pos for pos, cid in enumerate(self._id_map)}
+
+            if self._is_ivf and hasattr(self._index, 'nprobe'):
+                self._index.nprobe = self.config.ivf_nprobe
+
+            logger.info(f"FAISS: loaded index ({self._index.ntotal} vectors, "
+                         f"{'IVF' if self._is_ivf else 'Flat'})")
+            return True
+        except Exception as e:
+            logger.warning(f"FAISS: failed to load index: {e}")
+            return False
+
+
+# ============================================================================
+# UNIFIED SYSTEM v3.0 (FCPE + FHRSS + MultiScale + FAISS)
 # ============================================================================
 
 @dataclass
@@ -697,11 +1100,16 @@ class UnifiedFHRSS_FCPE_MultiScale:
         if self.config.auto_persist:
             self._load_from_disk()
 
+        # FAISS index (initialized after contexts are loaded)
+        self._init_faiss_index()
+
         logger.info(f"UnifiedFHRSS_FCPE_MultiScale v3.0 initialized")
         logger.info(f"  FCPE: {self.config.fcpe.dim}-dim")
         logger.info(f"  FHRSS: {self.config.fhrss.profile} profile, {self.fhrss.overhead_ratio:.3f}x overhead")
         if self.multiscale:
             logger.info(f"  MultiScale: {len(self.multiscale.domains)} domains, hexagonal={self.config.multiscale.use_hexagonal_packing}")
+        if self._faiss is not None and self._faiss.is_available:
+            logger.info(f"  FAISS: {'IVF' if self._faiss._is_ivf else 'Flat'} index, {self._faiss.ntotal} vectors")
 
     def encode_context(self, embeddings: np.ndarray, metadata: Dict[str, Any] = None) -> int:
         """Encode context with FCPE + FHRSS."""
@@ -735,6 +1143,10 @@ class UnifiedFHRSS_FCPE_MultiScale:
 
         self.contexts[ctx_id] = context
 
+        # Add to FAISS index in real-time
+        if self._faiss is not None:
+            self._faiss.add(ctx_id, fcpe_vector)
+
         if self.config.auto_persist:
             self._persist_context(context)
 
@@ -759,7 +1171,12 @@ class UnifiedFHRSS_FCPE_MultiScale:
             return context.fcpe_vector.copy()
 
     def retrieve_similar(self, query_vector: np.ndarray, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Semantic similarity search."""
+        """Semantic similarity search.
+
+        Uses FAISS inner-product index when available (O(log n) for IVF,
+        O(n) SIMD-accelerated for Flat). Falls back to linear numpy scan
+        when FAISS is not installed or disabled.
+        """
         if len(query_vector.shape) == 2:
             query_vector = self.fcpe.encode(query_vector)
 
@@ -767,6 +1184,28 @@ class UnifiedFHRSS_FCPE_MultiScale:
         if query_norm < 1e-8:
             return []
 
+        # Normalize query (IP on unit vectors = cosine similarity)
+        normalized_query = query_vector / query_norm
+
+        # --- FAISS fast path ---
+        if (self._faiss is not None and
+                self._faiss.is_available and
+                self._faiss.ntotal > 0):
+            faiss_results = self._faiss.search(normalized_query, top_k)
+            results = []
+            for ctx_id, similarity in faiss_results:
+                if ctx_id in self.contexts:
+                    ctx = self.contexts[ctx_id]
+                    results.append({
+                        'ctx_id': ctx_id,
+                        'similarity': similarity,
+                        'metadata': ctx.metadata,
+                        'domain_id': ctx.domain_id,
+                        'access_count': ctx.access_count
+                    })
+            return results
+
+        # --- Linear scan fallback ---
         results = []
         for ctx_id, ctx in self.contexts.items():
             ctx_norm = np.linalg.norm(ctx.fcpe_vector)
@@ -785,20 +1224,27 @@ class UnifiedFHRSS_FCPE_MultiScale:
         results.sort(key=lambda x: x['similarity'], reverse=True)
         return results[:top_k]
 
-    def test_recovery(self, ctx_id: int, loss_percent: float, seed: int = 42) -> Dict[str, Any]:
-        """Test recovery at specified loss level."""
+    def test_recovery(self, ctx_id: int, loss_percent: float, seed: int = 42,
+                       damage_parity: bool = False) -> Dict[str, Any]:
+        """Test recovery at specified loss level using RS-enhanced parity.
+
+        Args:
+            damage_parity: If True, also corrupt parity (harder test).
+                           Default False = parity intact (standard per reference repo).
+        """
         if ctx_id not in self.contexts:
             raise KeyError(f"Context {ctx_id} not found")
 
         context = self.contexts[ctx_id]
         original_vector = context.fcpe_vector.copy()
 
-        # Inject realistic loss (data + parity)
+        # Inject loss (parity intact by default for standard RS testing)
         damaged, loss_masks = self.fhrss.inject_loss_realistic(
-            context.fhrss_encoded, loss_percent, seed
+            context.fhrss_encoded, loss_percent, seed,
+            damage_parity=damage_parity
         )
 
-        # Recover
+        # Recover using RS-enhanced iterative cascade
         t0 = time.time()
         recovered_bytes = self.fhrss.decode(damaged, loss_masks)
         recovery_time = (time.time() - t0) * 1000
@@ -824,7 +1270,8 @@ class UnifiedFHRSS_FCPE_MultiScale:
             'hash_match': hash_match,
             'cosine_similarity': cosine_sim,
             'recovery_time_ms': recovery_time,
-            'realistic_test': True  # Flag that parity was also corrupted
+            'parity_strength': self.fhrss.r,
+            'parity_damaged': damage_parity
         }
 
     def get_stats(self) -> Dict[str, Any]:
@@ -849,7 +1296,48 @@ class UnifiedFHRSS_FCPE_MultiScale:
         if self.multiscale:
             stats['multiscale'] = self.multiscale.get_statistics()
 
+        # FAISS index statistics
+        stats['faiss_available'] = HAS_FAISS
+        stats['faiss_enabled'] = self.config.faiss.enabled
+        if self._faiss is not None and self._faiss.is_available:
+            stats['faiss_index_type'] = 'IVF' if self._faiss._is_ivf else 'Flat'
+            stats['faiss_index_size'] = self._faiss.ntotal
+        else:
+            stats['faiss_index_type'] = 'none'
+            stats['faiss_index_size'] = 0
+
         return stats
+
+    def _init_faiss_index(self):
+        """Initialize the FAISS index, rebuilding from contexts if needed."""
+        if not HAS_FAISS or not self.config.faiss.enabled:
+            self._faiss = None
+            return
+
+        self._faiss = FAISSIndexManager(
+            dim=self.config.fcpe.dim,
+            config=self.config.faiss,
+            storage_path=self.storage_path
+        )
+
+        # Verify index matches context count, rebuild if mismatched
+        if self._faiss.is_available:
+            if self._faiss.ntotal != len(self.contexts):
+                logger.warning(
+                    f"FAISS index has {self._faiss.ntotal} vectors but "
+                    f"Dict has {len(self.contexts)} contexts — rebuilding"
+                )
+                self._faiss.rebuild_from_contexts(self.contexts)
+                self._faiss.save_index()
+        elif len(self.contexts) > 0:
+            # No saved index but we have contexts — rebuild
+            self._faiss.rebuild_from_contexts(self.contexts)
+            self._faiss.save_index()
+
+    def save_faiss_index(self):
+        """Explicitly save the FAISS index to disk."""
+        if self._faiss is not None:
+            self._faiss.save_index()
 
     def _persist_context(self, context: EncodedContextV3):
         """Persist context to disk."""

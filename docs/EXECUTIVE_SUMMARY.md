@@ -1,6 +1,6 @@
 # BYON Optimus — Executive Summary
 
-**TL;DR:** Multi-agent orchestrator cu AI, security enterprise, și memorie infinită.
+**TL;DR:** Multi-agent orchestrator with AI, enterprise security, and infinite memory.
 
 ---
 
@@ -8,7 +8,7 @@
 
 **BYON** = **B**alanced **Y**our **O**peration **N**etwork (Optimus Prime edition)
 
-**Core Value:** Execută task-uri complexe cu:
+**Core Value:** Executes complex tasks with:
 - ✅ **Security** — Ed25519 signatures, air-gap execution
 - ✅ **AI** — Claude Sonnet 4.5 integration
 - ✅ **Memory** — Patent-protected FHRSS+FCPE (73,000:1 compression)

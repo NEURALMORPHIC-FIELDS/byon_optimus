@@ -1,46 +1,46 @@
-# BYON Optimus - Arhitectură
+# BYON Optimus - Architecture
 
-## Componente Principale
+## Main Components
 
-| Serviciu | Port | Rol |
+| Service | Port | Role |
 |----------|------|-----|
-| Worker Agent | 3002 | Procesează mesaje din canale (Telegram, Discord), construiește evidență și planuri |
-| Auditor Agent | 3003 | Validează planuri, semnează cu Ed25519, verifică GMV compliance |
-| Memory Service | 8000/8001 | FHRSS+FCPE - 73,000x compresie, 100% recovery la 40% pierdere date |
-| OpenClaw Gateway | 3000 | UI unificat, proxy pentru toate serviciile |
+| Worker Agent | 3002 | Processes messages from channels (Telegram, Discord), builds evidence and plans |
+| Auditor Agent | 3003 | Validates plans, signs with Ed25519, verifies GMV compliance |
+| Memory Service | 8000/8001 | FHRSS+FCPE - 73,000x compression, 100% recovery at 40% data loss |
+| OpenClaw Gateway | 3000 | Unified UI, proxy for all services |
 
-## Flux de Date
+## Data Flow
 
 ```
-Canale (Telegram/Discord)
+Channels (Telegram/Discord)
          ↓
-Worker Agent (procesare, evidență)
+Worker Agent (processing, evidence)
          ↓
-Auditor Agent (validare, semnare)
+Auditor Agent (validation, signing)
          ↓
 Executor (air-gapped, network_mode: none)
          ↓
 Receipts → Worker → User
 ```
 
-## Endpoint-uri API (prin Gateway)
+## API Endpoints (via Gateway)
 
-- `/api/worker/status` - Status worker
-- `/api/auditor/status` - Status auditor
-- `/api/memory/stats` - Statistici FHRSS+FCPE
-- `/api/memory/search?query=...` - Căutare semantică
+- `/api/worker/status` - Worker status
+- `/api/auditor/status` - Auditor status
+- `/api/memory/stats` - FHRSS+FCPE statistics
+- `/api/memory/search?query=...` - Semantic search
 
-## Tehnologii Cheie
+## Key Technologies
 
-| Tehnologie | Descriere |
+| Technology | Description |
 |------------|-----------|
-| **FHRSS** | Fractal-Holographic Redundant Storage System - Redundanță fractală |
-| **FCPE** | Fractal-Chaotic Persistent Encoding - Compresie 73,000:1 |
-| **GMV** | Global Memory Vectors - Contextul global al conversației |
+| **FHRSS** | Fractal-Holographic Redundant Storage System - Fractal redundancy |
+| **FCPE** | Fractal-Chaotic Persistent Encoding - 73,000:1 compression |
+| **GMV** | Global Memory Vectors - Global conversation context |
 | **MACP v1.1** | Machine Agent Communication Protocol |
 
-## Note
+## Notes
 
-- Executor rulează air-gapped (network_mode: none) pentru securitate
-- Memory service oferă 100% data recovery chiar și la 40% pierdere
-- Toate serviciile sunt accesibile prin Gateway ca proxy unificat
+- Executor runs air-gapped (network_mode: none) for security
+- Memory service provides 100% data recovery even at 40% data loss
+- All services are accessible through Gateway as a unified proxy

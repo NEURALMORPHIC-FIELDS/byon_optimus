@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "byon://schema/global-memory-summary/v1",
   "title": "GlobalMemorySummary v1",
-  "description": "Schema pentru starea globală emergentă a memoriei - NU este rezumat textual, ci stare structurală",
+  "description": "Schema for global emergent memory state - NOT a text summary, but structural state",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -19,12 +19,12 @@
     "document_type": {
       "type": "string",
       "const": "GLOBAL_MEMORY_SUMMARY",
-      "description": "Discriminator pentru tipul de document"
+      "description": "Discriminator for document type"
     },
     "document_version": {
       "type": "string",
       "const": "1.0",
-      "description": "Versiunea schemei"
+      "description": "Schema version"
     },
     "timestamp": {
       "type": "string",

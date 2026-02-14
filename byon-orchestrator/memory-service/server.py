@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-BYON Memory Service
-===================
+BYON Memory Service - FAISS-Optimized
+=====================================
 
-HTTP microservice wrapper for FHRSS+FCPE infinite memory system.
+HTTP microservice wrapper for FAISS-based memory system.
+Replaces the FCPE backend which had a similarity collapse bug.
 
 Provides REST API for:
 - Store: code, conversation, fact memories
-- Search: semantic similarity search
-- Recovery: test FHRSS fault tolerance
+- Search: real semantic similarity via FAISS IndexFlatIP
+- Recovery: test endpoint (stub - FAISS uses disk persistence)
 - Stats: system statistics
 
 CRITICAL:
 - This service MUST be running for BYON orchestrator to start
-- FHRSS provides 100% recovery at 40% data loss
-- FCPE provides 73,000x compression for infinite context
+- Uses FAISS IndexFlatIP for real cosine similarity search
+- sentence-transformers all-MiniLM-L6-v2 (384-dim, CPU)
 
 Patent: FHRSS/OmniVault - Vasile Lucian Borbeleac - EP25216372.0
 """
@@ -28,9 +29,6 @@ import logging
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
-# Add parent path for fhrss_fcpe_unified import
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "INFINIT_MEMORYCONTEXT"))
-
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -43,7 +41,7 @@ import uvicorn
 from handlers import MemoryHandlers, MemoryType
 
 # ============================================================================
-# LOGGING (must be defined before prometheus imports use it)
+# LOGGING
 # ============================================================================
 
 logging.basicConfig(
@@ -53,7 +51,6 @@ logging.basicConfig(
 logger = logging.getLogger("byon-memory-service")
 
 # Prometheus metrics (O4 optimization)
-# Using custom registry to avoid collision errors on container restarts
 PROMETHEUS_AVAILABLE = False
 REGISTRY = None
 
@@ -71,7 +68,6 @@ except ImportError:
 # ============================================================================
 # PROMETHEUS METRICS - CUSTOM REGISTRY
 # ============================================================================
-# Using custom CollectorRegistry to avoid collision errors on container restarts
 
 REQUEST_COUNT = None
 REQUEST_LATENCY = None
@@ -84,85 +80,77 @@ UPTIME_SECONDS = None
 RATE_LIMIT_EXCEEDED = None
 
 if PROMETHEUS_AVAILABLE:
-    # Create custom registry to avoid collisions
     REGISTRY = CollectorRegistry()
-    
-    # Request metrics
+
     REQUEST_COUNT = Counter(
         'memory_service_requests_total',
         'Total number of requests',
         ['method', 'endpoint'],
         registry=REGISTRY
     )
-    
+
     REQUEST_LATENCY = Histogram(
         'memory_service_request_duration_seconds',
         'Request latency in seconds',
         ['method', 'endpoint'],
         registry=REGISTRY
     )
-    
-    # Store operation metrics
+
     STORE_OPERATIONS = Counter(
         'memory_service_store_operations_total',
         'Total number of store operations',
         ['memory_type'],
         registry=REGISTRY
     )
-    
-    # Search operation metrics
+
     SEARCH_OPERATIONS = Counter(
         'memory_service_search_operations_total',
         'Total number of search operations',
         ['memory_type'],
         registry=REGISTRY
     )
-    
+
     SEARCH_LATENCY = Histogram(
         'memory_service_search_duration_seconds',
         'Search operation latency in seconds',
         ['memory_type'],
         registry=REGISTRY
     )
-    
+
     SEARCH_RESULTS = Histogram(
         'memory_service_search_results_count',
         'Number of search results returned',
         ['memory_type'],
         registry=REGISTRY
     )
-    
-    # Context metrics
+
     CONTEXTS_TOTAL = Gauge(
         'memory_service_contexts_total',
         'Total number of memory contexts',
         ['memory_type'],
         registry=REGISTRY
     )
-    
-    # Service uptime
+
     UPTIME_SECONDS = Gauge(
         'memory_service_uptime_seconds',
         'Service uptime in seconds',
         registry=REGISTRY
     )
-    
-    # Rate limiting
+
     RATE_LIMIT_EXCEEDED = Counter(
         'memory_service_rate_limit_exceeded_total',
         'Total number of rate limit exceeded errors',
         registry=REGISTRY
     )
-    
+
     logger.info("Prometheus metrics initialized with custom registry")
 
 # ============================================================================
 # RATE LIMITING
 # ============================================================================
 
-# Rate limit configuration
-RATE_LIMIT_REQUESTS = int(os.environ.get("RATE_LIMIT_REQUESTS", "100"))  # requests
-RATE_LIMIT_WINDOW = int(os.environ.get("RATE_LIMIT_WINDOW", "60"))  # seconds
+RATE_LIMIT_REQUESTS = int(os.environ.get("RATE_LIMIT_REQUESTS", "100"))
+RATE_LIMIT_WINDOW = int(os.environ.get("RATE_LIMIT_WINDOW", "60"))
 
 class RateLimiter:
     """Simple in-memory rate limiter with sliding window"""
@@ -173,25 +161,17 @@ class RateLimiter:
         self.requests: Dict[str, List[float]] = defaultdict(list)
 
     def is_allowed(self, client_id: str) -> bool:
-        """Check if request is allowed for given client"""
         now = time.time()
         window_start = now - self.window_seconds
-
-        # Clean old requests
         self.requests[client_id] = [
             t for t in self.requests[client_id] if t > window_start
         ]
-
-        # Check limit
         if len(self.requests[client_id]) >= self.max_requests:
             return False
-
-        # Record request
         self.requests[client_id].append(now)
         return True
 
     def get_remaining(self, client_id: str) -> int:
-        """Get remaining requests for client"""
         now = time.time()
         window_start = now - self.window_seconds
         current = len([t for t in self.requests[client_id] if t > window_start])
@@ -204,21 +184,20 @@ rate_limiter = RateLimiter(RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW)
 # ============================================================================
 
 app = FastAPI(
-    title="BYON Memory Service",
-    description="FHRSS+FCPE infinite memory API for BYON orchestrator",
-    version="1.0.0",
+    title="BYON Memory Service (FAISS-Optimized)",
+    description="FAISS-based infinite memory API for BYON orchestrator",
+    version="4.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
 
-# CORS configuration - SECURITY HARDENED
-# Only allow specific origins in production
+# CORS configuration
 ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://byon-ui:3001").split(",")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=False,  # Disabled for security
+    allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
 )
@@ -226,18 +205,14 @@ app.add_middleware(
 # Rate limiting middleware
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
-    """Apply rate limiting to all requests"""
-    # Get client identifier (IP address or forwarded header)
     client_ip = request.client.host if request.client else "unknown"
     forwarded_for = request.headers.get("X-Forwarded-For")
     if forwarded_for:
         client_ip = forwarded_for.split(",")[0].strip()
 
-    # Skip rate limiting for health checks
     if request.url.path == "/health":
         return await call_next(request)
 
-    # Check rate limit
     if not rate_limiter.is_allowed(client_ip):
         logger.warning(f"Rate limit exceeded for {client_ip}")
         if PROMETHEUS_AVAILABLE:
@@ -252,7 +227,6 @@ async def rate_limit_middleware(request: Request, call_next):
             headers={"Retry-After": str(RATE_LIMIT_WINDOW)}
         )
 
-    # Add rate limit headers to response
     response = await call_next(request)
     remaining = rate_limiter.get_remaining(client_ip)
     response.headers["X-RateLimit-Limit"] = str(RATE_LIMIT_REQUESTS)
@@ -271,7 +245,7 @@ class PingRequest(BaseModel):
 class PingResponse(BaseModel):
     success: bool
     service: str = "byon-memory-service"
-    version: str = "1.0.0"
+    version: str = "4.0.0"
     timestamp: str
 
 class StoreCodeRequest(BaseModel):
@@ -340,7 +314,7 @@ class RecoveryTestResponse(BaseModel):
     hash_match: bool
     recovery_time_ms: float
     loss_percent: float
-    realistic_test: bool = True  # v3.0: indicates parity was also corrupted
+    realistic_test: bool = False
 
 class StatsRequest(BaseModel):
     action: str = "stats"
@@ -378,12 +352,20 @@ async def startup():
 
     storage_path = os.environ.get("MEMORY_STORAGE_PATH", "./memory_storage")
 
-    logger.info("Initializing FHRSS+FCPE memory system...")
+    logger.info("Initializing FAISS-optimized memory system...")
     handlers = MemoryHandlers(storage_path=storage_path)
     start_time = time.time()
 
     stats = handlers.get_stats()
-    logger.info(f"Memory service ready. Loaded {stats['num_contexts']} contexts.")
+    logger.info(f"Memory service ready. Backend: FAISS IndexFlatIP")
+    logger.info(f"  Loaded {stats['num_contexts']} contexts.")
+
+@app.on_event("shutdown")
+async def shutdown():
+    """Save all memory stores on shutdown"""
+    if handlers:
+        handlers.save_all()
+        logger.info("Memory stores saved on shutdown.")
 
 @app.post("/", response_model=Dict[str, Any])
 async def handle_request(request: Dict[str, Any]):
@@ -397,7 +379,7 @@ async def handle_request(request: Dict[str, Any]):
         return {
             "success": True,
             "service": "byon-memory-service",
-            "version": "1.0.0",
+            "version": "4.0.0-faiss",
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         }
 
@@ -424,31 +406,29 @@ async def health_check():
     """Health check endpoint"""
     uptime = time.time() - start_time if start_time else 0
 
-    # Update Prometheus uptime gauge
     if PROMETHEUS_AVAILABLE:
         UPTIME_SECONDS.set(uptime)
 
     return {
         "status": "healthy",
         "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
         "uptime_seconds": uptime
     }
 
 
 @app.get("/metrics")
 async def metrics():
-    """Prometheus metrics endpoint (O4 optimization)"""
+    """Prometheus metrics endpoint"""
     if not PROMETHEUS_AVAILABLE:
         raise HTTPException(status_code=501, detail="Prometheus metrics not available")
 
-    # Update context gauges
     if handlers:
         stats = handlers.get_stats()
         CONTEXTS_TOTAL.labels(memory_type='code').set(stats['by_type']['code'])
         CONTEXTS_TOTAL.labels(memory_type='conversation').set(stats['by_type']['conversation'])
         CONTEXTS_TOTAL.labels(memory_type='fact').set(stats['by_type']['fact'])
 
-    # Update uptime
     UPTIME_SECONDS.set(time.time() - start_time if start_time else 0)
 
     from starlette.responses import Response
@@ -485,7 +465,6 @@ async def store_memory(request: Dict[str, Any]) -> Dict[str, Any]:
     else:
         raise HTTPException(status_code=400, detail=f"Unknown memory type: {mem_type}")
 
-    # Track Prometheus metrics (O4)
     if PROMETHEUS_AVAILABLE:
         STORE_OPERATIONS.labels(memory_type=mem_type).inc()
 
@@ -522,7 +501,6 @@ async def search_memory(request: Dict[str, Any]) -> Dict[str, Any]:
 
     search_time_sec = time.time() - t0
 
-    # Track Prometheus metrics (O4)
     if PROMETHEUS_AVAILABLE:
         SEARCH_OPERATIONS.labels(memory_type=mem_type).inc()
         SEARCH_LATENCY.labels(memory_type=mem_type).observe(search_time_sec)
@@ -565,7 +543,7 @@ async def search_all_memory(request: Dict[str, Any]) -> Dict[str, Any]:
 # ============================================================================
 
 async def test_recovery(request: Dict[str, Any]) -> Dict[str, Any]:
-    """Test FHRSS recovery capability"""
+    """Test recovery capability (stub for FAISS backend)"""
     h = get_handlers()
 
     ctx_id = request.get("ctx_id")
@@ -583,7 +561,7 @@ async def test_recovery(request: Dict[str, Any]) -> Dict[str, Any]:
         "hash_match": result.get("hash_match", False),
         "recovery_time_ms": result["recovery_time_ms"],
         "loss_percent": loss_percent,
-        "realistic_test": result.get("realistic_test", True)  # v3.0: parity also corrupted
+        "realistic_test": result.get("realistic_test", False)
     }
 
 async def get_stats() -> Dict[str, Any]:
@@ -610,7 +588,7 @@ def main():
     host = os.environ.get("MEMORY_SERVICE_HOST", "0.0.0.0")
     port = int(os.environ.get("MEMORY_SERVICE_PORT", "8000"))
 
-    logger.info(f"Starting BYON Memory Service on {host}:{port}")
+    logger.info(f"Starting BYON Memory Service (FAISS-Optimized) on {host}:{port}")
 
     uvicorn.run(
         "server:app",

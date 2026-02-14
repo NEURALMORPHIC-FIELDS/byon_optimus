@@ -9,6 +9,9 @@ pydantic>=2.5.0
 # Scientific computing
 numpy>=1.24.0
 
+# FAISS vector search (replaces FCPE - fixes similarity collapse bug)
+faiss-cpu>=1.7.4
+
 # Production-grade embeddings (O1 optimization)
 sentence-transformers>=2.2.0
 torch>=2.0.0

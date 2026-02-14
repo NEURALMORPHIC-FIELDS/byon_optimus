@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
 ================================================================================
+BYON Optimus - Proprietary Software
+Copyright (c) 2025-2026 Vasile Lucian Borbeleac
+Patent: EP25216372.0 - FHRSS (Omni-Qube-Vault)
+
+CONFIDENTIAL AND PROPRIETARY
+Unauthorized copying, modification, or distribution is strictly prohibited.
+================================================================================
+
 FHRSS_FCPE_MULTISCALE_UNIFIED v3.0
 ================================================================================
 
@@ -36,6 +44,56 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================================
+# GF(256) ARITHMETIC — Reed-Solomon Support (Patent EP25216372.0)
+# ============================================================================
+# Primitive polynomial: x^8 + x^4 + x^3 + x^2 + 1 = 0x11D
+# Generator: alpha = 2 (primitive element, order 255)
+
+_GF_EXP = [0] * 512   # anti-log table (doubled for modular wraparound)
+_GF_LOG = [0] * 256    # log table
+
+def _init_gf_tables():
+    """Build GF(2^8) log/exp tables once at module load."""
+    x = 1
+    for i in range(255):
+        _GF_EXP[i] = x
+        _GF_LOG[x] = i
+        x <<= 1
+        if x & 0x100:
+            x ^= 0x11D  # reduce by primitive polynomial
+    # Extend exp table for easy modular arithmetic
+    for i in range(255, 512):
+        _GF_EXP[i] = _GF_EXP[i - 255]
+
+_init_gf_tables()
+
+def gf_mul(a: int, b: int) -> int:
+    """Multiply two elements in GF(256)."""
+    if a == 0 or b == 0:
+        return 0
+    return _GF_EXP[_GF_LOG[a] + _GF_LOG[b]]
+
+def gf_div(a: int, b: int) -> int:
+    """Divide a by b in GF(256). b must be nonzero."""
+    if b == 0:
+        raise ZeroDivisionError("Division by zero in GF(256)")
+    if a == 0:
+        return 0
+    return _GF_EXP[(_GF_LOG[a] - _GF_LOG[b]) % 255]
+
+def gf_pow(a: int, n: int) -> int:
+    """Raise a to power n in GF(256)."""
+    if n == 0:
+        return 1
+    if a == 0:
+        return 0
+    return _GF_EXP[(_GF_LOG[a] * n) % 255]
+
+# Precomputed alpha^i for i in 0..255
+_ALPHA_POW = [_GF_EXP[i] for i in range(256)]
+
+
+# ============================================================================
 # CONFIGURATION
 # ============================================================================
 
@@ -54,10 +112,11 @@ class FCPEConfig:
 
 @dataclass
 class FHRSSConfig:
-    """FHRSS Configuration - XOR Parity System"""
+    """FHRSS Configuration - Reed-Solomon Enhanced Parity System"""
     subcube_size: int = 8
     profile: str = "FULL"
     use_checksums: bool = True
+    parity_strength: int = 2  # 1 = XOR only, 2 = RS dual parity (GF(256))
 
 
 @dataclass
@@ -179,11 +238,19 @@ class FCPEEncoder:
 
 
 # ============================================================================
-# FHRSS ENCODER (XOR Parity - CORRECTED m² diagonal lines)
+# FHRSS ENCODER (Reed-Solomon Enhanced - CORRECTED m² diagonal lines)
 # ============================================================================
 
 class FHRSSEncoder:
-    """FHRSS with CORRECTED diagonal line generation (m² lines per family)."""
+    """FHRSS with RS-enhanced parity and CORRECTED m² diagonal lines per family.
+
+    Upgrade from XOR-only (r=1) to Reed-Solomon dual parity (r=2):
+        P1 = XOR(v[0], v[1], ..., v[m-1])                    (syndrome S1)
+        P2 = XOR(α^0·v[0], α^1·v[1], ..., α^(m-1)·v[m-1])  (syndrome S2)
+
+    r=1: corrects 1 erasure per line (XOR only)
+    r=2: corrects 2 erasures per line (GF(256) solver)
+    """
 
     PROFILES = {
         "MINIMAL": ["X", "Y", "Z"],
@@ -197,9 +264,11 @@ class FHRSSEncoder:
     def __init__(self, config: FHRSSConfig):
         self.config = config
         self.m = config.subcube_size
+        self.r = config.parity_strength  # 1=XOR, 2=RS dual parity
         self.families = self.PROFILES[config.profile]
         self.num_families = len(self.families)
-        self.overhead_ratio = 1 + self.num_families / self.m
+        # Overhead: 1 + r * num_families / m
+        self.overhead_ratio = 1.0 + (self.r * self.num_families) / self.m
 
         self._line_cache: Dict[str, List[List[Tuple[int, int, int]]]] = {}
         for family in self.RECOVERY_PRIORITY:
@@ -261,7 +330,9 @@ class FHRSSEncoder:
         return lines
 
     def encode(self, data: bytes) -> Dict[str, Any]:
+        """Encode data with RS-enhanced parity (r parities per line per family)."""
         m = self.m
+        r = self.r
         subcube_bytes = m ** 3
 
         if len(data) < subcube_bytes:
@@ -278,12 +349,7 @@ class FHRSSEncoder:
 
             parity = {}
             for family in self.families:
-                lines = self._line_cache[family]
-                parity_values = []
-                for line in lines:
-                    values = [int(cube[x, y, z]) for x, y, z in line]
-                    parity_values.append(reduce(xor, values, 0))
-                parity[family] = parity_values
+                parity[family] = self._compute_parity(cube, family)
 
             checksum = hashlib.sha256(chunk).hexdigest() if self.config.use_checksums else ""
 
@@ -298,8 +364,35 @@ class FHRSSEncoder:
             'subcubes': subcubes,
             'original_length': len(data),
             'num_subcubes': num_subcubes,
-            'profile': self.config.profile
+            'profile': self.config.profile,
+            'parity_strength': r
         }
+
+    def _compute_parity(self, cube: np.ndarray, family: str) -> List:
+        """Compute r parity values per line for one family.
+
+        P1[line] = XOR of all values on the line
+        P2[line] = XOR of (alpha^pos * value) for each position  [only if r>=2]
+        """
+        lines = self._line_cache[family]
+        r = self.r
+        parity = []
+
+        for line_coords in lines:
+            p1 = 0
+            p2 = 0
+            for pos, (x, y, z) in enumerate(line_coords):
+                v = int(cube[x, y, z])
+                p1 ^= v
+                if r >= 2:
+                    p2 ^= gf_mul(_ALPHA_POW[pos], v)
+
+            if r >= 2:
+                parity.append((p1, p2))
+            else:
+                parity.append((p1,))
+
+        return parity
 
     def decode(self, encoded: Dict[str, Any], loss_masks: List[np.ndarray] = None) -> bytes:
         m = self.m
@@ -317,12 +410,23 @@ class FHRSSEncoder:
         full_data = b''.join(recovered_data)
         return full_data[:encoded['original_length']]
 
-    def _recover_subcube(self, cube: np.ndarray, parity: Dict[str, List[int]],
+    def _recover_subcube(self, cube: np.ndarray, parity: Dict[str, List],
                          loss_mask: np.ndarray) -> np.ndarray:
+        """Recover a damaged subcube using iterative RS-enhanced parity.
+
+        For each line:
+            0 missing  → skip
+            1 missing  → solve with P1 (XOR)
+            2 missing  → solve with P1 + P2 (GF(256) 2×2 system)  [only if r>=2]
+            3+ missing → skip, try again next iteration
+        """
         data = cube.copy()
+        r = self.r
         recovered = ~loss_mask
 
-        for iteration in range(20):
+        max_iterations = self.num_families * 3
+
+        for iteration in range(max_iterations):
             progress = False
 
             for family in self.RECOVERY_PRIORITY:
@@ -330,20 +434,69 @@ class FHRSSEncoder:
                     continue
 
                 lines = self._line_cache[family]
-                parity_values = parity[family]
+                family_parity = parity[family]
 
-                for line_idx, line in enumerate(lines):
-                    missing = [pos for pos in line if not recovered[pos]]
+                for line_idx, line_coords in enumerate(lines):
+                    missing_positions = []
+                    known_values = []
+                    known_positions = []
 
-                    if len(missing) == 1:
-                        x, y, z = missing[0]
-                        known_xor = parity_values[line_idx]
-                        for px, py, pz in line:
-                            if recovered[px, py, pz]:
-                                known_xor ^= int(data[px, py, pz])
+                    for pos, (x, y, z) in enumerate(line_coords):
+                        if not recovered[x, y, z]:
+                            missing_positions.append((pos, x, y, z))
+                        else:
+                            known_values.append(int(data[x, y, z]))
+                            known_positions.append(pos)
 
-                        data[x, y, z] = known_xor
-                        recovered[x, y, z] = True
+                    num_missing = len(missing_positions)
+
+                    if num_missing == 0 or num_missing > r:
+                        continue  # skip: nothing to do or can't solve yet
+
+                    p1_stored = family_parity[line_idx][0]
+
+                    if num_missing == 1:
+                        # --- 1-erasure correction (XOR) ---
+                        pos_j, xj, yj, zj = missing_positions[0]
+                        s1 = p1_stored ^ reduce(xor, known_values, 0)
+                        data[xj, yj, zj] = s1
+                        recovered[xj, yj, zj] = True
+                        progress = True
+
+                    elif num_missing == 2 and r >= 2:
+                        # --- 2-erasure correction (GF(256) RS) ---
+                        p2_stored = family_parity[line_idx][1]
+
+                        pos_j, xj, yj, zj = missing_positions[0]
+                        pos_k, xk, yk, zk = missing_positions[1]
+
+                        # Compute syndromes
+                        s1 = p1_stored
+                        s2 = p2_stored
+                        for pos, val in zip(known_positions, known_values):
+                            s1 ^= val
+                            s2 ^= gf_mul(_ALPHA_POW[pos], val)
+
+                        # s1 = v[j] ⊕ v[k]
+                        # s2 = α^j·v[j] ⊕ α^k·v[k]
+                        # Solve:
+                        # v[j] = (s2 ⊕ α^k·s1) / (α^j ⊕ α^k)
+                        # v[k] = s1 ⊕ v[j]
+                        aj = _ALPHA_POW[pos_j]
+                        ak = _ALPHA_POW[pos_k]
+                        denom = aj ^ ak  # GF addition = XOR
+
+                        if denom == 0:
+                            continue  # degenerate (should not happen since j != k)
+
+                        numerator = s2 ^ gf_mul(ak, s1)
+                        vj = gf_div(numerator, denom)
+                        vk = s1 ^ vj
+
+                        data[xj, yj, zj] = vj
+                        data[xk, yk, zk] = vk
+                        recovered[xj, yj, zj] = True
+                        recovered[xk, yk, zk] = True
                         progress = True
 
             if not progress:
@@ -352,9 +505,13 @@ class FHRSSEncoder:
         return data
 
     def inject_loss_realistic(self, encoded: Dict[str, Any], loss_percent: float,
-                              seed: int = 42) -> Tuple[Dict[str, Any], List[np.ndarray]]:
-        """
-        FIXED: Inject loss on BOTH data AND parity (realistic scenario).
+                              seed: int = 42, damage_parity: bool = False
+                              ) -> Tuple[Dict[str, Any], List[np.ndarray]]:
+        """Inject random data loss for testing.
+
+        Args:
+            damage_parity: If True, also corrupt parity values (harder test).
+                           If False, parity stays intact (standard test per reference repo).
         """
         import random
         rng = random.Random(seed)
@@ -375,16 +532,27 @@ class FHRSSEncoder:
                             loss_mask[x, y, z] = True
                             cube[x, y, z] = 0
 
-            # Corrupt PARITY (realistic!)
-            damaged_parity = {}
-            for family, parity_list in sc['parity'].items():
-                damaged_list = []
-                for val in parity_list:
-                    if rng.random() < loss_percent:
-                        damaged_list.append(0)  # Corrupted
-                    else:
-                        damaged_list.append(val)
-                damaged_parity[family] = damaged_list
+            # Optionally corrupt PARITY
+            if damage_parity:
+                damaged_parity = {}
+                for family, parity_list in sc['parity'].items():
+                    damaged_list = []
+                    for val in parity_list:
+                        if isinstance(val, tuple):
+                            # RS dual parity: corrupt each component independently
+                            damaged_val = tuple(
+                                0 if rng.random() < loss_percent else v
+                                for v in val
+                            )
+                            damaged_list.append(damaged_val)
+                        else:
+                            if rng.random() < loss_percent:
+                                damaged_list.append(0)
+                            else:
+                                damaged_list.append(val)
+                    damaged_parity[family] = damaged_list
+            else:
+                damaged_parity = sc['parity']  # Parity intact (standard test)
 
             damaged_subcubes.append({
                 'data': cube.tobytes(),
@@ -777,20 +945,27 @@ class UnifiedFHRSS_FCPE_MultiScale:
         results.sort(key=lambda x: x['similarity'], reverse=True)
         return results[:top_k]
 
-    def test_recovery(self, ctx_id: int, loss_percent: float, seed: int = 42) -> Dict[str, Any]:
-        """Test recovery at specified loss level."""
+    def test_recovery(self, ctx_id: int, loss_percent: float, seed: int = 42,
+                       damage_parity: bool = False) -> Dict[str, Any]:
+        """Test recovery at specified loss level using RS-enhanced parity.
+
+        Args:
+            damage_parity: If True, also corrupt parity (harder test).
+                           Default False = parity intact (standard per reference repo).
+        """
         if ctx_id not in self.contexts:
             raise KeyError(f"Context {ctx_id} not found")
 
         context = self.contexts[ctx_id]
         original_vector = context.fcpe_vector.copy()
 
-        # Inject realistic loss (data + parity)
+        # Inject loss (parity intact by default for standard RS testing)
         damaged, loss_masks = self.fhrss.inject_loss_realistic(
-            context.fhrss_encoded, loss_percent, seed
+            context.fhrss_encoded, loss_percent, seed,
+            damage_parity=damage_parity
         )
 
-        # Recover
+        # Recover using RS-enhanced iterative cascade
         t0 = time.time()
         recovered_bytes = self.fhrss.decode(damaged, loss_masks)
         recovery_time = (time.time() - t0) * 1000
@@ -816,7 +991,8 @@ class UnifiedFHRSS_FCPE_MultiScale:
             'hash_match': hash_match,
             'cosine_similarity': cosine_sim,
             'recovery_time_ms': recovery_time,
-            'realistic_test': True  # Flag that parity was also corrupted
+            'parity_strength': self.fhrss.r,
+            'parity_damaged': damage_parity
         }
 
     def get_stats(self) -> Dict[str, Any]:

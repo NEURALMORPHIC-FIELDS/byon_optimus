@@ -47,7 +47,10 @@ COPY tsconfig.json ./
 COPY byon-config.ts ./
 
 # Copy source code
+# Copy source code
 COPY src/ ./src/
+COPY shared/ ./shared/
+RUN cat src/agents/worker/index.ts | grep "Incoming request" || echo "NOT FOUND IN SOURCE"
 
 # ============================================
 # Build Stage

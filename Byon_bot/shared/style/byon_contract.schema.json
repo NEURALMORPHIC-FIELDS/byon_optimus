@@ -101,7 +101,7 @@
           "type": "string",
           "minLength": 3,
           "maxLength": 200,
-          "description": "Ce trebuie făcut."
+          "description": "What needs to be done."
         },
         "deadline": {
           "type": "string",

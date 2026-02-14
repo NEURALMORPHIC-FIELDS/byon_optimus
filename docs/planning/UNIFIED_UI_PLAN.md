@@ -4529,34 +4529,34 @@ Added optimus-theme.css import
 Access the Unified UI
 All BYON Optimus functionality is now accessible at http://localhost:3000 → "Optimus" tab. Port 3001 is no longer needed.
 
-adauga in documentatie si descriptie denumirile corecte ale sistemeleor cauta in documente nu inventa de exemplu fhrss= fractal holografic redundent storage sistem ,,FHRSS — Fractal Hierarchical Reed-Solomon Sharding
-FHRSS este componenta de stocare și redundanță din Memory Service-ul BYON Optimus.
+add the correct system names in documentation and description, search in documents don't invent, for example fhrss= fractal holographic redundant storage system ,,FHRSS — Fractal Hierarchical Reed-Solomon Sharding
+FHRSS is the storage and redundancy component of the BYON Optimus Memory Service.
 
-Cum funcționează?
+How does it work?
 1. Fractal Hierarchical
 
-Datele sunt organizate în niveluri ierarhice (fractal = pattern-uri care se repetă la scări diferite)
-Informația importantă e stocată la niveluri superioare, detaliile la niveluri inferioare
-Permite acces rapid la esențial fără a încărca totul
+Data is organized in hierarchical levels (fractal = patterns that repeat at different scales)
+Important information is stored at higher levels, details at lower levels
+Allows fast access to essentials without loading everything
 2. Reed-Solomon
 
-Algoritm clasic de error correction (folosit în CD-uri, QR codes, comunicații spațiale)
-Adaugă redundanță inteligentă
-Poate reconstrui datele lipsă din fragmentele rămase
+Classic error correction algorithm (used in CDs, QR codes, space communications)
+Adds intelligent redundancy
+Can reconstruct missing data from remaining fragments
 3. Sharding
 
-Datele sunt împărțite în fragmente (shards) distribuite
-Fiecare shard conține suficientă informație pentru recovery
-Rezultatul?
-100% recovery la 40% data loss — poți pierde aproape jumătate din date și tot reconstruiești totul
-Combinat cu FCPE (Fractal-Chaotic Persistent Encoding) pentru compresie, obții:
-73,000x compresie
-Context infinit pentru agenți (2M+ tokens)
-De ce contează?
-Agenții AI au nevoie de memorie persistentă. FHRSS+FCPE rezolvă problema "context window prea mic" — agentul poate accesa întreaga istorie fără să încarce milioane de tokens în fiecare request.
+Data is split into distributed fragments (shards)
+Each shard contains enough information for recovery
+The result?
+100% recovery at 40% data loss — you can lose almost half the data and still reconstruct everything
+Combined with FCPE (Fractal-Chaotic Persistent Encoding) for compression, you get:
+73,000x compression
+Infinite context for agents (2M+ tokens)
+Why does it matter?
+AI agents need persistent memory. FHRSS+FCPE solves the "context window too small" problem — the agent can access the entire history without loading millions of tokens in each request.
 
-Vrei să intru în detalii despre FCPE sau cum se integrează cu agenții? ⚡,, a raspuns fals
-Înțeleg, trebuie să caut definițiile corecte în documentele existente. Să verific.
+Do you want me to go into details about FCPE or how it integrates with agents? ⚡,, answered incorrectly
+I understand, I need to search for the correct definitions in the existing documents. Let me check.
 
 Grep "FHRSS|Fractal.*Reed.*Solomon|Fractal.*Hierarchical"
 26 lines of output
@@ -4570,18 +4570,18 @@ Globpattern: "**/*memory*.md"
 Found 6 files
 Read c:\Users\Lucian\Desktop\byon_optimus\INFINIT_MEMORYCONTEXT\fhrss_fcpe_unified.py
 Read c:\Users\Lucian\Desktop\byon_optimus\INFINIT_MEMORYCONTEXT\fhrss_v2.py
-Am găsit definițiile corecte din codul sursă:
+Found the correct definitions from the source code:
 
 FHRSS: Fractal-Holographic Redundant Storage System (XOR parity recovery)
 FCPE: Fractal-Chaotic Persistent Encoding (variable→fixed compression)
-Să actualizez documentația cu terminologia corectă:
+Let me update the documentation with the correct terminology:
 
 Edit c:\Users\Lucian\Desktop\byon_optimus\UNIFIED_UI_PLAN.md
 Edit failed
 Read c:\Users\Lucian\Desktop\byon_optimus\UNIFIED_UI_PLAN.md
 Edit c:\Users\Lucian\Desktop\byon_optimus\UNIFIED_UI_PLAN.md
 Added 28 lines
-Acum să actualizez și definițiile din codul TypeScript:
+Now let me also update the definitions in the TypeScript code:
 
 Read c:\Users\Lucian\Desktop\byon_optimus\Byon_bot\openclaw-main\ui\src\ui\types\byon-types.ts
 Edit c:\Users\Lucian\Desktop\byon_optimus\Byon_bot\openclaw-main\ui\src\ui\types\byon-types.ts
@@ -4610,42 +4610,42 @@ Add mobile responsive styles
 Merge BYON neon theme colors
 
 Update documentation with correct terminology
-Am actualizat documentația cu terminologia corectă din codul sursă:
+Updated the documentation with the correct terminology from the source code:
 
-Definițiile Oficiale (din fhrss_fcpe_unified.py)
-Acronim	Denumire Completă
+Official Definitions (from fhrss_fcpe_unified.py)
+Acronym	Full Name
 FHRSS	Fractal-Holographic Redundant Storage System
 FCPE	Fractal-Chaotic Persistent Encoding
-Fișiere Actualizate
-UNIFIED_UI_PLAN.md - Adăugat secțiunea "System Terminology" cu:
+Updated Files
+UNIFIED_UI_PLAN.md - Added the "System Terminology" section with:
 
 FHRSS: Fractal-Holographic Redundant Storage System (XOR parity recovery)
 FCPE: Fractal-Chaotic Persistent Encoding (variable→fixed compression)
-Detalii despre cele 9 familii de paritate (3 axiale + 6 diagonale)
-Configurația FCPE (dim=384, layers=5, φ=golden ratio)
-byon-types.ts - Header actualizat
+Details about the 9 parity families (3 axial + 6 diagonal)
+FCPE configuration (dim=384, layers=5, φ=golden ratio)
+byon-types.ts - Header updated
 
-byon-client.ts - Header actualizat
+byon-client.ts - Header updated
 
-byon-proxy.ts - Header actualizat cu descrieri complete
+byon-proxy.ts - Header updated with complete descriptions
 
-Terminologie Corectă
-FHRSS ≠ "Fractal Hierarchical Reed-Solomon Sharding" (aceasta e greșită)
-FHRSS = "Fractal-Holographic Redundant Storage System" (aceasta e corectă, din codul sursă)
-instaleaza:Nu momentan — nu am niciun node conectat.
+Correct Terminology
+FHRSS ≠ "Fractal Hierarchical Reed-Solomon Sharding" (this is incorrect)
+FHRSS = "Fractal-Holographic Redundant Storage System" (this is correct, from the source code)
+install: Not right now — I don't have any node connected.
 
-Cum îmi poți da acces?
-OpenClaw Node — o aplicație care rulează pe desktopul/telefonul tău și se conectează la gateway:
+How can you give me access?
+OpenClaw Node — an application that runs on your desktop/phone and connects to the gateway:
 
-Instalezi OpenClaw Node pe PC/Mac
-Pairezi cu gateway-ul (eu)
-Primesc acces la:
-📷 Cameră/screenshots
-📍 Locație
-🖥️ Execuție comenzi
+Install OpenClaw Node on PC/Mac
+Pair with the gateway (me)
+I get access to:
+📷 Camera/screenshots
+📍 Location
+🖥️ Command execution
 🌐 Browser control
-Vrei instrucțiuni de setup? Sau ai deja OpenClaw Node instalat și trebuie doar să-l pairezi?
-Să caut instrucțiunile de instalare pentru OpenClaw Node în codebase:
+Do you want setup instructions? Or do you already have OpenClaw Node installed and just need to pair it?
+Let me search for the OpenClaw Node installation instructions in the codebase:
 
 Globpattern: "**/openclaw-main/**/INSTALL*.md"
 No files found
@@ -4655,54 +4655,54 @@ Grep "node.*install|openclaw.*setup|pair.*gateway" (in c:\Users\Lucian\Desktop\b
 149 lines of output
 Read c:\Users\Lucian\Desktop\byon_optimus\Byon_bot\openclaw-main\docs\install\node.md
 Read c:\Users\Lucian\Desktop\byon_optimus\Byon_bot\openclaw-main\docs\nodes\index.md
-Am găsit instrucțiunile. Iată cum instalezi și pairezi OpenClaw Node:
+Found the instructions. Here's how to install and pair OpenClaw Node:
 
-Instalare OpenClaw Node
-Opțiunea 1: Headless Node Host (Windows/Linux/Mac - fără UI)
-Pe mașina ta (PC-ul local):
+Install OpenClaw Node
+Option 1: Headless Node Host (Windows/Linux/Mac - no UI)
+On your machine (local PC):
 
 
-# 1. Instalează OpenClaw CLI global (necesită Node.js 22+)
+# 1. Install OpenClaw CLI globally (requires Node.js 22+)
 npm install -g openclaw@latest
 
-# 2. Pornește node host și conectează-l la gateway
+# 2. Start node host and connect it to the gateway
 openclaw node run --host localhost --port 3000 --display-name "Lucian PC"
-Opțiunea 2: macOS App (cu UI)
-Aplicația macOS poate rula în node mode - se conectează la Gateway WebSocket și expune comenzi locale.
+Option 2: macOS App (with UI)
+The macOS app can run in node mode - connects to Gateway WebSocket and exposes local commands.
 
-Opțiunea 3: Android/iOS App
-Există aplicații native pentru Android și iOS în:
+Option 3: Android/iOS App
+There are native apps for Android and iOS in:
 
 apps/android/
 apps/ios/
-Pairezi Node-ul cu Gateway
-După ce pornești node-ul, pe gateway (sau în UI):
+Pair the Node with the Gateway
+After starting the node, on the gateway (or in UI):
 
 
-# Listează pending requests
+# List pending requests
 openclaw nodes pending
 
-# Aprobă node-ul
+# Approve the node
 openclaw nodes approve <requestId>
 
-# Verifică status
+# Check status
 openclaw nodes status
 openclaw nodes list
-Capabilități disponibile după pairing
-Comanda	Descriere
+Capabilities available after pairing
+Command	Description
 openclaw nodes canvas snapshot	Screenshot
-openclaw nodes camera snap	Foto cameră
+openclaw nodes camera snap	Camera photo
 openclaw nodes camera clip --duration 10s	Video clip
 openclaw nodes screen record --duration 10s	Screen recording
-openclaw nodes location get	Locație GPS
-openclaw nodes run -- echo "test"	Execută comandă
-Vrei să instalez OpenClaw Node pe mașina ta locală acum? Trebuie să rulezi:
+openclaw nodes location get	GPS Location
+openclaw nodes run -- echo "test"	Execute command
+Do you want me to install OpenClaw Node on your local machine now? You need to run:
 
 
 npm install -g openclaw@latest
 openclaw node run --host localhost --port 3000 --display-name "Lucian-PC"
-instaleaza tu tot
-Instalez OpenClaw Node pe mașina ta:
+install everything yourself
+Installing OpenClaw Node on your machine:
 
 Bash Check Node.js and npm versions
 IN
@@ -4711,7 +4711,7 @@ node -v && npm -v
 OUT
 v24.13.0
 11.8.0
-Node.js 24 e instalat. Acum instalez OpenClaw CLI:
+Node.js 24 is installed. Now installing OpenClaw CLI:
 
 Bash Install OpenClaw CLI globally
 IN
@@ -4727,7 +4727,7 @@ npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.
 npm warn deprecated gauge@4.0.4: This package is no longer supported.
 npm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
-OpenClaw instalat. Verific instalarea:
+OpenClaw installed. Checking the installation:
 
 Bash Check OpenClaw version
 IN
@@ -4735,7 +4735,7 @@ openclaw --version
 
 OUT
 2026.1.30
-OpenClaw v2026.1.30 instalat. Acum pornesc node-ul și îl conectez la gateway:
+OpenClaw v2026.1.30 installed. Now starting the node and connecting it to the gateway:
 
 Bash Check if gateway is running on port 3000
 IN
@@ -4747,7 +4747,7 @@ OUT
   TCP    [::1]:3000             [::]:0                 LISTENING
   TCP    [::1]:3000             [::1]:51583            ESTABLISHED
   TCP    [::1]:51583            [::1]:3000             ESTABLISHED
-Gateway-ul rulează pe port 3000. Pornesc OpenClaw Node:
+The gateway is running on port 3000. Starting OpenClaw Node:
 
 Bash Start OpenClaw Node and connect to gateway
 IN
@@ -4771,7 +4771,7 @@ OUT
 Exit code 1
 /usr/bin/bash: line 1: type: C:UsersLucianAppDataLocalTempclaudec--Users-Lucian-Desktop-byon-optimustasksb623db8.output: not found
 Read C:\Users\Lucian\AppData\Local\Temp\claude\c--Users-Lucian-Desktop-byon-optimus\tasks\b623db8.output
-Gateway-ul cere autentificare. Să verific tokenul din .env:
+The gateway requires authentication. Let me check the token from .env:
 
 Grep "OPENCLAW_GATEWAY_TOKEN" (in c:\Users\Lucian\Desktop\byon_optimus)
 19 lines of output
@@ -4851,7 +4851,7 @@ Next steps:
   Need to share?      openclaw status --all
   Need to debug live? openclaw logs --follow
   Fix reachability first: openclaw gateway probe
-Văd problema - Gateway-ul BYON Optimus (port 3000) necesită token de autentificare. Să configurez tokenul:
+I see the problem - The BYON Optimus gateway (port 3000) requires an authentication token. Let me configure the token:
 
 Bash Generate a secure gateway token
 IN
@@ -4859,13 +4859,13 @@ openssl rand -hex 32
 
 OUT
 987ad2399f0e70b75238d2b3dd586545e2635b8a92572e0e6e9fb70b7fb2a5d5
-Adaug tokenul în .env:
+Adding the token to .env:
 
 Read c:\Users\Lucian\Desktop\byon_optimus\.env (lines 141-170)
 Read c:\Users\Lucian\Desktop\byon_optimus\.env (lines 111-145)
 Edit c:\Users\Lucian\Desktop\byon_optimus\.env
 Added 4 lines
-Token adăugat. Acum să verific ce gateway rulează pe port 3000:
+Token added. Now let me check which gateway is running on port 3000:
 
 Bash Check what process is listening on port 3000
 IN
@@ -4892,7 +4892,7 @@ OUT
    -- -----------        ----                                                           
  1616 com.docker.backend C:\Program Files\Docker\Docker\resources\com.docker.backend.exe
 20176 wslrelay           C:\Program Files\WSL\wslrelay.exe
-Văd - port 3000 e Docker. OpenClaw CLI are propriul gateway pe port 18789. Să pornesc gateway-ul OpenClaw:
+I see - port 3000 is Docker. OpenClaw CLI has its own gateway on port 18789. Let me start the OpenClaw gateway:
 
 Bash Start OpenClaw gateway on localhost
 IN
@@ -4932,7 +4932,7 @@ OUT
 <output>
 [stderr] 2026-02-02T06:31:55.665Z Missing config. Run `openclaw setup` or set gateway.mode=local (or pass --allow-unconfigured).
 </output>
-Trebuie să rulez setup-ul OpenClaw mai întâi:
+I need to run the OpenClaw setup first:
 
 Bash Run OpenClaw setup for local mode
 IN
@@ -4991,7 +4991,7 @@ Guide: https://docs.openclaw.ai/windows
 Updated C:\Users\Lucian\.openclaw\openclaw.json
 Workspace OK: C:\Users\Lucian\.openclaw\workspace
 Sessions OK: C:\Users\Lucian\.openclaw\agents\main\sessions
-Config creat. Acum pornesc gateway-ul:
+Config created. Now starting the gateway:
 
 Bash Start OpenClaw gateway
 IN
@@ -5018,7 +5018,7 @@ OUT
 [90m2026-02-02T06:33:15.919Z[39m [36m[gateway][39m [36mlog file: \tmp\openclaw\openclaw-2026-02-02.log[39m
 [90m2026-02-02T06:33:15.926Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
 </output>
-Gateway-ul OpenClaw rulează pe port 18789. Acum pornesc node-ul:
+The OpenClaw gateway is running on port 18789. Now starting the node:
 
 Bash Start OpenClaw Node connected to gateway
 IN
@@ -5044,10 +5044,10 @@ node host PATH: C:\Users\Lucian\bin;C:\Program Files\Git\mingw64\bin;C:\Program 
 [stderr] gateway connect failed: Error: unauthorized: gateway token mismatch (provide gateway auth token)
 [stderr] node host gateway closed (1008): unauthorized: gateway token mismatch (provide gateway auth token)
 </output>
-Gateway-ul cere token. Să verific configurația gateway-ului:
+The gateway requires a token. Let me check the gateway configuration:
 
 Read C:\Users\Lucian\.openclaw\openclaw.json
-Găsit tokenul gateway-ului. Conectez node-ul cu token:
+Found the gateway token. Connecting the node with the token:
 
 Bash Start node with auth token
 IN
@@ -5114,7 +5114,7 @@ node host PATH: C:\Users\Lucian\bin;C:\Program Files\Git\mingw64\bin;C:\Program 
 [stderr] gateway connect failed: Error: unauthorized: gateway token mismatch (provide gateway auth token)
 [stderr] node host gateway closed (1008): unauthorized: gateway token mismatch (provide gateway auth token)
 </output>
-Trebuie să pairez dispozitivul prin CLI. Să verific dispozitivele pending:
+I need to pair the device through CLI. Let me check the pending devices:
 
 Bash List devices
 IN
@@ -5135,7 +5135,7 @@ Bind: loopback
     at Socket.socketOnClose (C:\Users\Lucian\AppData\Roaming\npm\node_modules\openclaw\node_modules\ws\lib\websocket.js:1346:15)
     at Socket.emit (node:events:508:28)
     at TCP.<anonymous> (node:net:346:12)
-Trebuie să setez remote.token în config:
+I need to set remote.token in config:
 
 Edit C:\Users\Lucian\.openclaw\openclaw.json
 Added 3 lines
@@ -5158,7 +5158,7 @@ Bind: loopback
     at Socket.socketOnClose (C:\Users\Lucian\AppData\Roaming\npm\node_modules\openclaw\node_modules\ws\lib\websocket.js:1346:15)
     at Socket.emit (node:events:508:28)
     at TCP.<anonymous> (node:net:346:12)
-Trebuie să restartez gateway-ul pentru a prelua noua configurație:
+I need to restart the gateway to pick up the new configuration:
 
 TaskStop
 IN
@@ -5229,7 +5229,7 @@ OUT
 [90m2026-02-02T06:35:57.444Z[39m [36m[gateway][39m [36mlog file: \tmp\openclaw\openclaw-2026-02-02.log[39m
 [90m2026-02-02T06:35:57.450Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
 </output>
-Gateway pornit. Verific dispozitivele:
+Gateway started. Checking devices:
 
 Bash List devices
 IN
@@ -5263,7 +5263,7 @@ Paired (1)
 │ 77fe6c7ad67b9f5948362f1bb077ecde97d9d9975d │ operator   │ operator.admin, operator.       │ operator   │            │
 │ fda6e604ecf3ef6298c12f                     │            │ approvals, operator.pairing     │            │            │
 └────────────────────────────────────────────┴────────────┴─────────────────────────────────┴────────────┴────────────┘
-Funcționează! Acum pornesc node-ul cu token:
+It works! Now starting the node with the token:
 
 Bash Start node with token env
 IN
@@ -5284,7 +5284,7 @@ OUT
 <output>
 node host PATH: C:\Users\Lucian\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Lucian\bin;C:\Users\Lucian\AppData\Local\Programs\Python\Python311\Scripts;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\dotnet;C:\Program Files\Microsoft SQL Server\170\Tools\Binn;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn;C:\Program Files (x86)\IncrediBuild;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit;C:\Program Files\nodejs;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Program Files\GitHub CLI;C:\Program Files\PowerShell\7;C:\Program Files\Docker\Docker\resources\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\dotnet;C:\Program Files\Microsoft SQL Server\170\Tools\Binn;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn;C:\Program Files (x86)\IncrediBuild;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit;C:\Program Files\nodejs;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Program Files\GitHub CLI;C:\Users\Lucian\AppData\Local\Programs\cursor\resources\app\codeBin;C:\Users\Lucian\AppData\Local\Programs\Python\Python311\Scripts;C:\Users\Lucian\AppData\Local\Programs\Python\Python311;C:\Users\Lucian\AppData\Local\Microsoft\WindowsApps;C:\Users\Lucian\.dotnet\tools;C:\Users\Lucian\AppData\Roaming\npm;C:\Users\Lucian\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Lucian\AppData\Local\GitHubDesktop\bin;C:\Users\Lucian\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\Lucian\AppData\Local\Microsoft\WinGet\Packages\Rclone.Rclone_Microsoft.Winget.Source_8wekyb3d8bbwe\rclone-v1.72.1-windows-amd64;C:\Users\Lucian\AppData\Local\Programs\Antigravity\bin;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl
 </output>
-Node-ul pare să ruleze. Verific lista de noduri:
+The node seems to be running. Checking the list of nodes:
 
 Bash Check nodes status
 IN
@@ -5318,7 +5318,7 @@ Summary:
    - Phase 3: Single entry point architecture - remove port 3001, consolidate to gateway
    - Phase 4: Mobile responsive styles and BYON neon theme merge
    - Fix documentation terminology for FHRSS and FCPE systems
-   - Install OpenClaw Node and connect it to the gateway ("instaleaza tu tot")
+   - Install OpenClaw Node and connect it to the gateway ("install everything yourself")
 
 2. Key Technical Concepts:
    - **FHRSS**: Fractal-Holographic Redundant Storage System (XOR parity recovery, 100% recovery @ 40% loss)
@@ -5455,9 +5455,9 @@ Summary:
 
 6. All User Messages:
    - (Context from previous session summary about implementing Phases 1-4)
-   - "adauga in documentatie si descriptie denumirile corecte ale sistemeleor cauta in documente nu inventa de exemplu fhrss= fractal holografic redundent storage sistem..." (Add correct system names to documentation, search in documents, don't invent - pointed out FHRSS terminology was wrong)
-   - "instaleaza:Nu momentan — nu am niciun node conectat..." (Install: Currently no node connected - how to get access via OpenClaw Node)
-   - "instaleaza tu tot" (Install everything for me)
+   - "add the correct system names in documentation and description, search in documents, don't invent, for example fhrss= fractal holographic redundant storage system..." (pointed out FHRSS terminology was wrong)
+   - "install: Not right now — I don't have any node connected..." (how to get access via OpenClaw Node)
+   - "install everything yourself" (Install everything for me)
 
 7. Pending Tasks:
    - None explicitly pending - all phases completed, node installed and connected
@@ -5558,20 +5558,20 @@ openclaw nodes run --node "Lucian-PC" -- echo "Hello from BYON"
 openclaw nodes status
 The unified BYON Optimus architecture is now operational with the OpenClaw gateway serving as the single entry point on port 18789 (CLI) or port 3000 (Docker).
 
-ncă nu văd "Lucian-PC" în lista mea de noduri.
+I still don't see "Lucian-PC" in my list of nodes.
 
-Câteva posibilități:
+A few possibilities:
 
-1. Node-ul nu e pornit încă?
+1. The node isn't started yet?
 
 openclaw node start
-2. Nu e pairing făcut cu acest gateway?
+2. Pairing not done with this gateway?
 
 openclaw node pair
-3. Verifică din partea ta:
+3. Check on your side:
 
 openclaw nodes status
-Ce îți arată ție când rulezi openclaw nodes status? Dacă apare "Lucian-PC" la tine dar nu la mine, e problemă de conexiune între node și gateway.
+What does it show you when you run openclaw nodes status? If "Lucian-PC" appears on your side but not on mine, it's a connection problem between the node and the gateway.
 Let me check the current node status and troubleshoot the connection.
 
 Bash Check OpenClaw nodes status
@@ -5597,32 +5597,32 @@ Known: 1 · Paired: 1 · Connected: 1
 │      │                                                           │          │ core_  │                       │      │
 │      │                                                           │          │ perl   │                       │      │
 └──────┴───────────────────────────────────────────────────────────┴──────────┴────────┴───────────────────────┴──────┘
-Node-ul "Lucian-PC" este conectat și funcțional la mine:
+The "Lucian-PC" node is connected and functional on my side:
 
 
 Known: 1 · Paired: 1 · Connected: 1
 Node: Lucian-PC
 Status: paired · connected (5m ago)
 Caps: browser, system
-Problema ta - Probabil rulezi pe un gateway diferit sau nu ai setat token-ul. Încearcă:
+Your problem - You're probably running on a different gateway or you haven't set the token. Try:
 
 
-# 1. Setează token-ul corect
+# 1. Set the correct token
 $env:OPENCLAW_GATEWAY_TOKEN="2de14ad36d35b6937095c2ca96a9a8ace6e8f9649b1561e6"
 
-# 2. Verifică statusul
+# 2. Check the status
 openclaw nodes status
 
-# 3. Dacă nu merge, verifică că gateway-ul rulează pe port 18789
+# 3. If it doesn't work, check that the gateway is running on port 18789
 netstat -an | findstr 18789
-Dacă ai propriul tău gateway pe altă mașină, trebuie să:
+If you have your own gateway on another machine, you need to:
 
-Pornești node-ul să se conecteze la acel gateway
-Aprobi pairing-ul pe gateway-ul tău
-Vrei să pornesc node-ul să se conecteze la un alt host/port? Spune-mi adresa gateway-ului tău.
+Start the node to connect to that gateway
+Approve the pairing on your gateway
+Do you want me to start the node to connect to a different host/port? Tell me your gateway address.
 
-introdu tot tu in sistem ca la mine nu merge seteaza tu tot!!
-Bine, configurez totul de la zero.
+enter everything into the system yourself because it doesn't work on my end, set up everything yourself!!
+OK, configuring everything from scratch.
 
 Update Todos
 
@@ -5670,7 +5670,7 @@ Connect and pair node
 
 Verify connection works
 Read C:\Users\Lucian\.openclaw\openclaw.json
-Configurația există deja. Acum pornesc gateway-ul și node-ul.
+The configuration already exists. Now starting the gateway and node.
 
 Update Todos
 
@@ -5696,7 +5696,7 @@ powershell -Command "Start-Sleep -Seconds 3"
 OUT
 0
 Read C:\Users\Lucian\AppData\Local\Temp\claude\c--Users-Lucian-Desktop-byon-optimus\tasks\bf3d248.output
-Gateway pornit pe ws://127.0.0.1:18789. Acum pornesc node-ul.
+Gateway started on ws://127.0.0.1:18789. Now starting the node.
 
 Update Todos
 
@@ -5768,7 +5768,7 @@ Gateway target: ws://127.0.0.1:18789
 Source: local loopback
 Config: C:\Users\Lucian\.openclaw\openclaw.json
 Bind: loopback
-Timeout - trebuie să configurez aprobările pentru exec. Let me fix that.
+Timeout - I need to configure the exec approvals. Let me fix that.
 
 Bash Get node details
 IN
@@ -5814,7 +5814,7 @@ Commands
 - system.execApprovals.set
 - system.run
 - system.which
-Node-ul are capabilități system.run. Trebuie să setez aprobările la modul "full" pentru a permite comenzi.
+The node has system.run capabilities. I need to set the approvals to "full" mode to allow commands.
 
 Bash Get current exec approvals settings
 IN

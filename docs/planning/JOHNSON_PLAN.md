@@ -18,68 +18,68 @@
 
 ---
 
-## ⚠️ PRINCIPIU FUNDAMENTAL
+## ⚠️ FUNDAMENTAL PRINCIPLE
 
-> **FHRSS+FCPE este OBLIGATORIU, nu opțional!**
+> **FHRSS+FCPE is MANDATORY, not optional!**
 >
-> Aceasta este diferența critică față de alte boturi care:
-> - Pierd context după câteva mesaje
-> - Rezumează atât de mult încât distrug proiectele
-> - Nu au memorie semantică persistentă
+> This is the critical difference from other bots that:
+> - Lose context after a few messages
+> - Summarize so much that they destroy projects
+> - Do not have persistent semantic memory
 >
-> **Byon Bot NU PORNEȘTE fără memory system activ.**
+> **Byon Bot DOES NOT START without active memory system.**
 
 ---
 
-## OBIECTIV PRINCIPAL
+## MAIN OBJECTIVE
 
-Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
-- 3 agenți izolați (Worker, Auditor, Executor)
-- Capabilitate de coding integrată
-- Jupyter Kernel pentru execuție autonomă de cod și teste
-- **Sistem FHRSS+FCPE pentru memorie semantică (OBLIGATORIU, HARD-WIRED)**
+Building a multi-agent system (MACP v1.1) based on OpenClaw, with:
+- 3 isolated agents (Worker, Auditor, Executor)
+- Integrated coding capability
+- Jupyter Kernel for autonomous code and test execution
+- **FHRSS+FCPE system for semantic memory (MANDATORY, HARD-WIRED)**
 
 ---
 
-## ARHITECTURA FINALĂ (DUAL GATE MODEL)
+## FINAL ARCHITECTURE (DUAL GATE MODEL)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         BYON BOT SYSTEM                             │
 │                                                                     │
 │  ┌───────────────────────────────────────────────────────────────┐ │
-│  │                    CANALE DE INTRARE                          │ │
+│  │                    INPUT CHANNELS                              │ │
 │  │   WhatsApp | Telegram | Discord | WebChat | CLI               │ │
 │  └───────────────────────────────┬───────────────────────────────┘ │
 │                                  │                                  │
 │  ┌───────────────────────────────▼───────────────────────────────┐ │
 │  │                      AGENT A (WORKER)                         │ │
-│  │  - Ingest evenimente                                          │ │
-│  │  - Indexare codebase (FHRSS+FCPE)                            │ │
-│  │  - Extragere context relevant                                 │ │
-│  │  - Generare evidence_pack.json + plan_draft.json             │ │
+│  │  - Ingest events                                              │ │
+│  │  - Codebase indexing (FHRSS+FCPE)                            │ │
+│  │  - Relevant context extraction                                │ │
+│  │  - Generate evidence_pack.json + plan_draft.json             │ │
 │  └───────────────────────────────┬───────────────────────────────┘ │
 │                                  │                                  │
 │                    [FILES: evidence_pack.json, plan_draft.json]     │
 │                                  │                                  │
 │  ┌───────────────────────────────▼───────────────────────────────┐ │
 │  │                      AGENT B (AUDITOR)                        │ │
-│  │  - Validare plan                                              │ │
-│  │  - Verificare securitate                                      │ │
-│  │  - Generare diff preview                                      │ │
-│  │  - Producere approval_request.json                            │ │
+│  │  - Plan validation                                            │ │
+│  │  - Security verification                                      │ │
+│  │  - Diff preview generation                                    │ │
+│  │  - Produce approval_request.json                              │ │
 │  └───────────────────────────────┬───────────────────────────────┘ │
 │                                  │                                  │
 │                    [FILE: approval_request.json]                    │
 │                                  │                                  │
 │  ┌───────────────────────────────▼───────────────────────────────┐ │
 │  │                          USER                                 │ │
-│  │  - Vizualizare plan + diff                                    │ │
+│  │  - View plan + diff                                           │ │
 │  │  - APPROVE / REJECT / MODIFY                                  │ │
-│  │  - Semnare execution_order.json                               │ │
+│  │  - Sign execution_order.json                                  │ │
 │  └───────────────────────────────┬───────────────────────────────┘ │
 │                                  │                                  │
-│                    [FILE: execution_order.json - SEMNAT]            │
+│                    [FILE: execution_order.json - SIGNED]            │
 │                                  │                                  │
 │  ┌───────────────────────────────▼───────────────────────────────┐ │
 │  │                    AGENT C (EXECUTOR)                         │ │
@@ -90,57 +90,57 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
 │  │  │   │ Kernel  │  │ Kernel  │  │ Kernel  │               │ │ │
 │  │  │   └─────────┘  └─────────┘  └─────────┘               │ │ │
 │  │  └─────────────────────────────────────────────────────────┘ │ │
-│  │  - Execuție cod în sandbox                                    │ │
-│  │  - Rulare teste autonom                                       │ │
-│  │  - Ciclu iterativ până la SUCCESS                             │ │
-│  │  - Producere johnson_receipt.json                             │ │
+│  │  - Code execution in sandbox                                  │ │
+│  │  - Autonomous test running                                    │ │
+│  │  - Iterative cycle until SUCCESS                              │ │
+│  │  - Produce johnson_receipt.json                               │ │
 │  └───────────────────────────────┬───────────────────────────────┘ │
 │                                  │                                  │
 │                    [FILE: johnson_receipt.json]                     │
 │                                  │                                  │
 │                                  ▼                                  │
-│                    AGENT A verifică receipt                         │
+│                    AGENT A verifies receipt                         │
 │                    (MATCH / DISPUTE)                                │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## PLAN DE IMPLEMENTARE
+## IMPLEMENTATION PLAN
 
-### FAZA 0: SETUP MEDIU DE DEZVOLTARE
+### PHASE 0: DEVELOPMENT ENVIRONMENT SETUP
 **Status**: [ ] NOT STARTED
 
-- [ ] 0.1 Instalare Node.js 22+
-- [ ] 0.2 Instalare pnpm
-- [ ] 0.3 Instalare Docker Desktop
+- [ ] 0.1 Install Node.js 22+
+- [ ] 0.2 Install pnpm
+- [ ] 0.3 Install Docker Desktop
 - [ ] 0.4 Clone OpenClaw repository
-- [ ] 0.5 Verificare că OpenClaw rulează corect (`pnpm install && pnpm build`)
-- [ ] 0.6 Setup Python environment pentru Jupyter
+- [ ] 0.5 Verify that OpenClaw runs correctly (`pnpm install && pnpm build`)
+- [ ] 0.6 Setup Python environment for Jupyter
 
 **Deliverables**:
-- OpenClaw funcțional local
-- Docker funcțional
-- Jupyter Kernel Gateway testat
+- OpenClaw functional locally
+- Docker functional
+- Jupyter Kernel Gateway tested
 
 ---
 
-### FAZA 1: FORK OPENCLAW × 3
+### PHASE 1: FORK OPENCLAW × 3
 **Status**: [ ] NOT STARTED
 
-- [ ] 1.1 Creare structură directoare:
+- [ ] 1.1 Create directory structure:
   ```
   Byon_bot/
   ├── agent-worker/      # Fork 1 - Agent A
   ├── agent-auditor/     # Fork 2 - Agent B
   ├── agent-executor/    # Fork 3 - Agent C
-  ├── shared/            # Cod comun (protocoale, types)
+  ├── shared/            # Common code (protocols, types)
   ├── kernel-host/       # Jupyter Kernel setup
   └── memory-store/      # FHRSS+FCPE storage
   ```
 
-- [ ] 1.2 Copiere OpenClaw în fiecare folder agent
-- [ ] 1.3 Creare `shared/` cu:
+- [ ] 1.2 Copy OpenClaw into each agent folder
+- [ ] 1.3 Create `shared/` with:
   - [ ] 1.3.1 `types/evidence_pack.ts`
   - [ ] 1.3.2 `types/plan_draft.ts`
   - [ ] 1.3.3 `types/approval_request.ts`
@@ -151,16 +151,16 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
   - [ ] 1.3.8 `validation/schemas.ts`
 
 **Deliverables**:
-- 3 foldere cu OpenClaw
-- Shared types definite
+- 3 folders with OpenClaw
+- Shared types defined
 - Crypto utilities
 
 ---
 
-### FAZA 2: IMPLEMENTARE ROLE GATE
+### PHASE 2: ROLE GATE IMPLEMENTATION
 **Status**: [ ] NOT STARTED
 
-- [ ] 2.1 Creare `shared/config/roles.ts`:
+- [ ] 2.1 Create `shared/config/roles.ts`:
   ```typescript
   export type AgentRole = 'worker' | 'auditor' | 'executor';
 
@@ -181,7 +181,7 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
       can_access_inbox: false,
       can_access_bus: true,
       can_execute: false,
-      can_contact_user: true  // doar pentru approval_request
+      can_contact_user: true  // only for approval_request
     },
     executor: {
       can_access_inbox: false,
@@ -192,37 +192,37 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
   };
   ```
 
-- [ ] 2.2 Modificare Agent Worker:
-  - [ ] 2.2.1 Dezactivare canale de output direct
-  - [ ] 2.2.2 Adăugare export către FILES (nu bus)
-  - [ ] 2.2.3 Implementare codebase indexer
-  - [ ] 2.2.4 Implementare context selector
+- [ ] 2.2 Modify Agent Worker:
+  - [ ] 2.2.1 Disable direct output channels
+  - [ ] 2.2.2 Add export to FILES (not bus)
+  - [ ] 2.2.3 Implement codebase indexer
+  - [ ] 2.2.4 Implement context selector
 
-- [ ] 2.3 Modificare Agent Auditor:
-  - [ ] 2.3.1 Dezactivare canale de input (doar citește files)
-  - [ ] 2.3.2 Implementare validator
-  - [ ] 2.3.3 Implementare diff generator
-  - [ ] 2.3.4 Implementare approval request generator
+- [ ] 2.3 Modify Agent Auditor:
+  - [ ] 2.3.1 Disable input channels (only reads files)
+  - [ ] 2.3.2 Implement validator
+  - [ ] 2.3.3 Implement diff generator
+  - [ ] 2.3.4 Implement approval request generator
 
-- [ ] 2.4 Modificare Agent Executor:
-  - [ ] 2.4.1 **DEZACTIVARE COMPLETĂ** canale (WhatsApp, Telegram, etc.)
-  - [ ] 2.4.2 **DEZACTIVARE** inbox
-  - [ ] 2.4.3 **DEZACTIVARE** bus
-  - [ ] 2.4.4 Singur input: FILE IMPORT (execution_order.json)
-  - [ ] 2.4.5 Implementare signature verification
-  - [ ] 2.4.6 Implementare executor engine
+- [ ] 2.4 Modify Agent Executor:
+  - [ ] 2.4.1 **COMPLETELY DISABLE** channels (WhatsApp, Telegram, etc.)
+  - [ ] 2.4.2 **DISABLE** inbox
+  - [ ] 2.4.3 **DISABLE** bus
+  - [ ] 2.4.4 Only input: FILE IMPORT (execution_order.json)
+  - [ ] 2.4.5 Implement signature verification
+  - [ ] 2.4.6 Implement executor engine
 
 **Deliverables**:
-- Fiecare agent cu rol strict
-- Executor complet izolat
+- Each agent with strict role
+- Executor completely isolated
 - Role gate functional
 
 ---
 
-### FAZA 3: IMPLEMENTARE PROTOCOL FILES
+### PHASE 3: FILE PROTOCOL IMPLEMENTATION
 **Status**: [ ] NOT STARTED
 
-- [ ] 3.1 Definire JSON Schemas:
+- [ ] 3.1 Define JSON Schemas:
   - [ ] 3.1.1 `schemas/evidence_pack.schema.json`
   - [ ] 3.1.2 `schemas/plan_draft.schema.json`
   - [ ] 3.1.3 `schemas/approval_request.schema.json`
@@ -230,18 +230,18 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
   - [ ] 3.1.5 `schemas/johnson_receipt.schema.json`
   - [ ] 3.1.6 `schemas/dispute_report.schema.json`
 
-- [ ] 3.2 Implementare File Handlers:
+- [ ] 3.2 Implement File Handlers:
   - [ ] 3.2.1 `shared/files/writer.ts` (with hash)
   - [ ] 3.2.2 `shared/files/reader.ts` (with validation)
   - [ ] 3.2.3 `shared/files/watcher.ts` (for handoff)
 
-- [ ] 3.3 Implementare Signing:
-  - [ ] 3.3.1 Generare user keypair (Ed25519)
-  - [ ] 3.3.2 Generare executor keypair
-  - [ ] 3.3.3 Sign function pentru execution_order
-  - [ ] 3.3.4 Verify function în executor
+- [ ] 3.3 Implement Signing:
+  - [ ] 3.3.1 Generate user keypair (Ed25519)
+  - [ ] 3.3.2 Generate executor keypair
+  - [ ] 3.3.3 Sign function for execution_order
+  - [ ] 3.3.4 Verify function in executor
 
-- [ ] 3.4 Implementare Handoff Directory:
+- [ ] 3.4 Implement Handoff Directory:
   ```
   handoff/
   ├── worker_to_auditor/
@@ -256,67 +256,67 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
   ```
 
 **Deliverables**:
-- Schemas validate
-- File handlers cu hashing
-- Signing/verification funcțional
+- Schemas validated
+- File handlers with hashing
+- Signing/verification functional
 - Handoff directory structure
 
 ---
 
-### FAZA 4: JUPYTER KERNEL INTEGRATION
+### PHASE 4: JUPYTER KERNEL INTEGRATION
 **Status**: [ ] NOT STARTED
 
 - [ ] 4.1 Setup Kernel Host:
-  - [ ] 4.1.1 Creare `kernel-host/Dockerfile`
-  - [ ] 4.1.2 Creare `kernel-host/docker-compose.yml`
-  - [ ] 4.1.3 Configurare kernels (Python, Node, Bash)
-  - [ ] 4.1.4 Configurare resource limits
-  - [ ] 4.1.5 Configurare network isolation
+  - [ ] 4.1.1 Create `kernel-host/Dockerfile`
+  - [ ] 4.1.2 Create `kernel-host/docker-compose.yml`
+  - [ ] 4.1.3 Configure kernels (Python, Node, Bash)
+  - [ ] 4.1.4 Configure resource limits
+  - [ ] 4.1.5 Configure network isolation
 
-- [ ] 4.2 Implementare Kernel Manager:
+- [ ] 4.2 Implement Kernel Manager:
   - [ ] 4.2.1 `agent-executor/src/kernel/manager.ts`
   - [ ] 4.2.2 `agent-executor/src/kernel/python.ts`
   - [ ] 4.2.3 `agent-executor/src/kernel/node.ts`
   - [ ] 4.2.4 `agent-executor/src/kernel/bash.ts`
 
-- [ ] 4.3 Implementare Execution Loop:
+- [ ] 4.3 Implement Execution Loop:
   - [ ] 4.3.1 `agent-executor/src/loop/autonomous.ts`
   - [ ] 4.3.2 Max iterations limit
   - [ ] 4.3.3 Same error detection (3x = escalate)
   - [ ] 4.3.4 Timeout handling
   - [ ] 4.3.5 Output capture
 
-- [ ] 4.4 Implementare Test Runner:
+- [ ] 4.4 Implement Test Runner:
   - [ ] 4.4.1 pytest integration
   - [ ] 4.4.2 jest/vitest integration
   - [ ] 4.4.3 unittest integration
   - [ ] 4.4.4 Test result parser
 
 **Deliverables**:
-- Docker container pentru kernels
-- Kernel manager funcțional
-- Autonomous loop cu limits
-- Test runner integrat
+- Docker container for kernels
+- Kernel manager functional
+- Autonomous loop with limits
+- Test runner integrated
 
 ---
 
-### FAZA 5: CODING CAPABILITY MODULE
+### PHASE 5: CODING CAPABILITY MODULE
 **Status**: [ ] NOT STARTED
 
-- [ ] 5.1 Implementare Codebase Indexer (Agent A):
+- [ ] 5.1 Implement Codebase Indexer (Agent A):
   - [ ] 5.1.1 File scanner
   - [ ] 5.1.2 AST parser (TypeScript, Python)
   - [ ] 5.1.3 Symbol extractor
   - [ ] 5.1.4 Dependency graph builder
-  - [ ] 5.1.5 Embedding generator (pentru FHRSS)
+  - [ ] 5.1.5 Embedding generator (for FHRSS)
 
-- [ ] 5.2 Implementare Context Selector (Agent A):
-  - [ ] 5.2.1 Semantic search în FHRSS
+- [ ] 5.2 Implement Context Selector (Agent A):
+  - [ ] 5.2.1 Semantic search in FHRSS
   - [ ] 5.2.2 Dependency resolution
   - [ ] 5.2.3 Chunk optimization
   - [ ] 5.2.4 Context pack builder
 
-- [ ] 5.3 Implementare Code Actions (Agent C):
+- [ ] 5.3 Implement Code Actions (Agent C):
   - [ ] 5.3.1 `code_read` action
   - [ ] 5.3.2 `code_write` action
   - [ ] 5.3.3 `code_edit` action
@@ -324,29 +324,29 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
   - [ ] 5.3.5 `test_run` action
   - [ ] 5.3.6 `notebook_run` action
 
-- [ ] 5.4 Implementare Diff Generator (Agent B):
+- [ ] 5.4 Implement Diff Generator (Agent B):
   - [ ] 5.4.1 Unified diff format
   - [ ] 5.4.2 Side-by-side preview
   - [ ] 5.4.3 Conflict detection
   - [ ] 5.4.4 Risk assessment
 
 **Deliverables**:
-- Codebase indexer funcțional
-- Context selection inteligent
-- Toate code actions
-- Diff preview pentru user
+- Codebase indexer functional
+- Intelligent context selection
+- All code actions
+- Diff preview for user
 
 ---
 
-### FAZA 6: POLICY ENGINE
+### PHASE 6: POLICY ENGINE
 **Status**: [ ] NOT STARTED
 
-- [ ] 6.1 Creare Policy DSL:
+- [ ] 6.1 Create Policy DSL:
   - [ ] 6.1.1 `shared/policy/schema.ts`
   - [ ] 6.1.2 `shared/policy/parser.ts`
   - [ ] 6.1.3 `shared/policy/validator.ts`
 
-- [ ] 6.2 Definire Whitelist Actions:
+- [ ] 6.2 Define Whitelist Actions:
   ```yaml
   # policy.yaml
   execution_whitelist:
@@ -359,13 +359,13 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
     send_message: { requires_confirmation: true }
   ```
 
-- [ ] 6.3 Implementare Constraint Checker:
+- [ ] 6.3 Implement Constraint Checker:
   - [ ] 6.3.1 Parameter validation
   - [ ] 6.3.2 TTL verification
   - [ ] 6.3.3 Scope verification
   - [ ] 6.3.4 Signature verification
 
-- [ ] 6.4 Implementare Escalation Rules:
+- [ ] 6.4 Implement Escalation Rules:
   - [ ] 6.4.1 iterations_exceeded
   - [ ] 6.4.2 same_error_3_times
   - [ ] 6.4.3 security_warning
@@ -373,52 +373,52 @@ Construirea unui sistem multi-agent (MACP v1.1) bazat pe OpenClaw, cu:
 
 **Deliverables**:
 - Policy DSL parser
-- Whitelist configurat
+- Whitelist configured
 - Constraint checker
 - Escalation logic
 
 ---
 
-### FAZA 7: FHRSS+FCPE INTEGRATION
-**Status**: [x] COMPLETE - HARD-WIRED (OBLIGATORIU)
+### PHASE 7: FHRSS+FCPE INTEGRATION
+**Status**: [x] COMPLETE - HARD-WIRED (MANDATORY)
 **Source**: `D:\Github Repo\INFINIT_MEMORYCONTEXT\`
 
-> ⚠️ **CRITICAL**: FHRSS+FCPE este **OBLIGATORIU**, nu opțional!
-> Agenții **NU PORNESC** fără memory system activ.
-> Aceasta este diferența fundamentală față de alte boturi care pierd context.
+> ⚠️ **CRITICAL**: FHRSS+FCPE is **MANDATORY**, not optional!
+> Agents **DO NOT START** without active memory system.
+> This is the fundamental difference from other bots that lose context.
 
-#### OVERVIEW SISTEM
+#### SYSTEM OVERVIEW
 
 **FHRSS** (Fractal-Holographic Redundant Storage System):
-- XOR-based parity system cu 9 families
-- **100% recovery la 40% data loss**
+- XOR-based parity system with 9 families
+- **100% recovery at 40% data loss**
 - Subcube size: 8×8×8 (512 bytes)
 - Profiles: MINIMAL (3), MEDIUM (4), HIGH (6), FULL (9 families)
-- Storage overhead: 2.125x pentru FULL profile
+- Storage overhead: 2.125x for FULL profile
 
 **FCPE** (Fractal-Chaotic Persistent Encoding):
-- Compresie variable→fixed: `[seq_len, 384] → [384]`
-- **73,000x compression ratio** pentru 2M tokens
+- Variable→fixed compression: `[seq_len, 384] → [384]`
+- **73,000x compression ratio** for 2M tokens
 - Weighted attention pooling
 - 5 fractal encoding layers
-- Content-aware jitter pentru discrimination
+- Content-aware jitter for discrimination
 
 #### ⚡ HARD-WIRED INTEGRATION
 
 ```typescript
-// agent-worker/src/index.ts - FHRSS+FCPE este OBLIGATORIU
+// agent-worker/src/index.ts - FHRSS+FCPE is MANDATORY
 async function main() {
   try {
     await initializeMemory(); // MUST succeed
   } catch (error) {
     console.error('FATAL: FHRSS+FCPE Memory REQUIRED!');
-    process.exit(1); // Agent REFUZĂ să pornească fără memory
+    process.exit(1); // Agent REFUSES to start without memory
   }
 }
 ```
 
 ```yaml
-# docker-compose.yml - Memory service container OBLIGATORIU
+# docker-compose.yml - Memory service container MANDATORY
 services:
   memory-service:
     build: ./shared/memory
@@ -429,10 +429,10 @@ services:
   agent-worker:
     depends_on:
       memory-service:
-        condition: service_healthy  # NU pornește fără memory
+        condition: service_healthy  # DOES NOT start without memory
 ```
 
-#### PERFORMANCE VERIFICAT
+#### VERIFIED PERFORMANCE
 
 | Tokens | Time | Memory | Compression |
 |--------|------|--------|-------------|
@@ -451,34 +451,34 @@ services:
 #### TASKS (COMPLETE - HARD-WIRED)
 
 - [x] 7.1 Setup Memory Store:
-  - [x] 7.1.1 Copiere `fhrss_fcpe_unified.py` în `shared/memory/fhrss_fcpe.py`
-  - [x] 7.1.2 Creare TypeScript wrapper: `shared/memory/index.ts`
+  - [x] 7.1.1 Copy `fhrss_fcpe_unified.py` to `shared/memory/fhrss_fcpe.py`
+  - [x] 7.1.2 Create TypeScript wrapper: `shared/memory/index.ts`
   - [x] 7.1.3 Setup `sentence-transformers` via `requirements.txt`
-  - [x] 7.1.4 Configurare storage paths per agent
+  - [x] 7.1.4 Configure storage paths per agent
   - [x] 7.1.5 Python service: `shared/memory/memory_service.py`
 
-- [x] 7.2 Implementare pentru Coding (Agent Worker):
+- [x] 7.2 Implementation for Coding (Agent Worker):
   - [x] 7.2.1 `storeCode()` - Code file → embeddings pipeline
   - [x] 7.2.2 `searchCode()` - Semantic code search
-  - [x] 7.2.3 FHRSS retrieval integrat în AgentMemory class
-  - [x] 7.2.4 **HARD-WIRED**: Agent refuză să pornească fără memory
+  - [x] 7.2.3 FHRSS retrieval integrated in AgentMemory class
+  - [x] 7.2.4 **HARD-WIRED**: Agent refuses to start without memory
 
-- [x] 7.3 Implementare pentru General Memory:
+- [x] 7.3 Implementation for General Memory:
   - [x] 7.3.1 `storeConversation()` - Conversation turns → embeddings
-  - [x] 7.3.2 `storeFact()` - Facts extraction și storage
+  - [x] 7.3.2 `storeFact()` - Facts extraction and storage
   - [x] 7.3.3 `searchConversation()` / `searchFacts()` - Retrieval
   - [x] 7.3.4 Cross-session memory via persistent storage
 
-- [x] 7.4 Docker Integration (OBLIGATORIU):
-  - [x] 7.4.1 `memory-service` container cu Python + sentence-transformers
-  - [x] 7.4.2 Health check pentru memory service
+- [x] 7.4 Docker Integration (MANDATORY):
+  - [x] 7.4.1 `memory-service` container with Python + sentence-transformers
+  - [x] 7.4.2 Health check for memory service
   - [x] 7.4.3 All agents `depends_on: memory-service`
-  - [x] 7.4.4 Shared volume pentru persistent storage
+  - [x] 7.4.4 Shared volume for persistent storage
 
-#### KEY CLASSES (din INFINIT_MEMORYCONTEXT)
+#### KEY CLASSES (from INFINIT_MEMORYCONTEXT)
 
 ```python
-# Configurație
+# Configuration
 @dataclass
 class FCPEConfig:
     dim: int = 384                  # Output dimension
@@ -503,40 +503,40 @@ class UnifiedFHRSS_FCPE:
     def test_recovery(ctx_id, loss_percent) → stats
 ```
 
-#### INTEGRARE ÎN BYON BOT
+#### INTEGRATION INTO BYON BOT
 
 ```
 Agent Worker (A):
-├── Primește mesaj de la user
-├── Generează embeddings pentru query
-├── retrieve_similar() din FHRSS
-├── Construiește context pack
-└── Salvează noi facts cu encode_context()
+├── Receives message from user
+├── Generates embeddings for query
+├── retrieve_similar() from FHRSS
+├── Builds context pack
+└── Saves new facts with encode_context()
 
 Agent Executor (C):
-├── Primește execution_order
-├── Codul executat → embeddings
-├── Salvează în memory pentru learning
-└── Receipt include memory_ids afectate
+├── Receives execution_order
+├── Executed code → embeddings
+├── Saves in memory for learning
+└── Receipt includes affected memory_ids
 ```
 
 **Deliverables** (COMPLETE):
-- ✅ FHRSS+FCPE **HARD-WIRED** (nu opțional!)
-- ✅ 73,000x compression funcțional
-- ✅ 100% recovery la 40% loss
-- ✅ Semantic search pentru cod și conversații
-- ✅ Persistence și fault tolerance
-- ✅ Docker container dedicat `memory-service`
-- ✅ Agenți refuză să pornească fără memory
+- ✅ FHRSS+FCPE **HARD-WIRED** (not optional!)
+- ✅ 73,000x compression functional
+- ✅ 100% recovery at 40% loss
+- ✅ Semantic search for code and conversations
+- ✅ Persistence and fault tolerance
+- ✅ Dedicated Docker container `memory-service`
+- ✅ Agents refuse to start without memory
 
 ---
 
-### FAZA 8: USER INTERFACE
+### PHASE 8: USER INTERFACE
 **Status**: [x] COMPLETE
 
 - [x] 8.1 Approval UI:
-  - [x] 8.1.1 Web interface pentru approval_request (`ui/public/approvals.html`)
-  - [x] 8.1.2 Diff viewer (JSON preview în approval detail)
+  - [x] 8.1.1 Web interface for approval_request (`ui/public/approvals.html`)
+  - [x] 8.1.2 Diff viewer (JSON preview in approval detail)
   - [x] 8.1.3 One-click approve/reject
   - [x] 8.1.4 Signature generation (TODO: Ed25519 integration)
 
@@ -547,7 +547,7 @@ Agent Executor (C):
 
 - [x] 8.3 CLI Interface:
   - [x] 8.3.1 `byon approve <request_id>` (`cli/src/commands/approve.ts`)
-  - [x] 8.3.2 `byon reject <request_id>` (în approve command)
+  - [x] 8.3.2 `byon reject <request_id>` (in approve command)
   - [x] 8.3.3 `byon status` (`cli/src/commands/status.ts`)
   - [x] 8.3.4 `byon history` (`cli/src/commands/history.ts`)
 
@@ -558,7 +558,7 @@ Agent Executor (C):
 
 ---
 
-### FAZA 9: TESTING & HARDENING
+### PHASE 9: TESTING & HARDENING
 **Status**: [x] COMPLETE
 
 - [ ] 9.1 Unit Tests:
@@ -586,13 +586,13 @@ Agent Executor (C):
   - [ ] 9.4.4 Resource limits enforcement
 
 **Deliverables**:
-- Test suite complet
+- Complete test suite
 - Security audit passed
 - Hardened deployment
 
 ---
 
-### FAZA 10: DEPLOYMENT
+### PHASE 10: DEPLOYMENT
 **Status**: [x] COMPLETE
 
 - [ ] 10.1 Docker Compose final:
@@ -629,27 +629,27 @@ Agent Executor (C):
         - isolated
   ```
 
-- [ ] 10.2 Documentație:
+- [ ] 10.2 Documentation:
   - [ ] 10.2.1 Setup guide
   - [ ] 10.2.2 Configuration reference
   - [ ] 10.2.3 Security guide
   - [ ] 10.2.4 API reference
 
 - [ ] 10.3 First Run:
-  - [ ] 10.3.1 Test complet end-to-end
-  - [ ] 10.3.2 Coding task real
+  - [ ] 10.3.1 Complete end-to-end test
+  - [ ] 10.3.2 Real coding task
   - [ ] 10.3.3 Bug fixes
 
 **Deliverables**:
 - Docker compose production-ready
-- Documentație completă
-- System funcțional
+- Complete documentation
+- Functional system
 
 ---
 
 ---
 
-### FAZA 11: WFP SEMANTIC GUARD (SYSTEM KERNEL)
+### PHASE 11: WFP SEMANTIC GUARD (SYSTEM KERNEL)
 **Status**: [x] SPECIFICATION COMPLETE - IMPLEMENTATION PENDING
 **Role**: Kernel-level enforcement of Semantic Intents.
 
@@ -659,30 +659,30 @@ Agent Executor (C):
 >
 > `Executor` is active ONLY when BOTH gates say "YES".
 
-#### COMPONENTE CHEIE
-- **WFP Callout Driver**: Driver kernel (`.sys`) care interceptează traficul.
-- **WFP Controller**: Serviciu user-mode care traduce `EXECUTION_INTENT` în filtre WFP.
+#### KEY COMPONENTS
+- **WFP Callout Driver**: Kernel driver (`.sys`) that intercepts traffic.
+- **WFP Controller**: User-mode service that translates `EXECUTION_INTENT` into WFP filters.
 - **Protocol BYON→WFP**: 
     - `EXECUTION_INTENT` (Signed JSON)
     - `EXECUTION_FEEDBACK` (Audit data)
 
 #### FLOW
-1. **BYON** emite `ExecutionIntent` semnat.
-2. **WFP Controller** verifică sig Ed25519.
-3. **WFP Controller** injectează filtre temporare în Kernel.
-4. **Executor** are acces la rețea DOAR cât timp intenția e validă (TTL).
-5. **WFP** trimite telemetrie înapoi la Auditor.
+1. **BYON** emits signed `ExecutionIntent`.
+2. **WFP Controller** verifies Ed25519 sig.
+3. **WFP Controller** injects temporary filters into Kernel.
+4. **Executor** has network access ONLY while the intent is valid (TTL).
+5. **WFP** sends telemetry back to Auditor.
 
 **Deliverables**:
-- Specificație formală Protocol (JSON Schema) ✔
-- Arhitectură WFP Callouts ✔
+- Formal Protocol Specification (JSON Schema) ✔
+- WFP Callouts Architecture ✔
 - Threat Model Strategy ✔
 
 ---
 
 ---
 
-### FAZA 11: WFP SEMANTIC GUARD (SYSTEM KERNEL)
+### PHASE 11: WFP SEMANTIC GUARD (SYSTEM KERNEL)
 **Status**: [x] SPECIFICATION COMPLETE - IMPLEMENTATION PENDING
 **Role**: Kernel-level enforcement of Semantic Intents.
 
@@ -692,109 +692,109 @@ Agent Executor (C):
 >
 > `Executor` is active ONLY when BOTH gates say "YES".
 
-#### COMPONENTE CHEIE
-- **WFP Callout Driver**: Driver kernel (`.sys`) care interceptează traficul.
-- **WFP Controller**: Serviciu user-mode care traduce `EXECUTION_INTENT` în filtre WFP.
+#### KEY COMPONENTS
+- **WFP Callout Driver**: Kernel driver (`.sys`) that intercepts traffic.
+- **WFP Controller**: User-mode service that translates `EXECUTION_INTENT` into WFP filters.
 - **Protocol BYON→WFP**: 
     - `EXECUTION_INTENT` (Signed JSON)
     - `EXECUTION_FEEDBACK` (Audit data)
 
 #### FLOW
-1. **BYON** emite `ExecutionIntent` semnat.
-2. **WFP Controller** verifică sig Ed25519.
-3. **WFP Controller** injectează filtre temporare în Kernel.
-4. **Executor** are acces la rețea DOAR cât timp intenția e validă (TTL).
-5. **WFP** trimite telemetrie înapoi la Auditor.
+1. **BYON** emits signed `ExecutionIntent`.
+2. **WFP Controller** verifies Ed25519 sig.
+3. **WFP Controller** injects temporary filters into Kernel.
+4. **Executor** has network access ONLY while the intent is valid (TTL).
+5. **WFP** sends telemetry back to Auditor.
 
 **Deliverables**:
-- Specificație formală Protocol (JSON Schema) ✔
-- Arhitectură WFP Callouts ✔
+- Formal Protocol Specification (JSON Schema) ✔
+- WFP Callouts Architecture ✔
 - Threat Model Strategy ✔
 
 ---
 
-## METRICI DE SUCCES (ACTUALIZAT)
+## SUCCESS METRICS (UPDATED)
 
 | Metric | Target |
 |--------|--------|
-| Agenți izolați complet | 3/3 |
-| User approval required pentru execuție | 100% |
+| Completely isolated agents | 3/3 |
+| User approval required for execution | 100% |
 | **WFP Enforcement** | **100% Packet Coverage** |
 | Autonomous coding iterations | max 10 |
-| Test pass rate după fix | >90% |
+| Test pass rate after fix | >90% |
 | Security tests passed | 100% |
 | Context retrieval relevance | >80% |
 
 ---
 
-## RISCURI ȘI MITIGĂRI
+## RISKS AND MITIGATIONS
 
-| Risc | Probabilitate | Impact | Mitigare |
-|------|--------------|--------|----------|
-| Kernel escape din sandbox | Low | Critical | Docker seccomp + no-root |
-| Prompt injection în mesaje | Medium | High | Policy strict, no raw inbox în C |
-| Signature bypass | Low | Critical | Ed25519, verificare în C |
-| Context retrieval slab | Medium | Medium | Tune FHRSS, fallback la full file |
-| Infinite loop în coding | Medium | Medium | Max iterations + timeout |
+| Risk | Probability | Impact | Mitigation |
+|------|------------|--------|------------|
+| Kernel escape from sandbox | Low | Critical | Docker seccomp + no-root |
+| Prompt injection in messages | Medium | High | Strict policy, no raw inbox in C |
+| Signature bypass | Low | Critical | Ed25519, verification in C |
+| Weak context retrieval | Medium | Medium | Tune FHRSS, fallback to full file |
+| Infinite loop in coding | Medium | Medium | Max iterations + timeout |
 
 ---
 
-## INTEGRARE VIBE-CODING TEMPLATE
+## VIBE-CODING TEMPLATE INTEGRATION
 
-### Concepte adoptate din `vibe-coding-prompt-template-main/`:
+### Concepts adopted from `vibe-coding-prompt-template-main/`:
 
-#### 1. Progressive Disclosure (Dezvăluire Progresivă)
-- **AGENTS.md** = Master plan pentru fiecare agent
-- **agent_docs/** = Detalii specifice (tech_stack, code_patterns, etc.)
-- **Tool configs** = Pointeri către documentație
+#### 1. Progressive Disclosure
+- **AGENTS.md** = Master plan for each agent
+- **agent_docs/** = Specific details (tech_stack, code_patterns, etc.)
+- **Tool configs** = Pointers to documentation
 
 #### 2. Plan → Execute → Verify Loop
-Mapare la arhitectura noastră:
+Mapping to our architecture:
 ```
 VIBE-CODING          →    BYON BOT MACP
 ─────────────────────────────────────────
-Plan                 →    Agent A (propune)
-Execute              →    Agent C (execută)
-Verify               →    Agent A (verifică receipt)
+Plan                 →    Agent A (proposes)
+Execute              →    Agent C (executes)
+Verify               →    Agent A (verifies receipt)
 ```
 
-#### 3. Structura agent_docs/ per Agent
+#### 3. agent_docs/ Structure per Agent
 
 ```
 Byon_bot/
 ├── agent-worker/
 │   ├── AGENTS.md                    # Master plan Worker
 │   └── agent_docs/
-│       ├── tech_stack.md            # Ce tehnologii folosește
-│       ├── code_patterns.md         # Cum indexează, cum selectează context
+│       ├── tech_stack.md            # What technologies it uses
+│       ├── code_patterns.md         # How it indexes, how it selects context
 │       ├── capabilities.md          # READ, PARSE, PROPOSE, VERIFY
-│       └── handoff_protocol.md      # Cum produce evidence_pack, plan_draft
+│       └── handoff_protocol.md      # How it produces evidence_pack, plan_draft
 │
 ├── agent-auditor/
 │   ├── AGENTS.md                    # Master plan Auditor
 │   └── agent_docs/
-│       ├── validation_rules.md      # Reguli de validare
-│       ├── security_checks.md       # Ce verifică
-│       ├── diff_generation.md       # Cum face preview
-│       └── approval_protocol.md     # Format approval_request
+│       ├── validation_rules.md      # Validation rules
+│       ├── security_checks.md       # What it verifies
+│       ├── diff_generation.md       # How it generates preview
+│       └── approval_protocol.md     # approval_request format
 │
 ├── agent-executor/
 │   ├── AGENTS.md                    # Master plan Executor
 │   └── agent_docs/
-│       ├── execution_loop.md        # Ciclu autonom
-│       ├── kernel_usage.md          # Cum folosește Jupyter
-│       ├── action_whitelist.md      # Ce acțiuni poate face
-│       └── receipt_protocol.md      # Format johnson_receipt
+│       ├── execution_loop.md        # Autonomous cycle
+│       ├── kernel_usage.md          # How it uses Jupyter
+│       ├── action_whitelist.md      # What actions it can perform
+│       └── receipt_protocol.md      # johnson_receipt format
 │
 └── shared/
     └── agent_docs/
-        ├── protocol_overview.md     # MACP v1.1 explicat
+        ├── protocol_overview.md     # MACP v1.1 explained
         ├── file_formats.md          # JSON schemas
         ├── security_model.md        # Air-gap, signing
-        └── anti_patterns.md         # Ce NU trebuie făcut
+        └── anti_patterns.md         # What NOT to do
 ```
 
-#### 4. Anti-Vibe Engineering Rules (pentru Executor)
+#### 4. Anti-Vibe Engineering Rules (for Executor)
 
 ```markdown
 ## What NOT To Do (agent-executor/AGENTS.md)
@@ -818,39 +818,39 @@ Byon_bot/
 - If 3x same error, ESCALATE to user
 ```
 
-#### 5. High-Order Prompts pentru LLM (în fiecare AGENTS.md)
+#### 5. High-Order Prompts for LLM (in each AGENTS.md)
 
 ```markdown
 ## How I Should Think
 
-1. **Understand Intent First**: Ce vrea de fapt user-ul?
-2. **Check Permissions**: Am voie să fac asta?
-3. **Validate Input**: Schema corectă? Semnătură validă?
-4. **Plan Before Action**: Propune plan, așteaptă aprobare
-5. **Verify After Action**: Testează, verifică rezultatul
-6. **Report Honestly**: Nu ascunde erori, raportează exact
+1. **Understand Intent First**: What does the user actually want?
+2. **Check Permissions**: Am I allowed to do this?
+3. **Validate Input**: Correct schema? Valid signature?
+4. **Plan Before Action**: Propose plan, wait for approval
+5. **Verify After Action**: Test, verify the result
+6. **Report Honestly**: Don't hide errors, report exactly
 ```
 
-#### 6. Skill-uri adaptate pentru Byon Bot
+#### 6. Skills adapted for Byon Bot
 
-| Skill Original | Adaptare Byon Bot |
-|----------------|-------------------|
-| `/vibe-research` | Agent A: indexare codebase |
-| `/vibe-prd` | Agent A: generare plan_draft |
-| `/vibe-techdesign` | Agent B: validare arhitectură |
-| `/vibe-agents` | Setup configurație agenți |
-| `/vibe-build` | Agent C: execuție cod |
+| Original Skill | Byon Bot Adaptation |
+|----------------|---------------------|
+| `/vibe-research` | Agent A: codebase indexing |
+| `/vibe-prd` | Agent A: plan_draft generation |
+| `/vibe-techdesign` | Agent B: architecture validation |
+| `/vibe-agents` | Agent configuration setup |
+| `/vibe-build` | Agent C: code execution |
 
 ---
 
-## STRUCTURA FINALĂ PROIECT (ACTUALIZATĂ)
+## FINAL PROJECT STRUCTURE (UPDATED)
 
 ```
 Byon_bot/
-├── JOHNSON_PLAN.md              # Acest document (master plan)
+├── JOHNSON_PLAN.md              # This document (master plan)
 ├── JOHNSON_STATUS.json          # Status machine-readable
 │
-├── docs/                        # Documentație generală
+├── docs/                        # General documentation
 │   ├── PRD-ByonBot-MVP.md      # Product Requirements
 │   ├── TechDesign-ByonBot.md   # Technical Design
 │   └── research-notes.md        # Research findings
@@ -858,7 +858,7 @@ Byon_bot/
 ├── agent-worker/                # AGENT A
 │   ├── AGENTS.md
 │   ├── agent_docs/
-│   ├── src/                     # OpenClaw fork modificat
+│   ├── src/                     # Modified OpenClaw fork
 │   └── Dockerfile
 │
 ├── agent-auditor/               # AGENT B
@@ -873,12 +873,12 @@ Byon_bot/
 │   ├── src/
 │   └── Dockerfile
 │
-├── shared/                      # Cod comun
+├── shared/                      # Common code
 │   ├── types/                   # TypeScript types
 │   ├── schemas/                 # JSON Schemas
 │   ├── crypto/                  # Ed25519, SHA256
 │   ├── policy/                  # Policy DSL
-│   └── agent_docs/              # Documentație protocol
+│   └── agent_docs/              # Protocol documentation
 │
 ├── kernel-host/                 # Jupyter Kernels
 │   ├── Dockerfile
@@ -887,7 +887,7 @@ Byon_bot/
 ├── memory-store/                # FHRSS+FCPE
 │   └── ...
 │
-├── handoff/                     # Director pentru fișiere protocol
+├── handoff/                     # Directory for protocol files
 │   ├── worker_to_auditor/
 │   ├── auditor_to_user/
 │   ├── user_to_executor/
@@ -896,19 +896,19 @@ Byon_bot/
 ├── ui/                          # Approval UI
 │   └── ...
 │
-├── docker-compose.yml           # Orchestrare
+├── docker-compose.yml           # Orchestration
 └── .env.example                 # Environment template
 ```
 
 ---
 
-### FAZA 11: IMMUTABLE AUDIT TRAIL SYSTEM
+### PHASE 11: IMMUTABLE AUDIT TRAIL SYSTEM
 **Status**: [x] COMPLETE
 **Priority**: HIGH
 
-> 📋 **Digital Paper Trail** - Toate acțiunile documentate, sortate pe calendar, stocate în FHRSS+FCPE
+> 📋 **Digital Paper Trail** - All actions documented, sorted by calendar, stored in FHRSS+FCPE
 
-#### PRINCIPII FUNDAMENTALE
+#### FUNDAMENTAL PRINCIPLES
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -920,34 +920,34 @@ Byon_bot/
 │   delete?     delete?       delete?        LOCK                │
 │     ✅          ✅            ✅             ❌                  │
 │                                                                 │
-│  După EXECUTED = PERMANENT, IMUTABIL, NIMENI NU POATE ȘTERGE   │
-│  Doar USER poate șterge draft/pending/approved (fizic)         │
-│  Agenții NU POT șterge NICIODATĂ                               │
+│  After EXECUTED = PERMANENT, IMMUTABLE, NOBODY CAN DELETE     │
+│  Only USER can delete draft/pending/approved (physically)      │
+│  Agents CANNOT delete EVER                                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 #### CALENDAR INDEXING
 
-| Granularitate | Format | Exemplu |
-|---------------|--------|---------|
-| Oră | `YYYY-MM-DD-HH` | `2026-02-01-14` |
-| Zi | `YYYY-MM-DD` | `2026-02-01` |
-| Săptămână | `YYYY-WXX` | `2026-W05` |
-| An | `YYYY` | `2026` |
+| Granularity | Format | Example |
+|-------------|--------|---------|
+| Hour | `YYYY-MM-DD-HH` | `2026-02-01-14` |
+| Day | `YYYY-MM-DD` | `2026-02-01` |
+| Week | `YYYY-WXX` | `2026-W05` |
+| Year | `YYYY` | `2026` |
 
 #### DOCUMENT LIFECYCLE
 
-| Stare | User șterge? | Agent șterge? | Modificabil? | Ștergere tip |
-|-------|-------------|---------------|--------------|--------------|
-| `draft` | ✅ DA | ❌ NU | ✅ DA | FIZIC |
-| `pending` | ✅ DA | ❌ NU | ❌ NU | FIZIC |
-| `approved` | ✅ DA | ❌ NU | ❌ NU | FIZIC |
-| `executed` | ❌ **NU** | ❌ NU | ❌ NU | **IMPOSIBIL** |
-| `failed` | ❌ **NU** | ❌ NU | ❌ NU | **IMPOSIBIL** |
+| State | User deletes? | Agent deletes? | Modifiable? | Deletion type |
+|-------|--------------|----------------|-------------|---------------|
+| `draft` | ✅ YES | ❌ NO | ✅ YES | PHYSICAL |
+| `pending` | ✅ YES | ❌ NO | ❌ NO | PHYSICAL |
+| `approved` | ✅ YES | ❌ NO | ❌ NO | PHYSICAL |
+| `executed` | ❌ **NO** | ❌ NO | ❌ NO | **IMPOSSIBLE** |
+| `failed` | ❌ **NO** | ❌ NO | ❌ NO | **IMPOSSIBLE** |
 
 #### TASKS
 
-- [x] 11.1 Tipuri Audit Document:
+- [x] 11.1 Audit Document Types:
   - [x] 11.1.1 `shared/types/audit.ts` - AuditDocument interface
   - [x] 11.1.2 Status enum (draft, pending, approved, executed, failed)
   - [x] 11.1.3 Calendar metadata fields
@@ -957,57 +957,57 @@ Byon_bot/
   - [x] 11.2.1 `shared/audit/immutability.ts` - canDelete(), markAsExecuted()
   - [x] 11.2.2 Hard-coded rules (agent never deletes)
   - [x] 11.2.3 Auto-lock on execution
-  - [x] 11.2.4 Physical deletion pentru drafts
+  - [x] 11.2.4 Physical deletion for drafts
 
 - [x] 11.3 Calendar Index:
   - [x] 11.3.1 `shared/audit/calendar-index.ts`
-  - [x] 11.3.2 Index pe oră, zi, săptămână, an
+  - [x] 11.3.2 Index by hour, day, week, year
   - [x] 11.3.3 Query by date range
-  - [x] 11.3.4 Timestamp ordering (nu blockchain)
+  - [x] 11.3.4 Timestamp ordering (not blockchain)
 
-- [x] 11.4 Integration cu FHRSS+FCPE:
-  - [x] 11.4.1 Store audit docs în memory (shared/audit/index.ts)
-  - [x] 11.4.2 Semantic search în audit trail
-  - [x] 11.4.3 Recovery pentru executed docs
+- [x] 11.4 Integration with FHRSS+FCPE:
+  - [x] 11.4.1 Store audit docs in memory (shared/audit/index.ts)
+  - [x] 11.4.2 Semantic search in audit trail
+  - [x] 11.4.3 Recovery for executed docs
   - [x] 11.4.4 Persistent storage (TODO: actual FHRSS backend)
 
 - [x] 11.5 CLI Commands:
-  - [x] 11.5.1 `npx byon history` - Vezi istoric
+  - [x] 11.5.1 `npx byon history` - View history
   - [x] 11.5.2 `npx byon history --date 2026-02-01`
   - [x] 11.5.3 `npx byon history --week 2026-W05`
-  - [x] 11.5.4 `npx byon delete <doc_id>` - Șterge draft (doar user)
+  - [x] 11.5.4 `npx byon delete <doc_id>` - Delete draft (user only)
 
 **Deliverables**:
-- Audit trail imutabil pentru documente executate
-- Calendar indexing (oră/zi/săptămână/an)
-- User-only delete pentru drafts (fizic)
-- Semantic search în istoric
-- CLI pentru history viewing
+- Immutable audit trail for executed documents
+- Calendar indexing (hour/day/week/year)
+- User-only delete for drafts (physical)
+- Semantic search in history
+- CLI for history viewing
 
 ---
 
-### FAZA 12: BYON STYLE CONTRACT
+### PHASE 12: BYON STYLE CONTRACT
 **Status**: [x] COMPLETE
 **Priority**: HIGH
 
-> Forțează stilul strict de output pentru agenți: fără psihologie, empatie, povești, meta-commentary.
+> Enforces strict output style for agents: no psychology, empathy, stories, meta-commentary.
 
-#### REGULI HARD-CODED
+#### HARD-CODED RULES
 
 ```
-INTERZIS:
-- "îmi pare rău" / "te înțeleg" / empatie
-- "imaginează-ți" / povești / metafore
-- "ca model AI" / "nu pot" / meta-commentary
-- "desigur" / "cu plăcere" / filler phrases
-- traumă / anxietate / terapie
+FORBIDDEN:
+- "I'm sorry" / "I understand you" / empathy
+- "imagine" / stories / metaphors
+- "as an AI model" / "I can't" / meta-commentary
+- "of course" / "my pleasure" / filler phrases
+- trauma / anxiety / therapy
 
-OBLIGATORIU:
-- Output structurat (min 3 linii)
-- Max 3500 caractere
+MANDATORY:
+- Structured output (min 3 lines)
+- Max 3500 characters
 - Format: markdown/text/json/code
-- Opțiuni clare A/B/C
-- Next action explicit
+- Clear options A/B/C
+- Explicit next action
 ```
 
 #### TASKS
@@ -1026,11 +1026,11 @@ OBLIGATORIU:
 
 - [x] 12.3 Retry Loop:
   - [x] 12.3.1 `shared/style/validate_or_regenerate.ts`
-  - [x] 12.3.2 RegenContext cu lastErrors, lastScore, lastViolations
+  - [x] 12.3.2 RegenContext with lastErrors, lastScore, lastViolations
   - [x] 12.3.3 maxAttempts (default 4)
-  - [x] 12.3.4 hardFail option pentru throw/return
+  - [x] 12.3.4 hardFail option for throw/return
 
-- [x] 12.4 Teste:
+- [x] 12.4 Tests:
   - [x] 12.4.1 `tests/security/byon_style.test.ts`
   - [x] 12.4.2 Fixtures: good.worker.json, bad.empathy.json, bad.missing_fields.json
   - [x] 12.4.3 Schema validation tests
@@ -1039,29 +1039,29 @@ OBLIGATORIU:
 
 **Deliverables**:
 - BYON Style Contract schema
-- Validator cu scoring și penalizări
-- Retry loop pentru regenerare
-- Teste complete cu fixtures
+- Validator with scoring and penalties
+- Retry loop for regeneration
+- Complete tests with fixtures
 
 ---
 
-## URMĂTORUL PAS
+## NEXT STEP
 
-**STATUS**: Phase 12 COMPLETE - BYON Style Contract implementat!
+**STATUS**: Phase 12 COMPLETE - BYON Style Contract implemented!
 
 ```bash
-# Setup automat (include verificare Python pentru FHRSS+FCPE)
+# Automatic setup (includes Python verification for FHRSS+FCPE)
 node scripts/setup-first-run.js
 
-# SAU manual:
+# OR manual:
 pnpm install && pnpm build
 node scripts/generate-keys.js
 node scripts/setup-handoff.js
 
-# Start sistem
+# Start system
 pnpm docker:up
 
-# Verificare memory system (OBLIGATORIU)
+# Verify memory system (MANDATORY)
 docker logs byon-bot-memory-service
 
 # Test
@@ -1070,25 +1070,25 @@ npx byon inbox "Test message"
 npx byon approve
 ```
 
-> ⚠️ **IMPORTANT**: Dacă memory-service nu pornește, sistemul NU funcționează!
-> Python 3.10+ cu sentence-transformers este OBLIGATORIU.
+> ⚠️ **IMPORTANT**: If memory-service does not start, the system DOES NOT work!
+> Python 3.10+ with sentence-transformers is MANDATORY.
 
 ---
 
 ## CHANGELOG
 
-| Data | Schimbare |
-|------|-----------|
-| 2026-01-31 | Creare plan inițial |
-| 2026-01-31 | Integrare concepte din vibe-coding-prompt-template |
-| 2026-02-01 | **FHRSS+FCPE marcat ca OBLIGATORIU (hard-wired)** |
-| 2026-02-01 | Agent Worker refuză să pornească fără memory system |
-| 2026-02-01 | Docker memory-service container adăugat |
-| 2026-02-01 | Faze 1-10 COMPLETE |
+| Date | Change |
+|------|--------|
+| 2026-01-31 | Initial plan creation |
+| 2026-01-31 | Integrated concepts from vibe-coding-prompt-template |
+| 2026-02-01 | **FHRSS+FCPE marked as MANDATORY (hard-wired)** |
+| 2026-02-01 | Agent Worker refuses to start without memory system |
+| 2026-02-01 | Docker memory-service container added |
+| 2026-02-01 | Phases 1-10 COMPLETE |
 | 2026-02-01 | **Phase 11: Immutable Audit Trail System** - COMPLETE |
-| 2026-02-01 | Adăugat: shared/types/audit.ts, shared/audit/*.ts |
-| 2026-02-01 | Adăugat: CLI commands: npx byon history, npx byon delete |
-| 2026-02-01 | **Phase 8: Web UI implementat** - Dashboard, Approvals, History |
+| 2026-02-01 | Added: shared/types/audit.ts, shared/audit/*.ts |
+| 2026-02-01 | Added: CLI commands: npx byon history, npx byon delete |
+| 2026-02-01 | **Phase 8: Web UI implemented** - Dashboard, Approvals, History |
 | 2026-02-01 | **Phase 12: BYON Style Contract** - Schema, Validator, Retry Loop, Tests |
 | 2026-02-02 | **BYON Optimus Integration**: 9 phases complete (Docker, Tests, Documentation) |
 | 2026-02-02 | **OPEN_BYON Control UI**: Dashboard, Inbox, Approvals, Execution, Memory views (port 3001) |
@@ -1101,22 +1101,22 @@ npx byon approve
 
 ---
 
-**NOTA**: Acest document este sursa de adevar pentru proiect. Orice deviatie trebuie documentata aici.
+**NOTE**: This document is the source of truth for the project. Any deviation must be documented here.
 
 ---
 
-## REFERINȚE
+## REFERENCES
 
-- `openclaw-main/` - Bază pentru fork agenți
-- `vibe-coding-prompt-template-main/` - Template-uri și patterns
-- `descrierea proiectului.docx` - Viziune originală MACP v1.1
-- `D:\Github Repo\INFINIT_MEMORYCONTEXT\` - **FHRSS+FCPE implementare completă**
+- `openclaw-main/` - Base for agent forks
+- `vibe-coding-prompt-template-main/` - Templates and patterns
+- `descrierea proiectului.docx` - Original MACP v1.1 vision
+- `D:\Github Repo\INFINIT_MEMORYCONTEXT\` - **FHRSS+FCPE complete implementation**
 
 ---
 
-## ANEXĂ: FHRSS+FCPE TECHNICAL REFERENCE
+## APPENDIX: FHRSS+FCPE TECHNICAL REFERENCE
 
-### Sursa: `INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py`
+### Source: `INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py`
 
 #### Patent
 ```
@@ -1125,7 +1125,7 @@ Author: Vasile Lucian Borbeleac
 Version: 1.0.0 (2025)
 ```
 
-#### Arhitectura FHRSS (XOR Parity)
+#### FHRSS Architecture (XOR Parity)
 
 ```
 Data Input (bytes)
@@ -1134,16 +1134,16 @@ Padding → Multiple of 512 bytes (8³)
     ↓
 Split into Subcubes (8×8×8)
     ↓
-Pentru fiecare subcube:
-    ├── Compute X parity (linii pe axa X)
-    ├── Compute Y parity (linii pe axa Y)
-    ├── Compute Z parity (linii pe axa Z)
-    ├── Compute DXYp parity (diagonale XY+)
-    ├── Compute DXYn parity (diagonale XY-)
-    ├── Compute DXZp parity (diagonale XZ+)
-    ├── Compute DXZn parity (diagonale XZ-)
-    ├── Compute DYZp parity (diagonale YZ+)
-    └── Compute DYZn parity (diagonale YZ-)
+For each subcube:
+    ├── Compute X parity (lines on X axis)
+    ├── Compute Y parity (lines on Y axis)
+    ├── Compute Z parity (lines on Z axis)
+    ├── Compute DXYp parity (XY+ diagonals)
+    ├── Compute DXYn parity (XY- diagonals)
+    ├── Compute DXZp parity (XZ+ diagonals)
+    ├── Compute DXZn parity (XZ- diagonals)
+    ├── Compute DYZp parity (YZ+ diagonals)
+    └── Compute DYZn parity (YZ- diagonals)
     ↓
 Storage: {subcubes, parity_families, checksums}
 ```
@@ -1168,7 +1168,7 @@ def recover_subcube(data, parity, loss_mask):
                     recovered_mask[pos] = True
 ```
 
-#### Arhitectura FCPE (Compression)
+#### FCPE Architecture (Compression)
 
 ```
 Input Embeddings [seq_len, 384]
@@ -1176,7 +1176,7 @@ Input Embeddings [seq_len, 384]
 Feature Whitening: (x - mean) / std
     ↓
 Weighted Attention Pooling:
-    ├── Compute norms și deviations
+    ├── Compute norms and deviations
     ├── scores = norms × (1 + deviations)
     ├── weights = softmax(scores)
     └── pooled = Σ(weights × embeddings)
@@ -1194,7 +1194,7 @@ L2 Normalize
 Output: [384] compressed vector
 ```
 
-#### Fișiere de copiat în Byon_bot
+#### Files to copy into Byon_bot
 
 ```
 INFINIT_MEMORYCONTEXT/
@@ -1203,7 +1203,7 @@ INFINIT_MEMORYCONTEXT/
 └── test_ai_applicability.py  → tests/test_memory.py
 ```
 
-#### Usage Example (pentru integrare)
+#### Usage Example (for integration)
 
 ```python
 from shared.memory.fhrss_fcpe import UnifiedFHRSS_FCPE, UnifiedConfig

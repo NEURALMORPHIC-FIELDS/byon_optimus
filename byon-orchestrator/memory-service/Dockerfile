@@ -1,13 +1,14 @@
 # BYON Memory Service Dockerfile
 # ===============================
 #
-# FHRSS+FCPE Infinite Memory Service (O2 Optimized: Multi-Stage Build)
+# FAISS-Optimized Memory Service (O2 Optimized: Multi-Stage Build)
 # Patent: EP25216372.0 - OmniVault - Vasile Lucian Borbeleac
 #
-# Capabilities:
-#   - 73,000x compression ratio (FCPE)
-#   - 100% recovery at 50% data loss (FHRSS)
-#   - Semantic search with sentence-transformers
+# Backend: FAISS IndexFlatIP (cosine similarity)
+# Features:
+#   - Real semantic search via sentence-transformers
+#   - Per-type FAISS indices (code/conversation/fact)
+#   - Persistent storage with auto-save
 #
 # Build:
 #   docker build -t byon-memory-service .
@@ -15,7 +16,6 @@
 # Run:
 #   docker run -p 8000:8000 \
 #     -v ./memory_storage:/app/memory_storage \
-#     -v ./fhrss_fcpe_unified.py:/app/fhrss_fcpe_unified.py:ro \
 #     byon-memory-service
 
 # ============================================================================
@@ -47,8 +47,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 FROM python:3.11-slim AS production
 
 LABEL maintainer="BYON Team"
-LABEL description="FHRSS+FCPE infinite memory service for BYON orchestrator"
-LABEL version="1.1.0"
+LABEL description="FAISS-optimized memory service for BYON orchestrator"
+LABEL version="4.0.0"
 LABEL patent="EP25216372.0 - OmniVault"
 LABEL optimization="O2 multi-stage build"
 

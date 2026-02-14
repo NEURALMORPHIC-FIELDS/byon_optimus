@@ -33,17 +33,17 @@ This agent is COMPLETELY ISOLATED:
   - `notebook_run`: Execute Jupyter notebook
 
 ## What I CANNOT Do
-- NU pot citi inbox/mesaje
-- NU pot accesa rețeaua
-- NU pot comunica cu Agent A sau B
-- NU pot executa acțiuni neaprobate
-- NU pot depăși limita de iterații (10)
+- CANNOT read inbox/messages
+- CANNOT access the network
+- CANNOT communicate with Agent A or B
+- CANNOT execute unapproved actions
+- CANNOT exceed iteration limit (10)
 
 ## Context Files
 Load only when needed:
-- `agent_docs/execution_loop.md` - Cum funcționează ciclul autonom
-- `agent_docs/kernel_usage.md` - Cum folosesc Jupyter
-- `agent_docs/action_whitelist.md` - Acțiuni permise
+- `agent_docs/execution_loop.md` - How the autonomous cycle works
+- `agent_docs/kernel_usage.md` - How I use Jupyter
+- `agent_docs/action_whitelist.md` - Allowed actions
 - `agent_docs/receipt_protocol.md` - Format johnson_receipt
 
 ## Current State

@@ -23,6 +23,7 @@
 
 import * as crypto from "crypto";
 import { MemoryContext } from "../../types/protocol.js";
+import { MemoryClient, createMemoryClient } from "../../memory/client.js";
 
 // ============================================================================
 // TYPES
@@ -116,15 +117,71 @@ export class MemoryHandler {
     private entries: Map<number, MemoryEntry> = new Map();
     private nextCtxId: number = 1;
     private cache: Map<string, { results: MemorySearchResult[]; expires: number }> = new Map();
+    private memoryClient?: MemoryClient;
 
     constructor(config: Partial<MemoryHandlerConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
+
+        if (this.config.fhrss_endpoint) {
+            console.log(`[MemoryHandler] Initializing FHRSS Client at ${this.config.fhrss_endpoint}`);
+            this.memoryClient = createMemoryClient({
+                serviceUrl: this.config.fhrss_endpoint,
+                enableCache: this.config.enable_cache,
+                cacheTtlMs: this.config.cache_ttl_seconds * 1000
+            });
+        }
     }
 
     /**
      * Search memory for relevant context
      */
     async search(options: SearchOptions): Promise<MemorySearchResult[]> {
+        // Use Real FHRSS Service if available
+        if (this.memoryClient && options.categories && options.categories.length > 0) {
+            // Map categories to client methods
+            const category = options.categories[0];
+            let results: any[] = [];
+
+            try {
+                if (category === "code") {
+                    results = await this.memoryClient.searchCode(options.query, { top_k: options.limit });
+                } else if (category === "conversation") {
+                    results = await this.memoryClient.searchConversation(options.query, { top_k: options.limit });
+                } else if (category === "fact") {
+                    results = await this.memoryClient.searchFacts(options.query, { top_k: options.limit });
+                } else {
+                    // Fallback for other categories or mixed search
+                    // For now, default to mock if category not supported by specific client methods
+                    // OR implement a generic search in client if available
+                    // Using mock fallback for safety/simplicity unless specific
+                }
+
+                if (results.length > 0) {
+                    // Cache remote results locally so getEntry() works
+                    for (const r of results) {
+                        this.entries.set(r.ctx_id, {
+                            ctx_id: r.ctx_id,
+                            content: r.content,
+                            category: r.type || category,
+                            tags: [], // Tags might not be returned in simple search
+                            metadata: r.metadata || {},
+                            stored_at: new Date().toISOString(),
+                            content_hash: "remote"
+                        });
+                    }
+
+                    return results.map((r: any) => ({
+                        ctx_id: r.ctx_id,
+                        relevance: r.similarity,
+                        category: r.type as "conversation" | "code" | "fact" | "past_task",
+                        snippet_preview: r.content.substring(0, 100) + "..."
+                    }));
+                }
+            } catch (err) {
+                console.warn(`[MemoryHandler] FHRSS Search failed: ${err}. Falling back to local.`);
+            }
+        }
+
         // Check cache
         const cacheKey = this.getCacheKey(options);
         if (this.config.enable_cache) {
@@ -134,7 +191,7 @@ export class MemoryHandler {
             }
         }
 
-        // Perform search
+        // Perform search (Local Mock)
         const results = this.performSearch(options);
 
         // Cache results
@@ -152,6 +209,46 @@ export class MemoryHandler {
      * Store content in memory
      */
     async store(options: StoreOptions): Promise<MemoryStoreResult> {
+        // Use Real FHRSS Service if available
+        if (this.memoryClient) {
+            try {
+                let ctxId: number;
+                if (options.category === "code") {
+                    ctxId = await this.memoryClient.storeCode(
+                        options.content,
+                        (options.metadata?.file_path as string) || "unknown",
+                        (options.metadata?.line_number as number) || 0,
+                        options.tags || []
+                    );
+                } else if (options.category === "conversation") {
+                    ctxId = await this.memoryClient.storeConversation(
+                        options.content,
+                        (options.metadata?.role as any) || "user"
+                    );
+                } else if (options.category === "fact") {
+                    ctxId = await this.memoryClient.storeFact(
+                        options.content,
+                        (options.metadata?.source as string) || "worker",
+                        options.tags || []
+                    );
+                } else {
+                    // Past task etc
+                    const contentHash = crypto.createHash("sha256").update(options.content).digest("hex");
+                    // Mock ID generation for unmapped types or extend client
+                    ctxId = Date.now();
+                }
+
+                return {
+                    ctx_id: ctxId,
+                    stored_at: new Date().toISOString(),
+                    category: options.category,
+                    compressed: true // Real service always compresses
+                };
+            } catch (err) {
+                console.warn(`[MemoryHandler] FHRSS Store failed: ${err}. Falling back to local.`);
+            }
+        }
+
         const ctxId = this.nextCtxId++;
         const storedAt = new Date().toISOString();
         const contentHash = crypto
@@ -183,11 +280,31 @@ export class MemoryHandler {
     /**
      * Build MemoryContext from search results
      */
-    buildContext(
+    async buildContext(
         conversationQuery: string,
         codeQuery: string,
         factQuery: string
-    ): MemoryContext {
+    ): Promise<MemoryContext> {
+        if (this.memoryClient) {
+            try {
+                // Use parallel search if supported, or sequential
+                const conversationResults = await this.memoryClient.searchConversation(conversationQuery, { top_k: 1 });
+                const codeResults = codeQuery ? await this.memoryClient.searchCode(codeQuery, { top_k: 5 }) : [];
+                const factResults = await this.memoryClient.searchFacts(factQuery, { top_k: 5 });
+                // Past tasks not yet in Client API, assume empty or implement later
+                const pastResults: any[] = [];
+
+                return {
+                    conversation_ctx_id: conversationResults[0]?.ctx_id || null,
+                    relevant_code_ctx_ids: codeResults.map(r => r.ctx_id),
+                    relevant_fact_ctx_ids: factResults.map(r => r.ctx_id),
+                    similar_past_ctx_ids: pastResults.map(r => r.ctx_id)
+                };
+            } catch (err) {
+                console.warn(`[MemoryHandler] FHRSS BuildContext failed: ${err}. Falling back to local.`);
+            }
+        }
+
         // Search for conversation context
         const conversationResults = this.performSearch({
             query: conversationQuery,

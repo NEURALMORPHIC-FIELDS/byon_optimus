@@ -1,33 +1,33 @@
 {
   "version": "1.0",
   "agent_role": "worker",
-  "axis": "Sortare proiecte și construire structură home",
-  "decision": "Generez 3 opțiuni de organizare + un pas următor unic.",
+  "axis": "Sort projects and build home structure",
+  "decision": "Generate 3 organization options + a unique next step.",
   "constraints": [
-    "fără psihologie",
-    "fără empatie",
-    "fără povești",
-    "max 3 opțiuni"
+    "no psychology",
+    "no empathy",
+    "no stories",
+    "max 3 options"
   ],
   "options": [
     {
       "id": "A",
-      "title": "Structură pe domenii",
+      "title": "Structure by domains",
       "steps": [
-        "Extrage taguri din repo-uri și documente",
-        "Grupează în 6-10 categorii",
-        "Generează homepage cu secțiuni"
+        "Extract tags from repos and documents",
+        "Group into 6-10 categories",
+        "Generate homepage with sections"
       ],
       "risk": "low",
       "requires_user_approval": true
     },
     {
       "id": "B",
-      "title": "Structură pe produse (pipeline)",
+      "title": "Structure by products (pipeline)",
       "steps": [
-        "Identifică input→proces→output pentru fiecare proiect",
-        "Construiește graf relațional",
-        "Generează homepage + harta dependențelor"
+        "Identify input->process->output for each project",
+        "Build relational graph",
+        "Generate homepage + dependency map"
       ],
       "risk": "medium",
       "requires_user_approval": true
@@ -35,12 +35,12 @@
   ],
   "next_action": {
     "owner": "user",
-    "action": "Alege opțiunea A sau B.",
+    "action": "Choose option A or B.",
     "deadline": "now"
   },
   "output": {
     "format": "markdown",
-    "content": "## Axa\nSortare proiecte și construire structură home\n\n## Opțiuni\n- A: Structură pe domenii\n- B: Structură pe produse (pipeline)\n\n## Next\nAlege A sau B."
+    "content": "## Axis\nSort projects and build home structure\n\n## Options\n- A: Structure by domains\n- B: Structure by products (pipeline)\n\n## Next\nChoose A or B."
   },
   "meta": {
     "created_at": "2026-02-01T05:00:00Z",

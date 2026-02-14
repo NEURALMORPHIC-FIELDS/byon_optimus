@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "byon://schema/execution-plan/v1",
   "title": "BYON Execution Plan v1",
-  "description": "Schema pentru documentul de plan de execuție BYON - folosit de dezvoltatori, nu de agenți runtime",
+  "description": "Schema for the BYON execution plan document - used by developers, not runtime agents",
   "type": "object",
   "required": [
     "meta",
@@ -20,12 +20,12 @@
     "document_type": {
       "type": "string",
       "const": "BYON_EXECUTION_PLAN",
-      "description": "Discriminator pentru tipul de document"
+      "description": "Discriminator for document type"
     },
     "document_version": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
-      "description": "Versiunea schemei documentului"
+      "description": "Document schema version"
     },
 
     "meta": {
@@ -104,7 +104,7 @@
           "phase_id": {
             "type": "string",
             "pattern": "^PHASE_[0-9]+$",
-            "description": "Identificator unic pentru fază"
+            "description": "Unique identifier for phase"
           },
           "name": { "type": "string" },
           "description": { "type": "string" },
@@ -144,12 +144,12 @@
 
     "key_technical_decisions": {
       "type": "object",
-      "description": "Decizii tehnice cheie - structură flexibilă"
+      "description": "Key technical decisions - flexible structure"
     },
 
     "file_structure_target": {
       "type": "object",
-      "description": "Structura țintă a fișierelor"
+      "description": "Target file structure"
     },
 
     "success_criteria": {

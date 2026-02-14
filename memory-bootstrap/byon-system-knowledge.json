@@ -48,7 +48,12 @@
         "security": {
           "signing_algorithm": "Ed25519",
           "key_storage": "In-memory (ephemeral per session)",
-          "risk_levels": ["low", "medium", "high", "critical"]
+          "risk_levels": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
         }
       },
       {
@@ -116,9 +121,13 @@
     "FHRSS": {
       "full_name": "Fractal-Holographic Redundant Storage System",
       "description": "Stores data with fractal redundancy patterns that allow complete reconstruction even with significant data loss",
-      "recovery_capability": "100% at 40% loss, 99.9% at 50% loss",
-      "overhead": "1.67x storage overhead",
-      "profiles": ["FULL", "BALANCED", "MINIMAL"]
+      "recovery_capability": "100% at 50% loss (RS r=2, parity intact), 98.4% at 10% adversarial",
+      "overhead": "3.25x storage overhead (FULL, r=2)",
+      "profiles": [
+        "FULL",
+        "BALANCED",
+        "MINIMAL"
+      ]
     },
     "FCPE": {
       "full_name": "Fractal-Chaotic Persistent Encoding",
@@ -137,7 +146,13 @@
       "full_name": "Machine Agent Communication Protocol",
       "version": "1.1",
       "description": "Protocol for structured communication between agents",
-      "message_types": ["evidence", "plan", "order", "receipt", "status"]
+      "message_types": [
+        "evidence",
+        "plan",
+        "order",
+        "receipt",
+        "status"
+      ]
     }
   },
   "data_flow": {

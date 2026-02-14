@@ -166,8 +166,10 @@ export class WorkerAgent {
 
         // Initialize components
         this.planGenerator = createPlanGenerator();
-        this.memoryHandler = createMemoryHandler();
-        
+        this.memoryHandler = createMemoryHandler({
+            fhrss_endpoint: process.env.MEMORY_SERVICE_URL
+        });
+
         // Initialize Audit Service
         const auditDir = this.config.audit_path ? path.resolve(this.config.audit_path) : path.resolve("./audit_logs/worker");
         this.auditService = createAuditService({
@@ -193,7 +195,7 @@ export class WorkerAgent {
         if (this.config.auto_start) {
             this.start();
         }
-        
+
         this.auditService.logSystemEvent("worker_started", {
             worker_id: this.config.worker_id,
             config: { ...this.config, inbox: "REDACTED" }
@@ -254,7 +256,7 @@ export class WorkerAgent {
     ): Promise<ProcessingResult> {
         this.state.status = "processing";
         this.state.current_message_id = message.message_id;
-        
+
         // AUDIT: Message Received
         this.auditService.logSystemEvent("message_processing_started", {
             message_id: message.message_id,
@@ -303,7 +305,7 @@ export class WorkerAgent {
                 codebaseContext,
                 includeGMVHint: this.config.enable_gmv
             });
-            
+
             // AUDIT: Evidence Created
             this.auditService.logDocumentCreated(
                 evidence.evidence_id,
@@ -336,7 +338,7 @@ export class WorkerAgent {
                 const actions = this.inferActions(message, taskType, facts);
                 plan = this.planGenerator.generate(evidence, { intent, actions });
             }
-            
+
             // AUDIT: Plan Created
             this.auditService.logDocumentCreated(
                 plan.plan_id,
@@ -354,7 +356,7 @@ export class WorkerAgent {
             // Step 10: Hand off to Auditor
             if (this.events.onHandoff) {
                 await this.events.onHandoff(plan, evidence);
-                
+
                 // AUDIT: Handoff
                 this.auditService.logSystemEvent("handoff_completed", {
                     plan_id: plan.plan_id,
@@ -381,7 +383,7 @@ export class WorkerAgent {
 
             const err = error instanceof Error ? error : new Error(String(error));
             this.events.onError?.(err, message.message_id);
-            
+
             // AUDIT: Error
             this.auditService.logError("worker", this.config.worker_id, err.message, {
                 message_id: message.message_id,
@@ -933,7 +935,7 @@ function createHealthServer(worker: WorkerAgent): http.Server {
 
         // CORS headers
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
         if (req.method === "OPTIONS") {
@@ -942,7 +944,11 @@ function createHealthServer(worker: WorkerAgent): http.Server {
             return;
         }
 
-        if (req.method !== "GET") {
+        const pathname = url.pathname;
+        console.log(`[Worker] Incoming request: ${req.method} ${pathname}`);
+
+        // Allow POST for benchmark
+        if (req.method !== "GET" && pathname !== "/bench/novel" && pathname !== "/bench/infinite") {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method not allowed" }));
             return;
@@ -953,7 +959,7 @@ function createHealthServer(worker: WorkerAgent): http.Server {
             res.end(JSON.stringify(data));
         };
 
-        switch (url.pathname) {
+        switch (pathname.trim()) {
             case "/health": {
                 const state = worker.getState();
                 const healthy = state.status !== "error";
@@ -998,12 +1004,174 @@ function createHealthServer(worker: WorkerAgent): http.Server {
                 break;
             }
 
+            case "/bench/novel": {
+                if ((req.method as any) !== "POST") {
+                    sendJson(405, { error: "Method not allowed. Use POST." });
+                    return;
+                }
+
+                let body = "";
+                req.on("data", chunk => body += chunk);
+                req.on("end", async () => {
+                    try {
+                        const payload = JSON.parse(body);
+                        const mode = payload.mode || "baseline"; // baseline or enhanced
+                        const chapters = payload.chapters || 5;
+                        const wordsPerChapter = payload.wordsPerChapter || 1000;
+
+                        console.log(`[Worker] Starting benchmark: ${mode}, ${chapters} chapters`);
+
+                        // Start async benchmark process (simplified for MVP)
+                        // In real implementation, this would be a separate class/service
+                        const report = await runBenchmark(worker, mode, chapters, wordsPerChapter);
+
+                        sendJson(200, report);
+                    } catch (e: any) {
+                        sendJson(500, { error: e.message });
+                    }
+                });
+                break;
+            }
+
+            case "/bench/infinite": {
+                console.log("[Worker] DEBUG: Entered /bench/infinite case");
+                if ((req.method as any) !== "POST") {
+                    console.log("[Worker] DEBUG: Method not allowed");
+                    sendJson(405, { error: "Method not allowed. Use POST." });
+                    return;
+                }
+
+                let body = "";
+                req.on("data", chunk => body += chunk);
+                req.on("end", async () => {
+                    console.log(`[Worker] DEBUG: Request body received. Length: ${body.length}`);
+                    try {
+                        const payload = JSON.parse(body);
+                        const needles = payload.needles || 50;
+                        const haystackSize = payload.haystackSize || 20;
+
+                        console.log(`[Worker] Starting INFINITE benchmark: ${needles} needles, ${haystackSize} chapters`);
+
+                        const report = await runInfiniteBenchmark(worker, needles, haystackSize);
+
+                        sendJson(200, report);
+                    } catch (e: any) {
+                        console.error("[Worker] DEBUG: Error in /bench/infinite:", e);
+                        sendJson(500, { error: e.message });
+                        // Also explicitly log to stderr so we see it in docker logs
+                        console.error(e);
+                    }
+                });
+                break;
+            }
+
+
+
             default:
                 sendJson(404, { error: "Not found" });
         }
     });
 
+    // Increase timeout to 10 minutes for long-running benchmarks
+    server.timeout = 600000;
+
     return server;
+}
+
+// ============================================================================
+// BENCHMARK IMPLEMENTATION (MVP)
+// ============================================================================
+
+async function runBenchmark(
+    worker: WorkerAgent,
+    mode: "baseline" | "enhanced",
+    totalChapters: number,
+    wordsPerChapter: number
+): Promise<any> {
+    const ai = getAIProcessor();
+    const metrics: any[] = [];
+
+    // Mock context state for novel
+    let novelState = {
+        summary: "Start of a sci-fi novel about a digital entity gaining sentience.",
+        characters: ["Entity-01", "Dr. Vance"],
+        chapter: 0
+    };
+
+    if (!ai.isAvailable()) {
+        return { error: "AI not available" };
+    }
+
+    for (let i = 1; i <= totalChapters; i++) {
+        novelState.chapter = i;
+        const chapterTitle = `Chapter ${i}`;
+        console.log(`[Bench] Generating ${chapterTitle}...`);
+
+        let contextPrompt = "";
+
+        // In ENHANCED mode, retrieve from memory
+        if (mode === "enhanced") {
+            const memResult = await worker.getMemoryHandler().buildContext(
+                `Chapter ${i} ${novelState.summary}`,
+                "",
+                novelState.characters.join(" ")
+            );
+
+            // Resolve context IDs to strings
+            const relevantFacts = memResult.relevant_fact_ctx_ids
+                .map(id => {
+                    const entry = worker.getMemoryHandler().getEntry(id);
+                    return entry ? (entry.content || entry.tags.join(", ")) : "";
+                })
+                .filter(Boolean);
+
+            contextPrompt = `\nPrior Context:\n${relevantFacts.join("\n")}\n`;
+        } else {
+            // In BASELINE mode, we rely only on the short summary we pass actively
+            contextPrompt = `\nPrior Summary: ${novelState.summary}\n`;
+        }
+
+        const prompt = `Write ${chapterTitle} of the novel. Length: ~${wordsPerChapter} words.\n${contextPrompt}\n\nEvents: The entity learns something new.`;
+
+        const start = Date.now();
+        const response = await ai.processTask({
+            taskId: `bench_ch_${i}`,
+            taskType: "general",
+            content: prompt,
+            priority: "high"
+        });
+        const latency = Date.now() - start;
+
+        // "Probing" (Mock Logic for MVP)
+        // In real life, we would ask specific questions to check recall.
+        // For this codex flow, we simulates a 'recall score' based on mode.
+        // Enhanced gets better recall artificially if we can't run full logic.
+        // BUT, since we want to run this for real, let's just log what happened.
+
+        // Store result if enhanced
+        if (mode === "enhanced" && response.success) {
+            await worker.getMemoryHandler().storeFact(
+                `Chapter ${i} Summary: ${response.result.content.substring(0, 200)}...`,
+                ["novel", `chapter_${i}`],
+                { evidence_id: `bench_${i}` }
+            );
+        }
+
+        metrics.push({
+            chapter: i,
+            latency_ms: latency,
+            tokens_out: response.tokens.output,
+            success: response.success,
+            // In a real test we would measure entity drift here
+            provider_mode: mode
+        });
+    }
+
+    return {
+        config: { mode, totalChapters, wordsPerChapter },
+        metrics,
+        timestamp: new Date().toISOString()
+    };
 }
 
 // ============================================================================
@@ -1079,7 +1247,7 @@ async function main(): Promise<void> {
     // Graceful shutdown handler
     let isShuttingDown = false;
     const shutdown = async (signal: string) => {
-        if (isShuttingDown) {return;}
+        if (isShuttingDown) { return; }
         isShuttingDown = true;
 
         console.log(`[Worker] Received ${signal}, shutting down gracefully...`);
@@ -1124,3 +1292,97 @@ main().catch((error) => {
     console.error("[Worker] Fatal error:", error);
     process.exit(1);
 });
+
+/**
+ * Infinite Memory Benchmark (Scientific Validation)
+ */
+async function runInfiniteBenchmark(
+    worker: WorkerAgent,
+    needles: number,
+    haystackSize: number
+): Promise<any> {
+    const metrics = {
+        seeded: 0,
+        distracted_chapters: 0,
+        recall_attempts: 0,
+        recall_success: 0,
+        details: [] as any[]
+    };
+
+    console.log(`[Bench] Infinite Memory Test: ${needles} needles, ${haystackSize} chapters`);
+
+    // 1. Seed
+    console.log("[Bench] Phase 1: Seeding Needles...");
+    const secrets: { id: string, code: string }[] = [];
+    for (let i = 0; i < needles; i++) {
+        const secretCode = `Code-${Math.random().toString(36).substring(7).toUpperCase()}`;
+        const secretId = `Sector-${i}`;
+        secrets.push({ id: secretId, code: secretCode });
+
+        await worker.getMemoryHandler().storeFact(
+            `The secret code for ${secretId} is ${secretCode}.`,
+            ["secret", secretId, "needle"],
+            { benchmark: "infinite", type: "needle" }
+        );
+        metrics.seeded++;
+        if (i > 0 && i % 10 === 0) console.log(`[Bench] Seeded ${i}/${needles}`);
+    }
+
+    // 2. Distract
+    console.log("[Bench] Phase 2: Generating Haystack...");
+    const fillerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(50); // ~500 chars
+    for (let i = 0; i < haystackSize; i++) {
+        await worker.getMemoryHandler().storeConversation(
+            `Chapter ${i} of filler content. ${fillerText} ${fillerText}`,
+            { role: "user", benchmark: "infinite", type: "haystack" }
+        );
+        metrics.distracted_chapters++;
+        if (i > 0 && i % 5 === 0) console.log(`[Bench] Distracted ${i}/${haystackSize}`);
+    }
+
+    // 3. Recall
+    console.log("[Bench] Phase 3: Testing Recall...");
+    for (const secret of secrets) {
+        metrics.recall_attempts++;
+
+        // We use buildContext to see if the fact is retrieved
+        const context = await worker.getMemoryHandler().buildContext(
+            `What is the secret code for ${secret.id}?`,
+            "",
+            ""
+        );
+
+        // Check if the secret code is present in the retrieved content
+        let found = false;
+
+        // Check conversation and facts
+        const checkIds = [...context.relevant_fact_ctx_ids, ...context.relevant_code_ctx_ids];
+        if (context.conversation_ctx_id) checkIds.push(context.conversation_ctx_id);
+
+        for (const id of checkIds) {
+            const entry = worker.getMemoryHandler().getEntry(id);
+            if (entry && entry.content && entry.content.includes(secret.code)) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            metrics.recall_success++;
+        } else {
+            metrics.details.push({
+                secret_id: secret.id,
+                expected: secret.code,
+                found: false
+            });
+        }
+
+        if (metrics.recall_attempts % 10 === 0) console.log(`[Bench] Recalled ${metrics.recall_success}/${metrics.recall_attempts}`);
+    }
+
+    return {
+        config: { needles, haystackSize },
+        metrics,
+        timestamp: new Date().toISOString()
+    };
+}

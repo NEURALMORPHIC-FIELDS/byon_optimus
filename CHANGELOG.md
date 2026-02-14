@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-13
+
+### Added
+- **Reed-Solomon GF(256) Dual Parity** in FHRSS encoder
+  - GF(256) arithmetic engine (log/exp tables, `gf_mul`, `gf_div`, `gf_pow`)
+  - `FHRSSConfig.parity_strength = 2` (dual parity P1 + P2)
+  - 2-erasure solver per line (was 1-erasure XOR only)
+  - 100% deterministic recovery at 50% data loss (verified 120 seeds)
+  - Overhead: 3.25x (FULL profile, r=2)
+- **Scientific Validation Suite** (`tests/scientific_validation.py`)
+  - 52 test assertions across 10 categories
+  - 50/52 passed (96.2%)
+  - Comprehensive 3-perspective report (`docs/SCIENTIFIC_VALIDATION_RS.md`)
+- `damage_parity` flag on `inject_loss_realistic()` and `test_recovery()`
+
+### Changed
+- FHRSS encoder uses RS GF(256) by default (backward compatible with r=1)
+- Recovery model defaults to parity-intact (matches reference repo)
+- Updated all documentation to reflect RS capabilities
+- Synced `byon-orchestrator/memory-service/fhrss_fcpe_unified.py`
+- Updated `byon-system-knowledge.json` recovery/overhead claims
+
+### Improved
+- Repository structure: removed 12 root-level duplicate files
+- `.gitignore`: added patterns for test outputs, benchmarks, runtime storage
+- Added `pyproject.toml` and `__init__.py` for INFINIT_MEMORYCONTEXT package
+
 ### Added
 - **🔐 Secure Vault** - Encrypted storage for sensitive data
   - GPG encryption (with AES-256-GCM fallback)
@@ -91,7 +118,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date       | Status      |
 |---------|------------|-------------|
-| 0.1.0   | 2026-02-04 | Current     |
+| 0.2.0   | 2026-02-13 | Current     |
+| 0.1.0   | 2026-02-04 | Stable      |
 
 ---
 

@@ -1,6 +1,6 @@
 # BYON Worker AI Integration - Implementation Guide
 
-**Obiectiv:** Adaugă procesare AI reală în Worker pentru generare cod, analiză date, și trading queries.
+**Objective:** Add real AI processing in Worker for code generation, data analysis, and trading queries.
 
 ---
 
@@ -8,24 +8,24 @@
 
 ### Prerequisites
 
-- Node.js 22+ (✅ ai deja)
-- Docker running (✅ ai deja)
-- Anthropic API Key (obține de la https://console.anthropic.com)
+- Node.js 22+ (✅ already have)
+- Docker running (✅ already have)
+- Anthropic API Key (get from https://console.anthropic.com)
 
 ---
 
-## STEP 1: Adaugă Dependențe (5 min)
+## STEP 1: Add Dependencies (5 min)
 
 ```bash
 cd "c:\Users\Lucian\Desktop\byon_optimus\byon-orchestrator"
 
-# Adaugă Anthropic SDK
+# Add Anthropic SDK
 npm install @anthropic-ai/sdk --save
 
-# Adaugă axios pentru trading API
+# Add axios for trading API
 npm install axios --save
 
-# Verifică package.json
+# Verify package.json
 cat package.json | grep -E "@anthropic|axios"
 ```
 
@@ -37,14 +37,14 @@ cat package.json | grep -E "@anthropic|axios"
 
 ---
 
-## STEP 2: Configurare API Key (2 min)
+## STEP 2: Configure API Key (2 min)
 
 ```bash
-# Adaugă în .env sau docker-compose.yml
+# Add to .env or docker-compose.yml
 echo 'ANTHROPIC_API_KEY=sk-ant-api03-...' >> .env
 ```
 
-**SAU** modifică `docker-compose.yml`:
+**OR** modify `docker-compose.yml`:
 
 ```yaml
 services:
@@ -56,24 +56,24 @@ services:
 
 ---
 
-## STEP 3: Modifică plan-generator.ts (15 min)
+## STEP 3: Modify plan-generator.ts (15 min)
 
-**Locație:** `byon-orchestrator/src/agents/worker/plan-generator.ts`
+**Location:** `byon-orchestrator/src/agents/worker/plan-generator.ts`
 
-### 3.1 Adaugă imports (sus în fișier)
+### 3.1 Add imports (top of file)
 
 ```typescript
 import Anthropic from '@anthropic-ai/sdk';
 
-// Configurare Claude client
+// Configure Claude client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || ''
 });
 ```
 
-### 3.2 Adaugă funcții noi (după imports)
+### 3.2 Add new functions (after imports)
 
-**Copiază din `worker-ai-integration.ts` (generat mai sus):**
+**Copy from `worker-ai-integration.ts` (generated above):**
 
 ```typescript
 // Paste here:
@@ -83,16 +83,16 @@ const anthropic = new Anthropic({
 // - generateFallbackPlan()
 ```
 
-### 3.3 Modifică export principal
+### 3.3 Modify main export
 
-**Găsește funcția existentă:**
+**Find the existing function:**
 ```typescript
 export function generatePlan(evidence: EvidencePack): PlanDraft {
   // Existing code...
 }
 ```
 
-**Replace cu:**
+**Replace with:**
 ```typescript
 export async function generatePlan(evidence: EvidencePack): Promise<PlanDraft> {
   if (requiresAI(evidence) && process.env.ANTHROPIC_API_KEY) {
@@ -100,7 +100,7 @@ export async function generatePlan(evidence: EvidencePack): Promise<PlanDraft> {
     return await generateAIPlan(evidence, evidence.task_type);
   } else {
     console.log('[Worker] Using generic plan generation');
-    return generateGenericPlan(evidence); // Funcția existentă
+    return generateGenericPlan(evidence); // Existing function
   }
 }
 ```
@@ -117,30 +117,30 @@ function generateGenericPlan(evidence: EvidencePack): PlanDraft { ... }
 
 ---
 
-## STEP 4: Adaugă Trading API Support (10 min)
+## STEP 4: Add Trading API Support (10 min)
 
-### 4.1 Creează fișier nou
+### 4.1 Create new file
 
 ```bash
 cd byon-orchestrator/src/agents/executor
 touch trading-client.ts
 ```
 
-### 4.2 Copiază conținut
+### 4.2 Copy content
 
-**Paste în `trading-client.ts`:**
+**Paste into `trading-client.ts`:**
 ```typescript
-// Copiază tot din trading-api-integration.ts
+// Copy everything from trading-api-integration.ts
 ```
 
-### 4.3 Modifică executor/index.ts
+### 4.3 Modify executor/index.ts
 
-**Adaugă import:**
+**Add import:**
 ```typescript
 import { CoinGeckoClient } from './trading-client';
 ```
 
-**În funcția `executeAction()`, adaugă cases:**
+**In the `executeAction()` function, add cases:**
 ```typescript
 async function executeAction(action: any): Promise<ActionResult> {
   switch (action.type) {
@@ -160,7 +160,7 @@ async function executeAction(action: any): Promise<ActionResult> {
 }
 ```
 
-**Adaugă funcțiile noi (la final de fișier):**
+**Add the new functions (at end of file):**
 ```typescript
 // Paste here:
 // - executeAPICall()
@@ -171,7 +171,7 @@ async function executeAction(action: any): Promise<ActionResult> {
 
 ## STEP 5: Update Types (5 min)
 
-**În `byon-orchestrator/byon-config.ts` sau `types.ts`:**
+**In `byon-orchestrator/byon-config.ts` or `types.ts`:**
 
 ```typescript
 // Add new action types
@@ -222,7 +222,7 @@ cat > "c:\Users\Lucian\Desktop\byon_optimus\handoff\inbox\test_ai_code.json" << 
   "id": "test-ai-quicksort",
   "channel": "manual",
   "from": "capability_test",
-  "content": "Scrie o funcție Python pentru quicksort cu type hints și docstring. Include și câteva teste.",
+  "content": "Write a Python function for quicksort with type hints and docstring. Include some tests as well.",
   "timestamp": "2026-02-04T03:00:00Z"
 }
 EOF
@@ -243,7 +243,7 @@ ls -lt "c:\Users\Lucian\Desktop\byon_optimus\handoff\worker_to_auditor" | head -
 cat "c:\Users\Lucian\Desktop\byon_optimus\handoff\worker_to_auditor\plan_*.json" | tail -1
 ```
 
-**Expected:** Plan cu cod Python real generat de Claude
+**Expected:** Plan with real Python code generated by Claude
 
 ---
 
@@ -284,7 +284,7 @@ sleep 5
 cat "c:\Users\Lucian\Desktop\byon_optimus\handoff\..\project\bitcoin_data.json"
 ```
 
-**Expected:** JSON cu date Bitcoin reale
+**Expected:** JSON with real Bitcoin data
 
 ---
 
@@ -298,13 +298,13 @@ cat > "c:\Users\Lucian\Desktop\byon_optimus\handoff\inbox\test_data_analysis.jso
   "id": "test-data-sort",
   "channel": "manual",
   "from": "capability_test",
-  "content": "Generează un fișier JSON cu numere prime de la 1 la 100, suma lor, și media aritmetică. Salvează în /project/primes_analysis.json",
+  "content": "Generate a JSON file with prime numbers from 1 to 100, their sum, and the arithmetic mean. Save to /project/primes_analysis.json",
   "timestamp": "2026-02-04T03:10:00Z"
 }
 EOF
 ```
 
-**Expected:** Claude generează cod Python care calculează primele, apoi Executor rulează codul.
+**Expected:** Claude generates Python code that calculates primes, then Executor runs the code.
 
 ---
 
@@ -347,21 +347,21 @@ docker-compose up -d byon-worker
 
 ### Issue: Worker log shows "Using generic plan generation"
 
-**Cause:** `requiresAI()` nu detectează keywords sau API key lipsește
+**Cause:** `requiresAI()` does not detect keywords or API key is missing
 
 **Fix:**
 ```bash
 # Check keywords in message
 cat "c:\Users\Lucian\Desktop\byon_optimus\handoff\inbox\test_*.json"
 
-# Should contain: "scrie", "cod", "functie", etc.
+# Should contain: "write", "code", "function", etc.
 ```
 
 ---
 
 ## 📊 Performance Impact
 
-- **Latență adăugată:** +500-2000ms (Claude API call)
+- **Added latency:** +500-2000ms (Claude API call)
 - **Cost:** ~$0.003 per request (Sonnet 4.5)
 - **Memory:** +50MB (Anthropic SDK)
 
@@ -396,6 +396,6 @@ Before deploying to production:
 
 **Estimated total time:** 30-45 minutes
 
-**Dificultate:** Medium (requires TypeScript knowledge)
+**Difficulty:** Medium (requires TypeScript knowledge)
 
-**Alternativă rapidă:** Folosește OpenClaw UI direct pentru AI tasks (0 min setup)
+**Quick alternative:** Use OpenClaw UI directly for AI tasks (0 min setup)

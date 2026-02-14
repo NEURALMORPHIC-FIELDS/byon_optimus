@@ -16,10 +16,10 @@
   },
   "plugins": {
     "slots": {
-      "memory": "memory-fhrss-fcpe"
+      "memory": "memory-faiss"
     },
     "entries": {
-      "memory-fhrss-fcpe": {
+      "memory-faiss": {
         "enabled": true,
         "config": {
           "serviceUrl": "http://memory-service:8000"

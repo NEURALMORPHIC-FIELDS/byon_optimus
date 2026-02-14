@@ -7,12 +7,12 @@
     "tracking_version": "1.0.0",
     "created_at": "2026-02-01T00:00:00Z",
     "last_updated": "2026-02-02T10:30:00Z",
-    "context_preservation": "Acest fișier păstrează contextul complet pentru dezvoltare iterativă"
+    "context_preservation": "This file preserves the complete context for iterative development"
   },
 
   "project_context": {
-    "objective": "Integrarea sistemului BYON cu memorie infinită (FHRSS+FCPE) ca orchestrator peste platforma OpenClaw",
-    "key_principle": "OpenClaw = Platform, BYON = Orchestrator - ambele coexistă",
+    "objective": "Integration of the BYON system with infinite memory (FHRSS+FCPE) as orchestrator on top of the OpenClaw platform",
+    "key_principle": "OpenClaw = Platform, BYON = Orchestrator - both coexist",
     "source_projects": {
       "openclaw": {
         "location": "Byon_bot/openclaw-main/",
@@ -669,10 +669,10 @@
       "Byon_bot/openclaw-main/extensions/memory-fhrss-fcpe/ - Existing partial integration"
     ],
     "key_reminders": [
-      "OpenClaw trebuie să rămână neatins - BYON se integrează prin bridge",
+      "OpenClaw must remain untouched - BYON integrates through bridge",
       "BYON orchestrator MUST NOT START fără memory service",
       "Executor MUST BE AIR-GAPPED (network_mode: none)",
-      "Toate execution orders trebuie semnate cu Ed25519"
+      "All execution orders must be signed with Ed25519"
     ]
   },
 
