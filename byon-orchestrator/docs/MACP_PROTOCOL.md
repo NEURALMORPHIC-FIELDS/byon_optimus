@@ -1,6 +1,8 @@
-# MACP v1.1 - Multi-Agent Control Protocol
+# MACP v1.1 — Multi-Agent Control Protocol
 
 **Specification for BYON Optimus Multi-Agent Orchestration**
+
+> **v0.6.4a addendum.** `EvidencePack` is extended with an optional `fce_context: FceContextMetadata` field carrying the FCE-M morphogenetic summary (omega/contested/aligned counts, hashed center identifiers, advisory and priority counts). The field is metadata-only by construction and is rejected by the Auditor if any text-content keys (`label`, `description`, `content`, `text`, `name`, `title`) are present. See [`../src/types/protocol.ts`](../src/types/protocol.ts) for the type definition and [../../docs/RESEARCH_PROGRESS_v0.6.md](../../docs/RESEARCH_PROGRESS_v0.6.md) for the operational semantics. Worker plans, Auditor approves, Executor air-gapped — these invariants are unchanged.
 
 ## Overview
 

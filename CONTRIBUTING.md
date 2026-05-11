@@ -125,11 +125,19 @@ User Request → Worker → PlanDraft → Auditor → ExecutionOrder → Executo
 - Use JSON Schema validation for all documents
 - Never skip the Auditor validation step
 
-### Memory System (FHRSS+FCPE)
+### Memory System (FAISS + FCE-M v0.6.0, hybrid)
 
-- 73,000:1 compression ratio
-- Perpetual retention via holographic encoding
-- Query via semantic search, not direct reads
+Since v0.6.0 the memory subsystem is a **hybrid** of two distinct layers:
+
+- **FAISS `IndexFlatIP`** with `sentence-transformers/all-MiniLM-L6-v2` 384-dim L2-normalized embeddings — semantic retrieval. Thread-scoped by default (v0.6.1, `scope: "thread"`); `scope: "global"` is opt-in for debug.
+- **FCE-M v0.6.0** (BSD-3-Clause, vendored at `byon-orchestrator/memory-service/vendor/fce_m/`) — morphogenetic advisory layer that produces `OmegaRecord` (irreversible coagulation), `ReferenceField` (interpretation lens), residue signaling and advisory feedback. Operational level today: **2 of 4** (Morphogenetic Advisory Memory). Omega coagulation through the conversational loop is not reached at default thresholds (`θ_s=0.28`, `τ_coag=12`); see [`docs/RESEARCH_PROGRESS_v0.6.md`](docs/RESEARCH_PROGRESS_v0.6.md).
+
+**Contributor rules for the memory subsystem:**
+- Auditor MUST validate `EvidencePack.fce_context` via `validateFceContext` — it is enforced metadata-only (no `label`, `description`, `content`, `text`, `name`, `title`; hashed center IDs only; capped array sizes).
+- FCE advisory is consumed by `applyFceRiskAdvisory` as a **risk factor**, not a verdict. Aligned ReferenceFields do not bypass approval.
+- Never write raw conversation text into FCE-M; use the fact-extractor pipeline.
+- Architecture / security / identity facts go SYSTEM-scope (`thread_id=null`, tag `__system__`); user preferences and project facts go thread-scoped.
+- Query via the standard MemoryClient surface (`getFceMemoryContext`, `getMorphogenesisReport`, etc.) — do not poke `UnifiedMemoryStore` directly from outside `fcem_backend.py`.
 
 ## Security
 

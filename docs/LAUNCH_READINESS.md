@@ -2,6 +2,8 @@
 
 **BYON Optimus v1.0** | Patent: EP25216372.0 | Date: 2026-02-07
 
+> **Historical document.** This snapshot pre-dates the v0.6.x research line (2026-05). For the current architecture (hybrid FAISS + FCE-M v0.6.0 memory, thread-scoped recall, fact extraction, field-signature injection, canonical-facts prompt seeding) and the present operational classification (Level 2 of 4 — Morphogenetic Advisory Memory) refer to [RESEARCH_PROGRESS_v0.6.md](RESEARCH_PROGRESS_v0.6.md) and [test-results/v0.6.4-synthesis.md](../test-results/v0.6.4-synthesis.md). The launch-readiness assessment below is preserved as a record of pre-FCE-M evaluation.
+
 ---
 
 ## 1. System Identity

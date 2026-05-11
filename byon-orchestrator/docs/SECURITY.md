@@ -2,6 +2,8 @@
 
 **Security Architecture and Threat Mitigation**
 
+> **v0.6.4 banner.** The FCE-M advisory layer introduced in v0.6.0+ produces *risk context only*: contested expressions or high-residue advisories may *raise* required review level via `applyFceRiskAdvisory`, but they cannot approve actions, cannot override truth verdicts, and cannot bypass user approval gates. Aligned ReferenceFields explicitly do **not** bypass approval (`FCE_NOTE: does NOT bypass approval`). The Auditor enforces `validateFceContext` to ensure `fce_context` carries only counts and hashed center IDs — no text content leaks through. Deep-suite security categories (E + F) report 27/27 PASS as of v0.6.4. Executor air-gap and Ed25519 signing requirements are unchanged. See [`../../docs/RESEARCH_PROGRESS_v0.6.md`](../../docs/RESEARCH_PROGRESS_v0.6.md).
+
 ## Overview
 
 BYON Optimus implements defense-in-depth with multiple security layers to ensure that AI task execution remains secure, auditable, and under human control.

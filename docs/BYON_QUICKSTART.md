@@ -1,6 +1,8 @@
 # BYON Optimus Quick Start Guide
 
-**Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+**Patent: EP25216372.0 — Omni-Qube-Vault — Vasile Lucian Borbeleac**
+
+> **v0.6.4 banner.** Memory backend is now hybrid FAISS + FCE-M v0.6.0 (not the legacy FHRSS+FCPE described in some older paragraphs). For the up-to-date architecture and operational status see [RESEARCH_PROGRESS_v0.6.md](RESEARCH_PROGRESS_v0.6.md). For setup of the WhatsApp bridge (Baileys, replaces OpenClaw locally) see [`test-results/whatsapp-setup.md`](../test-results/whatsapp-setup.md).
 
 ## Prerequisites
 

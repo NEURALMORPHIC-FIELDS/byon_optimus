@@ -1,6 +1,8 @@
 # BYON Optimus — Executive Summary
 
-**TL;DR:** Multi-agent orchestrator with AI, enterprise security, and infinite memory.
+> **v0.6.4 banner.** Default LLM is `claude-sonnet-4-6` (not 4.5). Memory backend is **hybrid FAISS + FCE-M v0.6.0** — a morphogenetic advisory layer (OmegaRecord, ReferenceField, residue) over a FAISS semantic retrieval substrate, vendored at `byon-orchestrator/memory-service/vendor/fce_m/` under BSD-3-Clause. Current operational classification: **Level 2 of 4** (Morphogenetic Advisory Memory). For the full scientific narrative see [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
+
+**TL;DR:** Multi-agent orchestrator with Claude Sonnet 4.6, enterprise security, and a hybrid semantic + morphogenetic memory substrate.
 
 ---
 
@@ -9,10 +11,10 @@
 **BYON** = **B**alanced **Y**our **O**peration **N**etwork (Optimus Prime edition)
 
 **Core Value:** Executes complex tasks with:
-- ✅ **Security** — Ed25519 signatures, air-gap execution
-- ✅ **AI** — Claude Sonnet 4.5 integration
-- ✅ **Memory** — Patent-protected FHRSS+FCPE (73,000:1 compression)
-- ✅ **Orchestration** — Multi-agent workflow automation
+- ✅ **Security** — Ed25519 signatures, air-gap execution, FCE-M metadata-only gate (27/27 security-boundary deep-suite tests pass)
+- ✅ **AI** — Native Claude Sonnet 4.6 integration
+- ✅ **Memory** — Hybrid FAISS retrieval + FCE-M v0.6.0 morphogenetic advisory (Patent EP25216372.0)
+- ✅ **Orchestration** — Multi-agent workflow automation under MACP v1.1
 - ✅ **Secure Vault** — GPG/AES encrypted secrets with human-in-the-loop approval
 
 ---

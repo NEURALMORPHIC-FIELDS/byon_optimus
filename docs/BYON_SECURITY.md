@@ -1,6 +1,8 @@
 # BYON Optimus Security Model
 
-**Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+**Patent: EP25216372.0 — Omni-Qube-Vault — Vasile Lucian Borbeleac**
+
+> **v0.6.4 banner.** The FCE-M morphogenetic advisory layer (`fce_advisory`, `fce_morphogenesis_report`, ReferenceFields, OmegaRecords) added in v0.6.0+ provides *risk context only*. It never approves execution and never overrides truth verdicts. `EvidencePack.fce_context` is enforced metadata-only by `validateFceContext` (no labels, no text content, hashed center IDs only). `applyFceRiskAdvisory` may *raise* required review level on contested_expression or high_residue but never bypasses Auditor approval. Aligned ReferenceFields explicitly do **not** bypass approval. Executor air-gap (`network_mode: none`) and Ed25519 signature requirements are unchanged. See [SECURITY_WHITEPAPER.md](SECURITY_WHITEPAPER.md) for the full FCE gate flow.
 
 ## Security Principles
 

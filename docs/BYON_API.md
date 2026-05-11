@@ -1,6 +1,19 @@
 # BYON Optimus API Reference
 
-**Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+**Patent: EP25216372.0 — Omni-Qube-Vault — Vasile Lucian Borbeleac**
+
+> **v0.6.4 addendum.** In addition to the legacy actions documented below (`ping`, `store`, `search`, `search_all`, `stats`, `test_recovery`), the memory service now exposes the FCE-M morphogenetic surface:
+>
+> - `fce_state` — full snapshot (omega registry, reference fields count, advisory count, dedup stats, events-since-consolidate).
+> - `fce_advisory` — raw advisory feedback list.
+> - `fce_priority_recommendations` — advisory items with `priority_delta > 0`.
+> - `fce_omega_registry` — irreversible OmegaRecord snapshot.
+> - `fce_reference_fields` — projected ReferenceFields and their morphogenetic events.
+> - `fce_consolidate` — explicit consolidation trigger.
+> - `fce_morphogenesis_report` — compact, metadata-only summary suitable for `EvidencePack.fce_context`.
+> - `fce_assimilate_receipt` — post-execution status assimilation (success → label 1, partial → 2, failed → 3, rejected → 4).
+>
+> Search/store actions accept optional `thread_id` and `scope ∈ {"thread", "global"}` (v0.6.1; default `"thread"`). `EvidencePack` carries optional `fce_context: FceContextMetadata` (v0.6.4a). See [RESEARCH_PROGRESS_v0.6.md](RESEARCH_PROGRESS_v0.6.md) for behavioural semantics.
 
 ## Memory Service API
 

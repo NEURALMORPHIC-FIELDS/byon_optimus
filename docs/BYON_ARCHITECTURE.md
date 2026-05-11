@@ -1,10 +1,12 @@
 # BYON Optimus Architecture
 
-**Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+**Patent: EP25216372.0 — Omni-Qube-Vault — Vasile Lucian Borbeleac**
+
+> **v0.6.4 banner.** The memory backend described in legacy paragraphs below as "FHRSS+FCPE" is, as of v0.6.0+, a **hybrid FAISS + FCE-M v0.6.0** stack: FAISS provides semantic retrieval (thread-scoped by default per v0.6.1), FCE-M provides the morphogenetic advisory layer (OmegaRecord, ReferenceField, residue, advisory feedback). The OpenClaw runtime is not bundled in the current local checkout; the WhatsApp surface is a Baileys-based bridge (text-only, bypasses Worker → Auditor → Executor). Auditor consumes FCE advisory via `validateFceContext` + `applyFceRiskAdvisory` — strictly as a risk factor, never as a verdict. Current operational classification: **Level 2 of 4** (Morphogenetic Advisory Memory). Full scientific narrative: [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
 
 ## Overview
 
-BYON Optimus integrates the FHRSS+FCPE infinite memory system as an orchestrator over the OpenClaw messaging platform. The architecture follows a strict layered design with clear separation of concerns.
+BYON Optimus integrates the **hybrid FAISS + FCE-M v0.6.0** memory backend (formerly FHRSS+FCPE; see banner) into a MACP v1.1 multi-agent pipeline. The architecture follows a strict layered design with clear separation of concerns: Worker plans, Auditor validates and Ed25519-signs ExecutionOrders, Executor runs in an air-gapped container.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐

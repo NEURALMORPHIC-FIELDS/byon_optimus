@@ -1,8 +1,26 @@
 # BYON Optimus Production Deployment Runbook
 
-**Document Version:** 1.0  
-**Date:** 2026-02-02  
-**Status:** PRODUCTION READY
+**Document Version:** 1.0 (with v0.6.4 memory backend addendum)
+**Date:** 2026-02-02 (original); **v0.6.4 addendum:** 2026-05-11
+**Status:** Level 2 (Morphogenetic Advisory Memory) — production-ready; Level 3 research-in-progress
+
+> **v0.6.4 memory backend addendum.** The memory service runs a hybrid backend:
+> - **FAISS `IndexFlatIP`** (semantic retrieval) — preserves all legacy actions (`ping`, `store`, `search`, `search_all`, `stats`, `test_recovery`).
+> - **FCE-M v0.6.0** (morphogenetic advisory) — exposes `fce_state`, `fce_advisory`, `fce_priority_recommendations`, `fce_omega_registry`, `fce_reference_fields`, `fce_consolidate`, `fce_morphogenesis_report`, `fce_assimilate_receipt`.
+>
+> **Deployment health check:** after `docker compose up -d`, verify both layers:
+> ```bash
+> curl -s http://localhost:8001/health         # FAISS+FCE-M health
+> curl -s -XPOST http://localhost:8001/ \
+>      -H 'Content-Type: application/json' \
+>      -d '{"action":"fce_state"}'           # expect enabled=true
+> curl -s -XPOST http://localhost:8001/ \
+>      -H 'Content-Type: application/json' \
+>      -d '{"action":"stats"}'                # legacy compatibility
+> ```
+> System facts (18-entry canonical corpus) are seeded automatically by the WhatsApp bridge and the deep test suite on startup; they can be re-seeded idempotently via `scripts/lib/byon-system-facts.mjs::seedSystemFacts(mem)`. State persists to `byon-orchestrator/memory-service/memory_storage/` (`faiss_*.bin`, `meta_*.pkl`, `fcem/fcem_snapshot.json`).
+>
+> See [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md) for the operational classification and known coagulation limits.
 
 ## Table of Contents
 

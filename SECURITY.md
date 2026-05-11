@@ -1,10 +1,14 @@
 # Security Policy
 
+> **v0.6.4 update.** The FCE-M morphogenetic layer added in v0.6.0+ produces *advisory metadata only* — it can shape attention and risk context, never approves execution, never overrides truth verdicts, and never bypasses the Auditor → Executor signed-order chain. `EvidencePack.fce_context` is enforced metadata-only by `validateFceContext` (no labels, no text content, hashed center IDs only); 27/27 security-boundary deep-suite assertions pass. The Executor air-gap (`network_mode: none`) and Ed25519 signature requirements are unchanged.
+
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
+| Version | Supported          | Notes                                              |
+| ------- | ------------------ | -------------------------------------------------- |
+| 0.6.x   | :white_check_mark: | Hybrid FAISS + FCE-M v0.6.0; research-in-progress  |
+| 0.2.x   | :white_check_mark: | FHRSS+FCPE memory (superseded by 0.6 hybrid)       |
+| 0.1.x   | :white_check_mark: | Initial MACP v1.1                                  |
 
 ## Reporting a Vulnerability
 

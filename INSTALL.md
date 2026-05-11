@@ -6,9 +6,11 @@
   <img src="docs/assets/logos/openclaw-logo.png" height="100" />
 </div>
 
-# BYON Optimus - Installation Guide
+# BYON Optimus — Installation Guide
 
-**Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
+**Patent: EP25216372.0 — Omni-Qube-Vault — Vasile Lucian Borbeleac**
+
+> **v0.6.4 banner.** Memory backend is **hybrid FAISS + FCE-M v0.6.0** (the FHRSS+FCPE references in some legacy paragraphs below pre-date v0.6.0 and are now historical). For the WhatsApp transport on the current local checkout we use a **Baileys-based bridge** (`byon-orchestrator/scripts/byon-whatsapp-bridge.mjs`) since the OpenClaw runtime is not bundled. Default LLM is `claude-sonnet-4-6`. For local hybrid setup without Docker, see [`test-results/whatsapp-setup.md`](test-results/whatsapp-setup.md) and [`docs/RESEARCH_PROGRESS_v0.6.md`](docs/RESEARCH_PROGRESS_v0.6.md).
 
 Complete step-by-step installation tutorial for the BYON Optimus multi-agent orchestration system.
 
@@ -49,7 +51,7 @@ cd "C:\Users\Lucian\Desktop\byon_optimus"
 | 2 | 📁 Ask for project folder path |
 | 3 | 🔍 Check prerequisites (Docker, Git, Node.js) |
 | 4 | 📂 Create directory structure (handoff, keys, memory) |
-| 5 | 🧠 Verify FHRSS+FCPE memory system exists |
+| 5 | 🧠 Verify FAISS + FCE-M v0.6.0 memory backend is in place |
 | 6 | ⚙️ Create/configure `.env` file (prompts for API key) |
 | 7 | 🔐 Generate Ed25519 security keys |
 | 8 | 📦 Install npm dependencies (optional) |
@@ -178,19 +180,38 @@ New-Item -ItemType Directory -Force -Path memory\fhrss
 New-Item -ItemType Directory -Force -Path project
 ```
 
-### Step 2.3: Verify FHRSS+FCPE Source
+### Step 2.3: Verify FAISS + FCE-M v0.6.0 memory backend
 
-Ensure the memory system source exists:
+Since v0.6.0 the memory subsystem is a **hybrid** of FAISS (semantic retrieval) and FCE-M v0.6.0 (morphogenetic advisory). Both are bundled in the orchestrator.
 
 ```bash
-# Check FHRSS+FCPE unified file exists
-ls INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py
+# FCE-M v0.6.0 vendored package (BSD-3-Clause)
+ls byon-orchestrator/memory-service/vendor/fce_m/unified_fragmergent_memory/__init__.py
+
+# FAISS-backed handlers + memory-service entry point
+ls byon-orchestrator/memory-service/handlers.py byon-orchestrator/memory-service/server.py
+
+# FCE-M adapter layered over UnifiedMemoryStore
+ls byon-orchestrator/memory-service/fcem_backend.py
+
+# The legacy INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py file is no longer the
+# active backend. It is retained for historical reference and benchmarking only.
 ```
 
-If missing, copy from source:
-```bash
-cp "D:\Github Repo\INFINIT_MEMORYCONTEXT\fhrss_fcpe_unified.py" INFINIT_MEMORYCONTEXT/
+The memory-service container default is `MEMORY_BACKEND=hybrid` (FAISS for retrieval + FCE-M for morphogenetic advisory). To enable / disable the FCE-M layer at runtime:
+
 ```
+MEMORY_BACKEND=hybrid|faiss|fcem
+FCEM_ENABLED=true
+FCEM_ADVISORY_MODE=priority_only
+FCEM_REFERENCE_FIELDS_ENABLED=true
+FCEM_MULTIPERSPECTIVAL_ENABLED=true
+FCEM_CONSOLIDATE_EVERY_N=3
+FCEM_COHERENT_REPEAT_THRESHOLD=0.92  # v0.6.4c
+FCEM_COHERENT_HISTORY_SIZE=20         # v0.6.4c
+```
+
+See [`docs/RESEARCH_PROGRESS_v0.6.md`](docs/RESEARCH_PROGRESS_v0.6.md) for the architecture overview and operational classification.
 
 ---
 
@@ -678,7 +699,7 @@ Configure channels in `.env` by adding the respective API tokens. See `.env.exam
 │                     └─────────────┘   └──────────────┘     │
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │              FHRSS+FCPE Memory Service               │   │
+│  │       FAISS + FCE-M v0.6.0 Memory Service (hybrid)    │   │
 │  │         73,000x compression • 100% recovery          │   │
 │  │                      :8000                           │   │
 │  └─────────────────────────────────────────────────────┘   │

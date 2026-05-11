@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BYON Optimus is a multi-agent orchestration system implementing the **MACP v1.1 (Multi-Agent Control Protocol)**. It uses three agents in a pipeline—Worker, Auditor, Executor—communicating via file-based handoff (no direct inter-agent APIs). The system includes an infinite memory backend (FHRSS+FCPE) and a unified communication gateway (OpenClaw) supporting 20+ channels.
+BYON Optimus is a multi-agent orchestration system implementing the **MACP v1.1 (Multi-Agent Control Protocol)**. It uses three agents in a pipeline—Worker, Auditor, Executor—communicating via file-based handoff (no direct inter-agent APIs).
 
-**Patent: EP25216372.0 - Omni-Qube-Vault** | **License: Proprietary**
+Since **v0.6.0** (research line v0.6.1 → v0.6.4) the memory subsystem is a **hybrid FAISS + FCE-M v0.6.0** backend: FAISS provides semantic retrieval, FCE-M (BSD-3-Clause) provides a morphogenetic advisory layer with OmegaRecord, ReferenceField, residue signaling, and metadata-only `fce_context` exposure to `EvidencePack`. Default LLM is `claude-sonnet-4-6`. Current operational classification: **Level 2 of 4** (Morphogenetic Advisory Memory). For the full scientific narrative see [`docs/RESEARCH_PROGRESS_v0.6.md`](docs/RESEARCH_PROGRESS_v0.6.md).
+
+**Patent: EP25216372.0 — Omni-Qube-Vault** | **License: Proprietary**
 
 ## Build & Development Commands
 
@@ -85,8 +87,11 @@ Each document has a `document_type` discriminator, UUID, ISO8601 timestamp, and 
 
 ### Key Subsystems
 
-- **Memory Service** (`byon-orchestrator/memory-service/`, Python Flask): FHRSS+FCPE algorithm providing semantic search. Runs on port 8001. System won't start without it.
-- **OpenClaw Gateway** (`Byon_bot/openclaw-main/`): Unified communication platform, serves UI at port 3000, browser relay at 8080.
+- **Memory Service v0.6.4** (`byon-orchestrator/memory-service/`, Python FastAPI): hybrid backend. FAISS `IndexFlatIP` (384-dim `sentence-transformers/all-MiniLM-L6-v2`) provides semantic retrieval; FCE-M v0.6.0 (BSD-3-Clause, vendored at `byon-orchestrator/memory-service/vendor/fce_m/`) provides the morphogenetic advisory layer (OmegaRecord, ReferenceField, residue signaling). Default port 8000 (8001 external on Docker). Thread-scoped recall by default (v0.6.1, `scope: "thread"`), `scope: "global"` is opt-in. New action endpoints: `fce_state`, `fce_advisory`, `fce_priority_recommendations`, `fce_omega_registry`, `fce_reference_fields`, `fce_consolidate`, `fce_morphogenesis_report`, `fce_assimilate_receipt`. **System won't start without memory-service.**
+- **Fact extraction** (`byon-orchestrator/scripts/lib/fact-extractor.mjs`, v0.6.2): LLM-driven distillation of user turns into canonical facts. Architecture / security / identity kinds route system-scope (visible across threads); user preferences / project facts route thread-scoped.
+- **Canonical system facts** (`byon-orchestrator/scripts/lib/byon-system-facts.mjs`, v0.6.4a): 18-entry corpus of architectural truths (Worker plans, Auditor approves, Executor air-gapped, …) seeded into memory-service at startup AND always injected into LLM system prompts via `renderCanonicalFactsBlock()`.
+- **WhatsApp bridge** (`byon-orchestrator/scripts/byon-whatsapp-bridge.mjs`): Baileys-based text-only conversational surface. Replaces OpenClaw locally (OpenClaw runtime is missing from this checkout). Bridge does NOT go through Worker → Auditor → Executor — it is a memory + Claude conversational layer only.
+- **OpenClaw Gateway** (`Byon_bot/openclaw-main/`): Unified communication platform when present; serves UI at port 3000, browser relay at 8080. Runtime not bundled in the current checkout.
 - **Vault** (`byon-orchestrator/src/vault/`): Encrypted secrets storage (GPG or AES-256-GCM fallback), ask-always access policy with desktop notifications.
 - **Audit Trail** (`byon-orchestrator/src/audit/`): Immutable hash-chain logging with calendar indexing.
 - **Policy Engine** (`byon-orchestrator/src/policy/`): Forbidden paths, forbidden patterns, whitelists, risk assessment.

@@ -1,10 +1,12 @@
 # BYON Optimus Architecture
 
-**Multi-Agent Orchestration System with Air-Gapped Execution**
+**Multi-Agent Orchestration System with Air-Gapped Execution and Morphogenetic Memory**
+
+> **v0.6.4 banner.** Memory backend is **hybrid FAISS + FCE-M v0.6.0**, not pure FHRSS+FCPE. FAISS provides semantic retrieval; FCE-M (BSD-3-Clause, vendored at `../memory-service/vendor/fce_m/`) provides the morphogenetic advisory layer (OmegaRecord, ReferenceField, residue). Endpoints surfacing the morphogenetic layer: `fce_state`, `fce_advisory`, `fce_priority_recommendations`, `fce_omega_registry`, `fce_reference_fields`, `fce_consolidate`, `fce_morphogenesis_report`, `fce_assimilate_receipt`. Auditor consumes FCE advisory through `validateFceContext` + `applyFceRiskAdvisory` (metadata-only gate, advisory raises risk but never approves). Default LLM is `claude-sonnet-4-6`. Operational classification: **Level 2 of 4** (Morphogenetic Advisory Memory). Full narrative: [`../../docs/RESEARCH_PROGRESS_v0.6.md`](../../docs/RESEARCH_PROGRESS_v0.6.md).
 
 ## System Overview
 
-BYON Optimus is a secure multi-agent AI orchestration system designed for autonomous task execution with human oversight. The system implements a separation-of-duties model where different agents handle planning, auditing, and execution.
+BYON Optimus is a secure multi-agent AI orchestration system designed for autonomous task execution with human oversight. The system implements a separation-of-duties model where different agents handle planning, auditing, and execution, with a hybrid semantic + morphogenetic memory substrate informing each stage.
 
 ## High-Level Architecture
 

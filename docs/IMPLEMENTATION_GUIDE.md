@@ -1,4 +1,14 @@
-# BYON Worker AI Integration - Implementation Guide
+# BYON Worker AI Integration — Implementation Guide
+
+> **v0.6.4 banner.** This guide pre-dates the v0.6 research line and reflects an *early* Anthropic-SDK wiring exercise. The current state of the integration is:
+>
+> - Default LLM is `claude-sonnet-4-6` (the guide below references Claude 3 Haiku / Sonnet 4.5 — historical; the actual default in `byon-orchestrator/src/agents/worker/ai-processor.ts` is `claude-sonnet-4-6`).
+> - The Worker must populate the optional `EvidencePack.fce_context: FceContextMetadata` field by calling `MemoryClient.getFceMemoryContext(query)` (v0.6.4a) — metadata-only by construction.
+> - The Auditor must validate `fce_context` via `validateFceContext` and consume it via `applyFceRiskAdvisory` — these are imported from `dist/src/agents/auditor/validator.js`.
+> - Memory recall is thread-scoped by default (v0.6.1 — pass `thread_id` and optionally `scope: "thread" | "global"` on `search` / `search_all`).
+> - Canonical BYON architecture facts are injected directly into the LLM system prompt via `renderCanonicalFactsBlock()` (v0.6.4a) — see `byon-orchestrator/scripts/lib/byon-system-facts.mjs`. This is independent of FAISS recall and ensures the Worker's prompt always carries the MACP roles, security boundary, and FCE-M policy.
+>
+> For the up-to-date end-to-end semantics see [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md) and [`ARCHITECTURE.md`](ARCHITECTURE.md). Cost / latency numbers below are reference values for Sonnet 4.5; Sonnet 4.6 is in the same order of magnitude.
 
 **Objective:** Add real AI processing in Worker for code generation, data analysis, and trading queries.
 

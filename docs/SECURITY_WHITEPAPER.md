@@ -2,9 +2,17 @@
 **BYON Optimus v1.0** | Patent: EP25216372.0 | Classification: CONFIDENTIAL
 
 **Author:** Vasile Lucian Borbeleac
-**Date:** 2026-02-07
-**Document Version:** 1.0
+**Date:** 2026-02-07 (original); **v0.6.4 addendum:** 2026-05-11
+**Document Version:** 1.0 + v0.6.4 addendum
 **Protocol Version:** MACP v1.1 (Multi-Agent Control Protocol)
+
+> **v0.6.4 addendum — FCE-M advisory boundary.** Starting v0.6.0, BYON integrates **FCE-M v0.6.0** as a morphogenetic advisory layer. Its security envelope is intentionally narrow:
+>
+> 1. **FCE-M is advisory, never authoritative.** It can raise risk level via `applyFceRiskAdvisory()` warnings on contested expressions, high-residue centers, and relation candidates. It cannot approve actions, cannot override Auditor truth verdicts, cannot bypass user approval gates.
+> 2. **`EvidencePack.fce_context` is metadata-only.** `validateFceContext()` rejects any payload containing `label`, `description`, `content`, `text`, `name`, or `title` keys; identifier arrays (`aligned_reference_fields`, `contested_expressions`, `high_residue_centers`, `risk_centers`) must be strings without spaces (hashed center IDs only); array sizes are capped.
+> 3. **Aligned ReferenceFields do not reduce risk.** `applyFceRiskAdvisory()` emits the explicit note `does NOT bypass approval` when aligned reference fields are present.
+> 4. **Bridge surface is text-only.** The WhatsApp Baileys bridge (`byon-orchestrator/scripts/byon-whatsapp-bridge.mjs`) is a conversational layer; it does NOT go through Worker → Auditor → Executor and produces no ExecutionOrder. Tool-using flows still require the full MACP pipeline.
+> 5. **Deep-suite security categories E (Auditor gate) + F (Executor isolation) report 27/27 PASS** as of v0.6.4. See [`../test-results/fcem-deep-v0.6.4a-report.md`](../test-results/fcem-deep-v0.6.4a-report.md).
 
 ---
 
