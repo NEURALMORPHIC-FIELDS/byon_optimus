@@ -136,7 +136,7 @@ class OpenAICompatibleClient implements LLMClient {
             throw new Error(`LLM API Error ${response.status}: ${errorText}`);
         }
 
-        const data = await response.json() as any;
+        const data = await response.json();
         const textContent = data.choices?.[0]?.message?.content || "";
 
         return {

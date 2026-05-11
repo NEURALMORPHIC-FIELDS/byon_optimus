@@ -1092,7 +1092,7 @@ async function runBenchmark(
     const metrics: any[] = [];
 
     // Mock context state for novel
-    let novelState = {
+    const novelState = {
         summary: "Start of a sci-fi novel about a digital entity gaining sentience.",
         characters: ["Entity-01", "Dr. Vance"],
         chapter: 0
@@ -1325,7 +1325,7 @@ async function runInfiniteBenchmark(
             { benchmark: "infinite", type: "needle" }
         );
         metrics.seeded++;
-        if (i > 0 && i % 10 === 0) console.log(`[Bench] Seeded ${i}/${needles}`);
+        if (i > 0 && i % 10 === 0) {console.log(`[Bench] Seeded ${i}/${needles}`);}
     }
 
     // 2. Distract
@@ -1337,7 +1337,7 @@ async function runInfiniteBenchmark(
             { role: "user", benchmark: "infinite", type: "haystack" }
         );
         metrics.distracted_chapters++;
-        if (i > 0 && i % 5 === 0) console.log(`[Bench] Distracted ${i}/${haystackSize}`);
+        if (i > 0 && i % 5 === 0) {console.log(`[Bench] Distracted ${i}/${haystackSize}`);}
     }
 
     // 3. Recall
@@ -1357,7 +1357,7 @@ async function runInfiniteBenchmark(
 
         // Check conversation and facts
         const checkIds = [...context.relevant_fact_ctx_ids, ...context.relevant_code_ctx_ids];
-        if (context.conversation_ctx_id) checkIds.push(context.conversation_ctx_id);
+        if (context.conversation_ctx_id) {checkIds.push(context.conversation_ctx_id);}
 
         for (const id of checkIds) {
             const entry = worker.getMemoryHandler().getEntry(id);
@@ -1377,7 +1377,7 @@ async function runInfiniteBenchmark(
             });
         }
 
-        if (metrics.recall_attempts % 10 === 0) console.log(`[Bench] Recalled ${metrics.recall_success}/${metrics.recall_attempts}`);
+        if (metrics.recall_attempts % 10 === 0) {console.log(`[Bench] Recalled ${metrics.recall_success}/${metrics.recall_attempts}`);}
     }
 
     return {
