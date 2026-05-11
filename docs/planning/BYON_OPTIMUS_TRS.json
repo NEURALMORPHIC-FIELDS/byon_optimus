@@ -1,0 +1,848 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "document_type": "TECHNICAL_REFERENCE_SPECIFICATION",
+  "document_id": "TRS-BYON-OPTIMUS-2026-001",
+  "version": "1.0.0",
+  "generated_at": "2026-02-02T06:00:00Z",
+  "patent": {
+    "number": "EP25216372.0",
+    "title": "OmniVault - Fractal-Holographic Redundant Storage System with Fractal-Chaotic Persistent Encoding",
+    "inventor": "Vasile Lucian Borbeleac",
+    "filing_date": "2025",
+    "status": "Filed"
+  },
+
+  "executive_summary": {
+    "project_name": "BYON Optimus",
+    "full_name": "Borrow Your Own Node - Optimus Multi-Agent Orchestration System",
+    "description": "A containerized, multi-agent orchestration system implementing MACP v1.1 (Multi-Agent Control Protocol) with three specialized agents (Worker, Auditor, Executor), unified through the FHRSS+FCPE infinite memory system and OpenClaw communication platform.",
+    "key_innovations": [
+      "FHRSS+FCPE: 73,000x compression with 100% recovery at 40% data loss",
+      "Air-gapped executor with cryptographic signature verification",
+      "Multi-channel unified communication (20+ platforms)",
+      "Kernel-level network enforcement via WFP Semantic Guard",
+      "File-based inter-agent communication for security isolation"
+    ],
+    "status": "Implementation Complete",
+    "location": "c:\\Users\\Lucian\\Desktop\\byon_optimus"
+  },
+
+  "architecture": {
+    "pattern": "Multi-Agent Orchestration with File-Based Handoff",
+    "protocol": "MACP v1.1 (Multi-Agent Control Protocol)",
+    "agents": {
+      "worker": {
+        "designation": "Agent A",
+        "role": "Evidence & Plan Builder",
+        "responsibilities": [
+          "Monitor inbox for incoming messages",
+          "Build EvidencePack from messages and context",
+          "Query semantic memory for relevant context",
+          "Generate PlanDraft with proposed actions",
+          "Process JohnsonReceipts and learn from outcomes"
+        ],
+        "network_access": true,
+        "api_access": ["Anthropic Claude", "Memory Service"],
+        "container": "byon-worker"
+      },
+      "auditor": {
+        "designation": "Agent B",
+        "role": "Validation & Approval Manager",
+        "responsibilities": [
+          "Validate plans against security policies",
+          "Assess risk levels (low/medium/high)",
+          "Manage user approval workflows",
+          "Sign ExecutionOrders with Ed25519",
+          "Enforce resource constraints"
+        ],
+        "network_access": true,
+        "api_access": ["Anthropic Claude", "Memory Service"],
+        "container": "byon-auditor"
+      },
+      "executor": {
+        "designation": "Agent C",
+        "role": "AIR-GAPPED Execution Engine",
+        "responsibilities": [
+          "Verify Ed25519 signatures on orders",
+          "Execute approved actions (code_edit, file_create, etc.)",
+          "Enforce resource limits (iterations, timeout, memory)",
+          "Generate JohnsonReceipt with results",
+          "Produce verification reports (tests, lint, build)"
+        ],
+        "network_access": false,
+        "api_access": [],
+        "container": "byon-executor",
+        "security": {
+          "network_mode": "none",
+          "user": "byon:byon (non-root)",
+          "no_new_privileges": true,
+          "read_only_keys": true
+        }
+      }
+    },
+    "communication_flow": {
+      "step_1": {
+        "from": "User",
+        "to": "OpenClaw Gateway",
+        "channel": "Telegram/Discord/Slack/etc.",
+        "data": "User message"
+      },
+      "step_2": {
+        "from": "OpenClaw Gateway",
+        "to": "Worker",
+        "path": "handoff/inbox/",
+        "data": "Normalized message JSON"
+      },
+      "step_3": {
+        "from": "Worker",
+        "to": "Auditor",
+        "path": "handoff/worker_to_auditor/",
+        "data": "EvidencePack + PlanDraft"
+      },
+      "step_4": {
+        "from": "Auditor",
+        "to": "User (optional)",
+        "path": "handoff/auditor_to_user/",
+        "data": "ApprovalRequest (high-risk only)"
+      },
+      "step_5": {
+        "from": "Auditor",
+        "to": "Executor",
+        "path": "handoff/auditor_to_executor/",
+        "data": "ExecutionOrder (Ed25519 signed)"
+      },
+      "step_6": {
+        "from": "Executor",
+        "to": "Worker",
+        "path": "handoff/executor_to_worker/",
+        "data": "JohnsonReceipt"
+      },
+      "step_7": {
+        "from": "Worker",
+        "to": "OpenClaw Gateway",
+        "path": "handoff/outbox/",
+        "data": "Response message"
+      },
+      "step_8": {
+        "from": "OpenClaw Gateway",
+        "to": "User",
+        "channel": "Same as input channel",
+        "data": "Formatted response"
+      }
+    }
+  },
+
+  "services": {
+    "docker_network": {
+      "name": "byon-network",
+      "driver": "bridge",
+      "subnet": "172.28.0.0/16"
+    },
+    "containers": [
+      {
+        "name": "byon-memory",
+        "service": "memory-service",
+        "role": "FHRSS+FCPE Infinite Memory",
+        "image": "Python 3.11-slim + FastAPI",
+        "port_external": 8001,
+        "port_internal": 8000,
+        "health_check": "GET /health",
+        "required": true,
+        "resources": {
+          "memory_limit": "4G",
+          "cpu_limit": "2"
+        },
+        "volumes": [
+          "./memory:/app/memory_storage:rw",
+          "./INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py:/app/fhrss_fcpe_unified.py:ro"
+        ]
+      },
+      {
+        "name": "byon-worker",
+        "service": "byon-worker",
+        "role": "Agent A - Evidence & Planning",
+        "image": "Node 22-alpine (multi-stage)",
+        "port_external": null,
+        "port_internal": null,
+        "health_check": "Node.js health script",
+        "required": true,
+        "depends_on": ["memory-service (healthy)", "redis (started)"],
+        "volumes": [
+          "./handoff/inbox:/handoff/inbox:rw",
+          "./handoff/worker_to_auditor:/handoff/worker_to_auditor:rw",
+          "./handoff/executor_to_worker:/handoff/executor_to_worker:ro",
+          "./keys:/keys:ro"
+        ]
+      },
+      {
+        "name": "byon-auditor",
+        "service": "byon-auditor",
+        "role": "Agent B - Validation & Signing",
+        "image": "Node 22-alpine (multi-stage)",
+        "port_external": null,
+        "port_internal": null,
+        "health_check": "Node.js health script",
+        "required": true,
+        "depends_on": ["memory-service (healthy)", "byon-worker (started)"],
+        "volumes": [
+          "./handoff/worker_to_auditor:/handoff/worker_to_auditor:ro",
+          "./handoff/auditor_to_user:/handoff/auditor_to_user:rw",
+          "./handoff/auditor_to_executor:/handoff/auditor_to_executor:rw",
+          "./keys:/keys:ro"
+        ]
+      },
+      {
+        "name": "byon-executor",
+        "service": "byon-executor",
+        "role": "Agent C - AIR-GAPPED Execution",
+        "image": "Node 22-alpine (minimal)",
+        "port_external": null,
+        "port_internal": null,
+        "network_mode": "none",
+        "restart_policy": "no",
+        "required": true,
+        "security": {
+          "air_gapped": true,
+          "no_api_keys": true,
+          "non_root_user": "byon:byon",
+          "no_new_privileges": true
+        },
+        "resources": {
+          "memory_limit": "2G",
+          "memory_reservation": "512M",
+          "cpu_limit": "2"
+        },
+        "volumes": [
+          "./handoff/auditor_to_executor:/handoff/auditor_to_executor:ro",
+          "./handoff/executor_to_worker:/handoff/executor_to_worker:rw",
+          "./project:/project:rw",
+          "./keys/public:/keys:ro"
+        ]
+      },
+      {
+        "name": "openclaw-gateway",
+        "service": "openclaw-gateway",
+        "role": "Communication Platform Gateway",
+        "image": "Node.js (OpenClaw)",
+        "port_external": [3000, 8080],
+        "port_internal": [3000, 8080],
+        "health_check": "GET http://localhost:3000/health",
+        "required": true,
+        "depends_on": ["memory-service (healthy)", "byon-worker (started)"],
+        "supported_channels": 20,
+        "volumes": [
+          "./handoff/inbox:/handoff/inbox:rw",
+          "./handoff/outbox:/handoff/outbox:ro",
+          "./Byon_bot/openclaw-main/data:/app/data:rw"
+        ]
+      },
+      {
+        "name": "byon-redis",
+        "service": "redis",
+        "role": "Message Queue",
+        "image": "redis:7-alpine",
+        "port_external": null,
+        "port_internal": 6379,
+        "health_check": "redis-cli ping",
+        "required": true,
+        "volumes": ["redis-data:/data"]
+      },
+      {
+        "name": "byon-watcher",
+        "service": "watcher",
+        "role": "File Change Monitor",
+        "image": "node:22-alpine",
+        "port_external": null,
+        "port_internal": null,
+        "required": false,
+        "depends_on": ["byon-worker", "byon-auditor"]
+      },
+      {
+        "name": "byon-ui",
+        "service": "byon-ui",
+        "role": "Web Dashboard",
+        "image": "Node.js (custom)",
+        "port_external": 3001,
+        "port_internal": 3001,
+        "health_check": "GET http://localhost:3001/health",
+        "required": false,
+        "depends_on": ["memory-service (healthy)", "byon-worker (started)"]
+      }
+    ]
+  },
+
+  "protocols": {
+    "macp_v1_1": {
+      "name": "Multi-Agent Control Protocol",
+      "version": "1.1",
+      "documents": [
+        {
+          "name": "EvidencePack",
+          "document_type": "EVIDENCE_PACK",
+          "created_by": "Worker",
+          "consumed_by": ["Auditor", "Plan Generator"],
+          "fields": {
+            "evidence_id": "string (UUID)",
+            "timestamp": "string (ISO8601)",
+            "task_type": "coding | scheduling | messaging | general",
+            "sources": "Source[]",
+            "extracted_facts": "ExtractedFact[]",
+            "raw_quotes": "RawQuote[]",
+            "codebase_context": "CodebaseContext",
+            "memory_context": "MemoryContext",
+            "global_memory_hint": "GlobalMemoryHint (optional)",
+            "forbidden_data_present": "boolean",
+            "hash": "string (SHA256)"
+          }
+        },
+        {
+          "name": "PlanDraft",
+          "document_type": "PLAN_DRAFT",
+          "created_by": "Worker",
+          "consumed_by": ["Auditor"],
+          "fields": {
+            "plan_id": "string (UUID)",
+            "timestamp": "string (ISO8601)",
+            "based_on_evidence": "string (evidence_id)",
+            "intent": "string",
+            "actions": "Action[]",
+            "risk_level": "low | medium | high",
+            "rollback_possible": "boolean",
+            "estimated_iterations": "number",
+            "memory_context": "MemoryContext",
+            "hash": "string (SHA256)"
+          }
+        },
+        {
+          "name": "ApprovalRequest",
+          "document_type": "APPROVAL_REQUEST",
+          "created_by": "Auditor",
+          "consumed_by": ["User"],
+          "fields": {
+            "request_id": "string (UUID)",
+            "timestamp": "string (ISO8601)",
+            "based_on_plan": "string (plan_id)",
+            "summary": "string",
+            "actions_preview": "Action[]",
+            "security_checks": "SecurityCheck[]",
+            "requires_approval": "boolean",
+            "expires_at": "string (ISO8601)",
+            "user_options": "UserOption[]",
+            "hash": "string (SHA256)"
+          }
+        },
+        {
+          "name": "ExecutionOrder",
+          "document_type": "EXECUTION_ORDER",
+          "created_by": "Auditor",
+          "consumed_by": ["Executor"],
+          "signed": true,
+          "signature_algorithm": "Ed25519",
+          "fields": {
+            "order_id": "string (UUID)",
+            "timestamp": "string (ISO8601)",
+            "based_on_plan": "string (plan_id)",
+            "approved_by": "string",
+            "approved_at": "string (ISO8601)",
+            "actions": "Action[]",
+            "constraints": {
+              "max_iterations": "number",
+              "timeout_ms": "number",
+              "memory_limit_mb": "number",
+              "disk_limit_mb": "number"
+            },
+            "rollback": {
+              "enabled": "boolean",
+              "instructions": "string (optional)"
+            },
+            "signature": "string (base64 Ed25519)",
+            "hash": "string (SHA256)"
+          }
+        },
+        {
+          "name": "JohnsonReceipt",
+          "document_type": "JOHNSON_RECEIPT",
+          "created_by": "Executor",
+          "consumed_by": ["Worker", "Audit Trail"],
+          "fields": {
+            "receipt_id": "string (UUID)",
+            "timestamp": "string (ISO8601)",
+            "based_on_order": "string (order_id)",
+            "execution_summary": {
+              "status": "success | partial | failed | rejected",
+              "actions_total": "number",
+              "actions_completed": "number",
+              "actions_failed": "number",
+              "iterations_used": "number",
+              "duration_ms": "number"
+            },
+            "action_results": "ActionResult[]",
+            "errors": "ExecutionError[]",
+            "changes_made": {
+              "files_modified": "string[]",
+              "files_created": "string[]",
+              "files_deleted": "string[]"
+            },
+            "verification": {
+              "tests_passing": "boolean | null",
+              "lint_passing": "boolean | null",
+              "build_passing": "boolean | null"
+            },
+            "hash": "string (SHA256)"
+          }
+        }
+      ],
+      "action_types": [
+        "code_edit",
+        "file_create",
+        "file_delete",
+        "file_write",
+        "file_modify",
+        "test_run",
+        "lint_run",
+        "build_run",
+        "shell_exec"
+      ],
+      "risk_levels": {
+        "low": {
+          "auto_approve": true,
+          "max_iterations": 5,
+          "timeout_minutes": 10,
+          "memory_limit_mb": 512,
+          "disk_limit_mb": 50
+        },
+        "medium": {
+          "auto_approve": false,
+          "max_iterations": 10,
+          "timeout_minutes": 30,
+          "memory_limit_mb": 1024,
+          "disk_limit_mb": 100
+        },
+        "high": {
+          "auto_approve": false,
+          "max_iterations": 3,
+          "timeout_minutes": 5,
+          "memory_limit_mb": 256,
+          "disk_limit_mb": 25
+        }
+      }
+    },
+    "wfp_semantic_guard": {
+      "name": "Windows Filtering Platform Semantic Guard",
+      "type": "Kernel Driver",
+      "purpose": "Kernel-level network enforcement based on signed intents",
+      "document": {
+        "name": "ExecutionIntent",
+        "document_type": "EXECUTION_INTENT",
+        "fields": {
+          "order_id": "string (order_[pattern])",
+          "issued_at": "string (datetime)",
+          "valid_until": "string (datetime)",
+          "capabilities": "string[]",
+          "scope": {
+            "process": "string",
+            "container": "string",
+            "destinations": "string[] (ip:port)"
+          },
+          "hash": "string (sha256:[64 hex])",
+          "signature": {
+            "alg": "ed25519",
+            "kid": "string",
+            "sig": "string (base64)"
+          }
+        }
+      },
+      "capabilities": [
+        "OUTBOUND_HTTPS",
+        "OUTBOUND_HTTP",
+        "DNS",
+        "GIT_PULL",
+        "PACKAGE_INSTALL",
+        "LOCAL_FS_WRITE",
+        "LOCAL_FS_READ"
+      ],
+      "ioctls": [
+        "IOCTL_BYON_ADD_INTENT (0x800)",
+        "IOCTL_BYON_REVOKE_INTENT (0x801)",
+        "IOCTL_BYON_FLUSH_ALL (0x802)",
+        "IOCTL_BYON_GET_STATS (0x803)"
+      ],
+      "components": {
+        "driver": "WFP-Semantic-Guard/driver/ (C, kernel-mode)",
+        "controller": "WFP-Semantic-Guard/controller/ (C++, user-mode)",
+        "shared": "WFP-Semantic-Guard/shared/ (headers, IOCTLs)"
+      }
+    }
+  },
+
+  "memory_system": {
+    "name": "FHRSS+FCPE Infinite Memory",
+    "patent_reference": "EP25216372.0",
+    "location": "INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py",
+    "size_bytes": 40602,
+    "components": {
+      "fcpe": {
+        "name": "Fractal-Chaotic Persistent Encoding",
+        "purpose": "Compress variable-length sequences to fixed-size vectors",
+        "compression_ratio": 73000,
+        "output_dimension": 384,
+        "algorithm_steps": [
+          "Feature Whitening: Normalize to mean=0, std=1",
+          "Weighted Attention Pooling: importance scores with softmax",
+          "Content-Aware Jitter: deterministic noise based on content hash",
+          "Fractal-Chaotic Iterations: 5 layers of orthogonal projections",
+          "L2 Normalization: unit vector output"
+        ],
+        "configuration": {
+          "dim": 384,
+          "num_layers": 5,
+          "lambda_s": 0.5,
+          "phi": 1.618033988749895,
+          "compression_method": "weighted_attention",
+          "use_whitening": true,
+          "use_content_seed": true,
+          "jitter_scale": 0.05
+        }
+      },
+      "fhrss": {
+        "name": "Fractal-Holographic Redundant Storage System",
+        "purpose": "Fault-tolerant storage with XOR parity recovery",
+        "recovery_capability": "100% at 40% data loss",
+        "redundancy_overhead": "30%",
+        "algorithm_steps": [
+          "Subcube Partitioning: m×m×m chunks (8×8×8=512)",
+          "XOR Parity Calculation: along 3 axes",
+          "Checksum Verification: SHA-256 integrity",
+          "Fault Recovery: reconstruct with threshold parity shares"
+        ],
+        "configuration": {
+          "subcube_size": 8,
+          "profile": "FULL",
+          "use_checksums": true
+        }
+      }
+    },
+    "api_endpoints": {
+      "base_url": "http://memory-service:8000",
+      "endpoints": [
+        {
+          "path": "/health",
+          "method": "GET/POST",
+          "purpose": "Health check"
+        },
+        {
+          "path": "/store",
+          "method": "POST",
+          "purpose": "Store code/conversation/fact",
+          "request_types": ["code", "conversation", "fact"]
+        },
+        {
+          "path": "/search",
+          "method": "POST",
+          "purpose": "Semantic similarity search",
+          "parameters": ["query", "k", "type_filter"]
+        },
+        {
+          "path": "/retrieve",
+          "method": "POST",
+          "purpose": "Retrieve context by ID",
+          "parameters": ["ctx_id"]
+        },
+        {
+          "path": "/recovery-test",
+          "method": "POST",
+          "purpose": "Test FHRSS fault tolerance",
+          "parameters": ["data_loss_percent"]
+        },
+        {
+          "path": "/stats",
+          "method": "GET",
+          "purpose": "System statistics"
+        }
+      ]
+    },
+    "storage_types": [
+      {
+        "type": "code",
+        "fields": ["code", "file_path", "line_number", "tags"]
+      },
+      {
+        "type": "conversation",
+        "fields": ["content", "role"]
+      },
+      {
+        "type": "fact",
+        "fields": ["fact", "source", "tags"]
+      }
+    ]
+  },
+
+  "security": {
+    "layers": [
+      {
+        "layer": 1,
+        "name": "Policy Engine",
+        "location": "src/policy/",
+        "controls": [
+          "Forbidden Paths Blacklist",
+          "Forbidden Patterns Detection",
+          "Resource Limits Enforcement",
+          "Risk Assessment Classification",
+          "Whitelist Action Model"
+        ]
+      },
+      {
+        "layer": 2,
+        "name": "Auditor Validation",
+        "agent": "Agent B",
+        "controls": [
+          "Security Checks Before Approval",
+          "Path Traversal Detection",
+          "Pattern Matching",
+          "Risk Level Enforcement",
+          "Ed25519 Signing"
+        ]
+      },
+      {
+        "layer": 3,
+        "name": "Air-Gapped Executor",
+        "agent": "Agent C",
+        "controls": [
+          "network_mode: none",
+          "No API Keys",
+          "Signature Verification",
+          "Non-root User",
+          "Read-only Keys"
+        ]
+      },
+      {
+        "layer": 4,
+        "name": "WFP Semantic Guard",
+        "type": "Windows Kernel Driver",
+        "controls": [
+          "Kernel-level Network Filtering",
+          "Capability-based Intent Enforcement",
+          "Per-process Network ACLs",
+          "Telemetry Collection"
+        ]
+      }
+    ],
+    "cryptography": {
+      "signing": {
+        "algorithm": "Ed25519",
+        "key_size": "256-bit",
+        "private_key_path": "keys/auditor.private.pem",
+        "public_key_path": "keys/auditor.public.pem",
+        "format": "base64"
+      },
+      "hashing": {
+        "algorithm": "SHA-256",
+        "usage": ["Document integrity", "Hash chain (audit)", "FHRSS checksums"]
+      }
+    },
+    "forbidden_paths": [
+      "/etc", "/usr", "/bin", "/sbin", "/var",
+      "C:\\Windows", "C:\\Program Files",
+      ".env", ".git", "node_modules",
+      "*.pem", "*.key", "*.secret"
+    ],
+    "forbidden_patterns": [
+      "eval(", "new Function(",
+      "fetch(", "http.request", "https.request",
+      "process.env", "require('child_process')",
+      "exec(", "spawn(", "execSync("
+    ]
+  },
+
+  "communication_channels": {
+    "gateway": "OpenClaw",
+    "total_supported": 20,
+    "categories": {
+      "messaging": ["Telegram", "Discord", "WhatsApp", "Signal", "iMessage"],
+      "corporate": ["Slack", "Microsoft Teams", "Google Chat", "Mattermost"],
+      "asian": ["LINE", "Zalo"],
+      "alternative": ["Matrix", "Nostr", "Tlon (Urbit)"],
+      "media": ["Twitch"],
+      "voice": ["Twilio", "Vonage"],
+      "email": ["SMTP/IMAP"],
+      "self_hosted": ["Nextcloud Talk"]
+    }
+  },
+
+  "directory_structure": {
+    "root": "c:\\Users\\Lucian\\Desktop\\byon_optimus",
+    "key_directories": {
+      "byon-orchestrator/": "Core TypeScript orchestrator (Node.js)",
+      "byon-orchestrator/src/agents/": "Worker, Auditor, Executor agents",
+      "byon-orchestrator/src/protocol/": "MACP v1.1 document builders",
+      "byon-orchestrator/src/memory/": "FHRSS+FCPE client & GMV",
+      "byon-orchestrator/src/policy/": "Security policies & constraints",
+      "byon-orchestrator/memory-service/": "Python FastAPI memory service",
+      "INFINIT_MEMORYCONTEXT/": "FHRSS+FCPE Python implementation",
+      "WFP-Semantic-Guard/": "Windows kernel driver",
+      "Byon_bot/openclaw-main/": "OpenClaw gateway",
+      "handoff/": "File-based inter-agent exchange",
+      "keys/": "Ed25519 cryptographic keys",
+      "memory/": "FHRSS+FCPE persistent storage",
+      "project/": "Executor workspace"
+    }
+  },
+
+  "api_ports": {
+    "external": [
+      {"port": 3000, "service": "OpenClaw Web UI", "protocol": "HTTP"},
+      {"port": 8080, "service": "OpenClaw Gateway Alt", "protocol": "HTTP"},
+      {"port": 8001, "service": "Memory Service", "protocol": "HTTP/REST"},
+      {"port": 3001, "service": "BYON Dashboard", "protocol": "HTTP"}
+    ],
+    "internal": [
+      {"port": 8000, "service": "Memory Service (internal)", "protocol": "HTTP"},
+      {"port": 6379, "service": "Redis", "protocol": "Redis"}
+    ]
+  },
+
+  "dependencies": {
+    "runtime": {
+      "docker": "24.0+",
+      "docker_compose": "v2.20+",
+      "nodejs": "22-alpine",
+      "python": "3.11-slim",
+      "redis": "7-alpine"
+    },
+    "nodejs_packages": {
+      "typescript": "^5.3.3",
+      "ajv": "^8.12.0",
+      "ajv-formats": "^2.1.1",
+      "better-sqlite3": "^11.0.0",
+      "sql.js": "^1.10.0",
+      "ts-node": "^10.9.2",
+      "vitest": "^1.2.0",
+      "eslint": "^8.56.0"
+    },
+    "python_packages": {
+      "fastapi": "0.104.1",
+      "uvicorn": "0.24.0",
+      "pydantic": "2.5.0",
+      "numpy": "1.24.3",
+      "scikit-learn": "1.3.0"
+    },
+    "external_apis": {
+      "required": ["Anthropic Claude (ANTHROPIC_API_KEY)"],
+      "optional": ["Telegram", "Discord", "Slack", "WhatsApp", "20+ channels"]
+    }
+  },
+
+  "startup_sequence": {
+    "order": [
+      {
+        "step": 1,
+        "service": "memory-service",
+        "required": true,
+        "health_check": "curl http://memory-service:8000/health",
+        "timeout": "30s start + 5s check",
+        "failure_action": "HARD STOP (exit code 10)"
+      },
+      {
+        "step": 2,
+        "service": "redis",
+        "required": true,
+        "health_check": "redis-cli ping",
+        "timeout": "5s"
+      },
+      {
+        "step": 3,
+        "service": "byon-worker",
+        "required": true,
+        "depends_on": ["memory-service (healthy)", "redis (started)"]
+      },
+      {
+        "step": 4,
+        "service": "byon-auditor",
+        "required": true,
+        "depends_on": ["memory-service (healthy)", "byon-worker (started)"]
+      },
+      {
+        "step": 5,
+        "service": "openclaw-gateway",
+        "required": true,
+        "depends_on": ["memory-service (healthy)", "byon-worker (started)"]
+      },
+      {
+        "step": 6,
+        "service": "byon-executor",
+        "required": true,
+        "trigger": "Manual (no auto-start)",
+        "note": "Triggered by ExecutionOrder presence"
+      },
+      {
+        "step": 7,
+        "service": "byon-ui",
+        "required": false,
+        "depends_on": ["memory-service (healthy)", "byon-worker (started)"]
+      }
+    ]
+  },
+
+  "execution_flow_example": {
+    "scenario": "User requests code feature via Telegram",
+    "steps": [
+      {"time": "T+0s", "action": "User sends message on Telegram", "data": "Add factorial function"},
+      {"time": "T+1s", "action": "OpenClaw normalizes and writes to inbox", "path": "handoff/inbox/msg_001.json"},
+      {"time": "T+10s", "action": "Worker builds EvidencePack + PlanDraft", "path": "handoff/worker_to_auditor/plan_001.json"},
+      {"time": "T+15s", "action": "Auditor validates, signs ExecutionOrder", "path": "handoff/auditor_to_executor/order_001.json"},
+      {"time": "T+20s", "action": "Executor runs actions, creates receipt", "path": "handoff/executor_to_worker/receipt_001.json"},
+      {"time": "T+25s", "action": "Worker processes receipt, generates response", "path": "handoff/outbox/response_001.json"},
+      {"time": "T+26s", "action": "OpenClaw sends response to Telegram", "data": "Successfully added factorial function!"}
+    ],
+    "total_time": "~26 seconds"
+  },
+
+  "files_manifest": {
+    "documentation": [
+      {"path": "README.md", "size_kb": 16, "purpose": "Quick start guide"},
+      {"path": "INSTALL.md", "size_kb": 18, "purpose": "Installation guide"},
+      {"path": "JOHNSON_PLAN.md", "size_kb": 44, "purpose": "Master implementation plan (12 phases)"},
+      {"path": "BYON_EXECUTION_PLAN.json", "size_kb": 53, "purpose": "Execution phases JSON"},
+      {"path": "BYON_PROGRESSION.json", "size_kb": 64, "purpose": "Phase tracking"}
+    ],
+    "configuration": [
+      {"path": "docker-compose.yml", "lines": 328, "purpose": "Service orchestration"},
+      {"path": "byon-config.ts", "lines": 439, "purpose": "Unified configuration"},
+      {"path": ".env.example", "lines": 161, "purpose": "Environment template"}
+    ],
+    "core_code": [
+      {"path": "byon-orchestrator/src/types/protocol.ts", "lines": 506, "purpose": "MACP v1.1 types"},
+      {"path": "byon-orchestrator/src/agents/worker/index.ts", "purpose": "Worker agent"},
+      {"path": "byon-orchestrator/src/agents/auditor/index.ts", "purpose": "Auditor agent"},
+      {"path": "byon-orchestrator/src/agents/executor/index.ts", "purpose": "Executor agent"},
+      {"path": "INFINIT_MEMORYCONTEXT/fhrss_fcpe_unified.py", "size_kb": 40, "purpose": "FHRSS+FCPE algorithm"}
+    ],
+    "wfp_driver": [
+      {"path": "WFP-Semantic-Guard/driver/Main.c", "lines": 149, "purpose": "Kernel driver entry"},
+      {"path": "WFP-Semantic-Guard/driver/Callouts.c", "purpose": "WFP callouts"},
+      {"path": "WFP-Semantic-Guard/controller/WfpManager.cpp", "purpose": "User-mode controller"},
+      {"path": "WFP-Semantic-Guard/protocol/schema.json", "purpose": "Intent JSON schema"},
+      {"path": "WFP-Semantic-Guard/shared/structures.h", "lines": 56, "purpose": "Shared data structures"}
+    ]
+  },
+
+  "validation_status": {
+    "all_phases_complete": true,
+    "total_phases": 12,
+    "implementation_status": "COMPLETE",
+    "tested_components": [
+      "FHRSS+FCPE compression (73,000x verified)",
+      "FHRSS recovery (100% at 40% loss verified)",
+      "Ed25519 signing/verification",
+      "Policy engine forbidden paths/patterns",
+      "Air-gapped executor isolation"
+    ]
+  },
+
+  "metadata": {
+    "document_generated_by": "Claude Opus 4.5",
+    "generation_date": "2026-02-02",
+    "schema_version": "1.0.0",
+    "iso_standard_reference": "ISO/IEC/IEEE 42010:2022 (Software Architecture Description)"
+  }
+}

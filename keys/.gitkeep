@@ -1,0 +1,9 @@
+# Ed25519 cryptographic keys directory
+# Contents are NEVER committed (security)
+#
+# Required keys:
+#   auditor.private.pem - Auditor's signing key
+#   auditor.public.pem  - Verification key (also in public/)
+#   public/             - Public keys for Executor
+#
+# Generate keys with: npm run keygen (in byon-orchestrator)

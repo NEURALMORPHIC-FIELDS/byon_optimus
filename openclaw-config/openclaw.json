@@ -1,0 +1,73 @@
+{
+  "gateway": {
+    "trustedProxies": [
+      "172.16.0.0/12",
+      "172.28.0.0/16",
+      "192.168.0.0/16",
+      "10.0.0.0/8"
+    ],
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "dangerouslyDisableDeviceAuth": true
+    }
+  },
+  "web": {
+    "enabled": true
+  },
+  "plugins": {
+    "slots": {
+      "memory": "memory-faiss"
+    },
+    "entries": {
+      "memory-faiss": {
+        "enabled": true,
+        "config": {
+          "serviceUrl": "http://memory-service:8000"
+        }
+      },
+      "whatsapp": { "enabled": true },
+      "telegram": { "enabled": true },
+      "discord": { "enabled": true },
+      "slack": { "enabled": true },
+      "signal": { "enabled": true },
+      "matrix": { "enabled": true },
+      "msteams": { "enabled": true },
+      "googlechat": { "enabled": true },
+      "imessage": { "enabled": true },
+      "line": { "enabled": true },
+      "mattermost": { "enabled": true },
+      "twitch": { "enabled": true },
+      "nostr": { "enabled": true },
+      "bluebubbles": { "enabled": true },
+      "voice-call": { "enabled": true }
+    }
+  },
+  "channels": {
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": ["*"]
+    }
+  },
+  "hooks": {
+    "enabled": true,
+    "token": "BYON_HOOK_TOKEN_CHANGE_ME",
+    "path": "/hooks",
+    "presets": ["gmail"],
+    "gmail": {
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "thinking": "off"
+    },
+    "mappings": [
+      {
+        "match": { "path": "gmail" },
+        "action": "agent",
+        "wakeMode": "now",
+        "name": "Gmail",
+        "sessionKey": "hook:gmail:{{messages[0].id}}",
+        "messageTemplate": "New email from {{messages[0].from}}\nSubject: {{messages[0].subject}}\n{{messages[0].snippet}}\n{{messages[0].body}}",
+        "deliver": true,
+        "channel": "last"
+      }
+    ]
+  }
+}

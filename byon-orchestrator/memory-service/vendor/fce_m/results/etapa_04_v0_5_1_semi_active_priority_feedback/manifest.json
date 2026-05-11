@@ -1,0 +1,42 @@
+{
+  "etapa": "04",
+  "version": "v0.5.1",
+  "short_name": "semi_active_priority_feedback",
+  "date": "2026-05-11",
+  "previous_total_tests": 241,
+  "new_total_tests": 254,
+  "tests_added": [
+    "tests/fce_omega_functional/test_19_semi_active_advisory.py (13 tests)"
+  ],
+  "files_modified": [
+    "unified_fragmergent_memory/facade/config.py",
+    "unified_fragmergent_memory/facade/memory_store.py",
+    "unified_fragmergent_memory/runtime/fce_omega_observer.py",
+    "tests/fce_omega_functional/test_12_persistence_reload.py",
+    "tests/fce_omega_functional/test_19_semi_active_advisory.py (new)",
+    "tools/fce_functional_report.py (note update)",
+    "CHANGELOG.md (v0.5.1 section)"
+  ],
+  "capabilities_confirmed": [
+    "fce_advisory_mode defaults to 'read_only' -> v0.5.0 byte-identical",
+    "'priority_only' emits FCEAdvisoryFeedback with bounded priority_delta in [-1,1]",
+    "6 kinds: high_residue, near_coagulation, coagulated_reference, contested_expression, fragmented, relation_candidate",
+    "full provenance: source_trace_ids + source_omega_ids + source_relation_candidate_ids + 16-hex feedback_id",
+    "epistemic status preserved: slot_event_log zones identical priority_only vs read_only",
+    "Omega registry byte-equal between read_only and priority_only on same input",
+    "no hidden write-back: runtime adapter snapshots identical across modes",
+    "near_coagulation recommends incubation BEFORE Omega fires",
+    "contested_expression recommends review WITHOUT uncoagulating",
+    "relation_candidate recommends relation review WITHOUT creating any new relation registry",
+    "persist/load roundtrips advisory_feedback_log (payload v0.5.1)"
+  ],
+  "limitations_remaining": [
+    "feedback consumption is left to the caller; observer never marks 'applied=True' itself",
+    "priority deltas use heuristic class constants; no learned calibration",
+    "no 'relation registry' first-class persistence (Etapa 5 / v0.6.0)",
+    "no ReferenceField yet (v0.6.0 native memory prototype)"
+  ],
+  "integration_mode": "semi_active",
+  "invariants_preserved": true,
+  "notes": "First semi-active mode. FCE-Omega now influences attention (priority metadata) but never truth (slot zones, Omega registry, runtime adapter all unchanged). Mission \u00a76 invariants verified by registry-equality test."
+}

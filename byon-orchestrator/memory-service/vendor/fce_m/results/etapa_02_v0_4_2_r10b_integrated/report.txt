@@ -1,0 +1,20 @@
+FCE-Omega functional integration report
+=======================================
+  UFME unit tests:               140
+  FCE-Omega unit tests:          20
+  FCE-Omega functional tests:    71
+  total tests:                   231
+
+Functional capability checks (PASS=True):
+  observer active/passive invariance: True
+  residue detected:                   True
+  Omega irreversibility:              True
+  advisory no-truth-override:         True
+  multiperspectival normalization:    True
+  provenance complete:                True
+  persistence roundtrip:              True
+  vendor layout clean:                True
+
+Notes:
+  - workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'contested_expression', 'high_residue']
+  - Integration mode: PASSIVE + advisory (v0.4.2). Advisory channel exposes read-only hints; no UFME write-back. Anchor is per-center. R10b coagulation reproduced end-to-end via check_coagulation rule (see experiments/r10b_integrated_phoenix.py).

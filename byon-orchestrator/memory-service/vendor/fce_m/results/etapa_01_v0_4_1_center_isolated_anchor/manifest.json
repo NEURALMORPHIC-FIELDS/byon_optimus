@@ -1,0 +1,39 @@
+{
+  "etapa": "01",
+  "version": "v0.4.1",
+  "short_name": "center_isolated_anchor",
+  "date": "2026-05-11",
+  "previous_total_tests": 213,
+  "new_total_tests": 222,
+  "tests_added": [
+    "tests/fce_omega_functional/test_16_center_isolated_anchor.py (8 tests)",
+    "tests/fce_omega_functional/test_10_coagulated_reference_field.py (+1: test_anchor_isolated_to_own_center)"
+  ],
+  "files_modified": [
+    "unified_fragmergent_memory/bridges/fce_translator.py",
+    "unified_fragmergent_memory/runtime/fce_omega_observer.py",
+    "tests/fce_omega_functional/test_09_directed_interaction.py",
+    "tests/fce_omega_functional/test_10_coagulated_reference_field.py",
+    "tests/fce_omega_functional/test_12_persistence_reload.py",
+    "tests/fce_omega_functional/test_16_center_isolated_anchor.py",
+    "tools/fce_functional_report.py",
+    "CHANGELOG.md"
+  ],
+  "capabilities_confirmed": [
+    "per-center anchor (committed/provisional/disputed counted per center)",
+    "bitwise isolation: A.kappa(solo)==A.kappa(mixed), A.Z_norm bit-equal",
+    "Omega on A does not seed anchor mass on B",
+    "backward-compat: anchor_from_runtime_snapshot still exported",
+    "persist/load roundtrips per-center zone counts (payload v0.4.1)",
+    "metrics_snapshot exposes center_anchors and center_zone_counts"
+  ],
+  "limitations_remaining": [
+    "in-episode aggregation: one delta_X per (center,episode)",
+    "Z_norm not a reliable discrimination axis (use AR/kappa)",
+    "directed interactions inter-center not yet wired in observer (Etapa 3 / v0.5.0)",
+    "R0-R11 not reproduced explicitly in integrated runtime (Etapa 2 / v0.4.2)"
+  ],
+  "integration_mode": "passive_with_advisory",
+  "invariants_preserved": true,
+  "notes": "Closes the v0.4.0 global-anchor coupling channel. Integration remains passive + advisory; advisory hints stay read-only."
+}

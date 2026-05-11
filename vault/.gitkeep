@@ -1,0 +1,12 @@
+# BYON Secure Vault
+# This directory stores encrypted sensitive data
+# All contents except .gitkeep are gitignored
+#
+# Categories:
+# - credentials/ : API keys, passwords, tokens
+# - keys/        : SSH, GPG, crypto keys
+# - financial/   : Banking, wallets, trading
+# - documents/   : Legal, medical, personal
+# - secrets/     : Generic secrets
+#
+# Security: All data encrypted with GPG or AES-256-GCM

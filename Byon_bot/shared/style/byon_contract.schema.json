@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "byon://schema/style-contract/v1",
+  "title": "BYON Style Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "agent_role",
+    "axis",
+    "decision",
+    "constraints",
+    "options",
+    "next_action",
+    "output",
+    "meta"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "agent_role": {
+      "type": "string",
+      "enum": ["worker", "auditor", "executor"]
+    },
+    "axis": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 180,
+      "description": "Axa curentă (tema strictă)."
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 220,
+      "description": "Decizia sau punctul de ieșire."
+    },
+    "constraints": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 200
+      },
+      "description": "Ce NU se face / limite."
+    },
+    "options": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "steps", "risk", "requires_user_approval"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-C]$",
+            "description": "A, B, C"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 7,
+            "items": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 220
+            }
+          },
+          "risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "requires_user_approval": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Maxim 3 opțiuni concrete."
+    },
+    "next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "action", "deadline"],
+      "properties": {
+        "owner": {
+          "type": "string",
+          "enum": ["user", "agent"],
+          "description": "Cine face pasul următor."
+        },
+        "action": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200,
+          "description": "What needs to be done."
+        },
+        "deadline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "description": "Deadline: 'now', 'today', '2026-02-01', etc."
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "content"],
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["markdown", "text", "json", "code"]
+        },
+        "content": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 5000,
+          "description": "Output-ul efectiv."
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_at", "language", "style_flags"],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["ro", "en"]
+        },
+        "style_flags": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "no_psychology",
+            "no_empathy",
+            "no_stories",
+            "administrative",
+            "structured"
+          ],
+          "properties": {
+            "no_psychology": { "type": "boolean", "const": true },
+            "no_empathy": { "type": "boolean", "const": true },
+            "no_stories": { "type": "boolean", "const": true },
+            "administrative": { "type": "boolean", "const": true },
+            "structured": { "type": "boolean", "const": true }
+          }
+        }
+      }
+    }
+  }
+}

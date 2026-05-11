@@ -1,0 +1,42 @@
+{
+  "etapa": "03",
+  "version": "v0.5.0",
+  "short_name": "multiperspectival_observer",
+  "date": "2026-05-11",
+  "previous_total_tests": 231,
+  "new_total_tests": 241,
+  "tests_added": [
+    "tests/fce_omega_functional/test_18_multiperspectival_observer.py (10 tests)"
+  ],
+  "files_modified": [
+    "unified_fragmergent_memory/facade/config.py",
+    "unified_fragmergent_memory/facade/memory_store.py",
+    "unified_fragmergent_memory/runtime/fce_omega_observer.py",
+    "tests/fce_omega_functional/test_12_persistence_reload.py",
+    "tests/fce_omega_functional/test_18_multiperspectival_observer.py (new)",
+    "tools/fce_functional_report.py (note update)",
+    "CHANGELOG.md (v0.5.0 section)"
+  ],
+  "capabilities_confirmed": [
+    "multiperspectival observer composes directional interactions for co-active center pairs",
+    "absorption / repulsion / interference / directional coagulation computed via vendor primitives",
+    "interference antisymmetry K_ij + K_ji = 0 verified bit-perfect in runtime",
+    "I_i<-j != I_j<-i (directional asymmetry preserved under unequal capacities)",
+    "class-wise normalization: directional terms / N(N-1), shared coag / N(N-1)/2 -> total bounded for N=1/4/8/16",
+    "shared-coagulation candidates emitted as RelationCandidate; do NOT auto-flip individual Omega",
+    "reference-field anchor from Omega centers influences disrupt_eff but cannot replace threshold rule",
+    "per-center isolation (v0.4.1) preserved when centers are not co-active in same consolidate pass",
+    "passive invariance: runtime ops, signals, audit_log identical OFF vs ON",
+    "persist/load roundtrips interaction_log and relation_candidates (payload v0.5.0)"
+  ],
+  "limitations_remaining": [
+    "in-episode aggregation still aggregates per-center observations into a single delta_X (Etapa 5 may revisit)",
+    "Z_norm not a reliable single-axis discriminator (AR/kappa preferred)",
+    "advisory feedback still read-only; queues / priorities are v0.5.1 work",
+    "relation candidates produce metadata only; no relation registry persisted as first-class entity",
+    "Phi_a for interference is seeded per (center, episode); reproducible but synthetic"
+  ],
+  "integration_mode": "passive_with_advisory",
+  "invariants_preserved": true,
+  "notes": "Multiperspectival observer is opt-in (default OFF) and remains passive: traces and candidates are audit, never UFME write-back. Reference-field anchor cannot coagulate B from A alone."
+}

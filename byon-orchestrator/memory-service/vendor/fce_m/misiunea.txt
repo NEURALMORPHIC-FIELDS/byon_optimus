@@ -1,0 +1,339 @@
+Da. Integrarea corectă este să nu bagi **FCE-Ω** ca „încă un memory engine”, ci ca **strat morfogenetic peste Unified Fragmergent Memory Engine**.
+
+UFME este deja construit ca fațadă unificată peste trei surse: `D_CORTEX_ULTIMATE`, `fragmergent-tf-engine` și `fragmergent-memory-engine`, păstrând sursele read-only și expunând API comun de read/write/propagate/consolidate. Repo-ul insistă explicit pe non-diluție: nu modifică sursele, nu le rezumă și păstrează simbolurile publice accesibile prin namespace separat. ([GitHub][1])
+
+FCE-Ω trebuie integrat exact în această logică: **nu ca înlocuitor al surselor**, ci ca strat care observă ce fac ele și decide ce devine reziduu, ce devine tensiune, ce devine nucleu și ce trece pragul de coagulare Ω.
+
+---
+
+## 1. Poziția FCE-Ω în UFME
+
+Aș defini integrarea așa:
+
+**UFME = corpul de memorie unificat.
+FCE-Ω = dinamica de coagulare, reziduu și referință internă peste acel corp.**
+
+UFME știe deja să gestioneze:
+
+* memorie simbolică prin `memory_engine_runtime`;
+* memorie numerică prin `tf_engine`;
+* primitive brute D_Cortex prin escape hatch;
+* consolidare episodică;
+* audit și routing după forma intrării. ([GitHub][1])
+
+FCE-Ω adaugă altceva:
+
+* urmărește cum o intrare modifică câmpul intern;
+* măsoară cât se asimilează și cât rămâne reziduu;
+* calculează expresia funcțională `S_t`;
+* marchează coagulări ireversibile `Ω`;
+* construiește câmpuri de referință din nucleele coagulate.
+
+Repo-ul FCE-Ω este deja formulat ca framework pentru cauzalitate ca exponențiere contextuală asimetrică, cu `Z_t` pentru reziduu, `S_t` pentru self-index și `Ω_s` ca registru ireversibil de coagulare. ([GitHub][2])
+
+---
+
+## 2. Principiul de integrare: pasiv întâi, activ după
+
+Prima regulă: **FCE-Ω nu trebuie să atingă direct adevărul epistemic.**
+
+Adică nu are voie să spună:
+
+„această memorie este adevărată”
+sau
+„această memorie trebuie suprascrisă”.
+
+Asta rămâne treaba D_Cortex / runtime / arbiter.
+
+FCE-Ω spune altceva:
+
+„această memorie a produs reziduu”
+„această configurație stabilizează câmpul”
+„acest centru a devenit referință”
+„acest episod a produs tensiune neintegrată”
+„acest cluster semantic se apropie de coagulare Ω”.
+
+Deci rolul lui FCE-Ω este **morfogenetic**, nu epistemic.
+
+---
+
+## 3. Structura nouă în proiect
+
+Aș adăuga în UFME patru zone noi.
+
+Prima: **source wrapper pentru FCE-Ω**
+În spiritul repo-ului actual, FCE-Ω poate fi tratat ca source separat, dar nu pentru routing obișnuit read/write. Ar trebui pus ca namespace separat, de tip:
+
+`unified_fragmergent_memory.sources.fce_omega`
+
+Rolul lui: acces la funcțiile FCE-Ω originale, fără modificare.
+
+A doua: **bridge semantic către FCE**
+Aici traduci evenimentele UFME în centre dinamice FCE.
+
+De exemplu:
+
+* o entitate simbolică devine centru dinamic;
+* o relație entity/attr devine vector de influență;
+* o memorie disputată crește reziduul;
+* o memorie committed crește coerența;
+* o propagare numerică din `tf_engine` actualizează câmpul;
+* o consolidare episodică devine fereastră de coagulare.
+
+A treia: **runtime FCE observer**
+Acesta rulează după fiecare episod sau consolidare. Nu schimbă încă deciziile. Doar înregistrează:
+
+* câmpul activ;
+* centrele dinamice;
+* reziduul;
+* scorul `S_t`;
+* pragurile de coagulare;
+* eventualele `Ω`.
+
+A patra: **Omega Registry**
+Aici este piesa serioasă. Trebuie un registru separat pentru nucleele coagulate.
+
+Nu îl pui în memorie obișnuită.
+
+Un `Ω` nu este doar o memorie. Este un **punct de referință**. După coagulare, nu mai trebuie tratat ca episod oarecare. Expresia lui poate fluctua, dar registrul rămâne.
+
+---
+
+## 4. Maparea dintre UFME și FCE-Ω
+
+În `memory_engine_runtime`, ai zone de tip committed, provisional, disputed, plus consolidare longitudinală. Repo-ul public descrie runtime-ul ca „living tissue” cu zone committed/provisional/disputed, consolidare, reconcile/prune/retrograde/promote și canal advisory. ([GitHub][1])
+
+Asta se potrivește direct cu FCE-Ω:
+
+**committed** crește stabilitatea câmpului;
+**provisional** creează tensiune activă, dar încă necoagulată;
+**disputed** produce reziduu sau conflict de câmp;
+**retrograde** poate semnala tensiune latentă;
+**promote** poate fi interpretat ca episod de asimilare;
+**consolidate** devine locul natural unde verifici dacă apare `Ω`.
+
+În `tf_engine`, vectorii numerici pot deveni suport pentru câmpul `X`. Repo-ul descrie `tf_engine` ca static retrieval bank cu vectori Husimi, MI scalar, attention softmax/MI/hybrid și propagare EMA top-k. ([GitHub][1])
+
+Asta poate alimenta partea continuă a FCE:
+
+* câmp numeric;
+* distanțe;
+* rotații de vector;
+* interferență;
+* reziduu vectorial;
+* stabilitate a clusterelor.
+
+În `d_cortex`, partea object-relational cu statusuri epistemice poate da criteriul de adevăr și conflict. FCE nu decide adevărul, ci folosește statusul epistemic ca input pentru coerență și reziduu. ([GitHub][1])
+
+---
+
+## 5. Pipeline-ul integrat
+
+Fluxul corect ar fi:
+
+Utilizatorul sau sistemul introduce o memorie.
+
+UFME o rutează normal: simbolică spre `memory_engine_runtime`, numerică spre `tf_engine`, raw spre `d_cortex` dacă e cerut explicit. Routing-ul actual face deja asta după forma intrării și permite `source=` override. ([GitHub][1])
+
+După write/read/consolidate, FCE-Ω primește un eveniment observabil:
+
+„ce s-a schimbat în câmp?”
+
+Apoi calculează:
+
+* ce parte a fost asimilată;
+* ce parte a rămas reziduu;
+* dacă reziduul a crescut;
+* dacă centrul semantic și-a crescut coerența;
+* dacă există fereastră de coagulare;
+* dacă un nucleu trebuie marcat `Ω`.
+
+Apoi scrie doar în audit / morphogenesis log:
+
+„acest episod a produs reziduu activ”
+„acest cluster a crescut spre coagulare”
+„acest centru a coagulat Ω”
+„acest Ω devine câmp de referință pentru viitoare interpretări”.
+
+---
+
+## 6. Ce nu trebuie făcut
+
+Nu trebuie ca FCE-Ω să modifice direct output-ul.
+
+Nu trebuie ca `Ω` să devină sinonim cu „adevăr”.
+
+Nu trebuie ca un `Ω` să blocheze corecția epistemică.
+
+Asta e foarte important: un nucleu coagulat poate fi identitar pentru sistem, dar dacă datele brute îl contrazic, stratul epistemic trebuie să rămână capabil să marcheze conflictul.
+
+Deci:
+
+**D_Cortex verifică adevărul.
+UFME gestionează memoria.
+FCE-Ω măsoară devenirea internă.**
+
+Asta păstrează sistemul sănătos.
+
+---
+
+## 7. Etapele de implementare
+
+### Etapa 1 — integrare pasivă
+
+Adaugi FCE-Ω ca sursă/wrapper, dar fără feedback asupra memoriei.
+
+Scopul: toate testele actuale UFME trebuie să treacă neschimbate.
+
+Aici verifici doar:
+
+* import;
+* acces la funcțiile FCE;
+* reproducere minimală a R0–R11;
+* audit separat.
+
+Această etapă respectă invarianta actuală a repo-ului: sursele rămân read-only și primitivele rămân accesibile prin namespace. ([GitHub][1])
+
+### Etapa 2 — morphogenesis observer
+
+Introduci un observator care rulează după `consolidate`.
+
+El construiește evenimente FCE din operațiile UFME.
+
+Output-ul lui este doar raport:
+
+* assimilation score;
+* residue score;
+* coherence estimate;
+* self-index;
+* omega candidate;
+* active field deformation.
+
+Nu schimbă încă nimic în routing.
+
+### Etapa 3 — residue-aware audit
+
+Reziduul devine parte din audit log.
+
+Aici poți vedea ce entități sau relații produc tensiune neintegrată.
+
+Practic, sistemul începe să poată spune:
+
+„nu doar că această informație este disputed, ci că ea deformează câmpul viitor.”
+
+Asta este mare diferență.
+
+### Etapa 4 — Omega Registry
+
+Când un centru trece pragul, se creează un `OmegaRecord`.
+
+Acest record trebuie să conțină:
+
+* `omega_id`;
+* centrul semantic;
+* sursele care au contribuit;
+* episoadele de coagulare;
+* durata peste prag;
+* `S_t` la coagulare;
+* expresia curentă `EΩ`;
+* referințe la audit;
+* status: active/inexpressed/contested, dar niciodată „uncoagulated”.
+
+Important: `Ω` poate deveni contestat ca expresie, dar nu dispare ca fapt istoric de coagulare.
+
+### Etapa 5 — feedback advisory
+
+Abia aici FCE-Ω începe să influențeze UFME.
+
+Dar doar ca **advisory channel**, nu ca decizie obligatorie.
+
+De exemplu:
+
+* crește prioritatea de consolidare pentru memorii legate de un Ω;
+* scade încrederea operațională în zone cu reziduu mare;
+* marchează conflicte ca structurale, nu doar locale;
+* recomandă fereastră de incubație înainte de integrarea unui cluster instabil;
+* semnalează când o nouă informație amenință doar expresia unui Ω, nu registrul lui.
+
+### Etapa 6 — native memory direction
+
+UFME spune în README că `native memory` este încă viitor, iar proiectul curent revendică substrate, protocol, internalization și consolidation. ([GitHub][1])
+
+FCE-Ω ar putea deveni exact puntea spre native memory.
+
+De ce?
+
+Pentru că native memory nu înseamnă doar să ai acces la trecut. Înseamnă ca trecutul să devină structură internă de referință.
+
+Asta este `Ω`.
+
+---
+
+## 8. Ce teste trebuie adăugate
+
+Testele nu trebuie să fie doar unitare. Trebuie să fie teste de comportament sistemic.
+
+Primul test: **non-regression**
+Toate testele UFME existente trebuie să treacă exact la fel cu FCE pasiv.
+
+Al doilea: **observer invariance**
+Cu FCE activ pasiv, read/write/consolidate trebuie să dea aceleași rezultate ca înainte.
+
+Al treilea: **residue accumulation**
+O secvență de intrări conflictuale trebuie să crească `Z`, nu să dispară.
+
+Al patrulea: **omega irreversibility**
+Când `Ω=1`, scăderea ulterioară a expresiei `S_t` nu are voie să readucă `Ω=0`.
+
+Al cincilea: **not-truth test**
+Un `Ω` nu are voie să suprascrie o decizie epistemică de tip disputed/rejected.
+
+Al șaselea: **multiperspectival normalization**
+Mai multe centre active nu au voie să explodeze câmpul doar prin numărul lor. Trebuie normalizare pe clase de termeni.
+
+Al șaptelea: **source provenance**
+Fiecare `Ω` trebuie să poată fi urmărit până la sursele și episoadele care l-au produs.
+
+---
+
+## 9. Versiunea de release
+
+Dacă luăm linia ta actuală ca direcție de dezvoltare, aș împărți așa:
+
+**v0.4.0 — FCE Passive Integration**
+Wrapper + observer + reproducere R0–R11 + audit separat.
+
+**v0.4.1 — Residue-Aware Consolidation Audit**
+Reziduul devine vizibil în audit și în rapoarte.
+
+**v0.5.0 — Omega Registry**
+Apar `OmegaRecord`, `SelfIndexTrace`, `ExpressionState`.
+
+**v0.5.1 — Advisory Feedback**
+FCE influențează priorități, nu adevăruri.
+
+**v0.6.0 — Native Memory Prototype**
+Ω-nucleele devin câmpuri de referință pentru asimilarea viitoare.
+
+---
+
+## 10. Formula arhitecturală finală
+
+Integrarea trebuie definită așa:
+
+**UFME unifică memoria.
+FCE-Ω îi dă memoriei devenire.
+D_Cortex verifică adevărul.
+Runtime-ul consolidează episoadele.
+Omega Registry marchează ceea ce a devenit ireversibil referențial.**
+
+Aceasta este cheia.
+
+Nu transformi FCE-Ω într-un motor paralel care concurează cu UFME. Îl transformi în **stratul care spune ce efect ontologic au operațiile de memorie asupra câmpului intern**.
+
+Într-o frază:
+
+**FCE-Ω trebuie să fie stratul morfogenetic al Unified Fragmergent Memory Engine: stratul care transformă memoria din arhivă într-un câmp de coagulare, reziduu și referință.**
+
+[1]: https://github.com/NEURALMORPHIC-FIELDS/unified-fragmergent-memory-engine "GitHub - NEURALMORPHIC-FIELDS/unified-fragmergent-memory-engine: Unified Fragmergent Memory Engine is an installable, non-diluting integration of `D_CORTEX_ULTIMATE`, `fragmergent-tf-engine`, and `fragmergent-memory-engine`. The three source projects remain read-only siblings. · GitHub"
+[2]: https://github.com/NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation "GitHub - NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation: FCE-Ω: Fragmergent Causal Exponentiation with Omega-Coagulation. A formal framework modeling causality as asymmetric contextual Lie-group exponentiation over shared dynamic fields. Introduces irreversible self-referential coagulation (Ω_s), active residue dynamics, and a computationally tractable Self-Index S_t. · GitHub"

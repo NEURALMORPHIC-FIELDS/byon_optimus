@@ -1,0 +1,51 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.13, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Users\Lucian\Desktop\fragmergent-causal-exponentiation memory
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0
+collected 231 items
+
+tests\async_coupling\test_async.py ..............                        [  6%]
+tests\auto_registration\test_auto_registration.py ..............         [ 12%]
+tests\bridges\test_convention_translators.py .........                   [ 16%]
+tests\bridges\test_shape_translators.py .........                        [ 19%]
+tests\cross_substrate\test_cross_substrate_pressure.py ................. [ 27%]
+                                                                         [ 27%]
+tests\cross_substrate\test_cycle.py ............                         [ 32%]
+tests\facade\test_orchestrator.py ..                                     [ 33%]
+tests\facade\test_unified_memory_store.py ...............                [ 39%]
+tests\fce_omega\test_non_regression.py ....                              [ 41%]
+tests\fce_omega\test_not_truth.py ...                                    [ 42%]
+tests\fce_omega\test_observer_invariance.py ..                           [ 43%]
+tests\fce_omega\test_omega_irreversibility.py ....                       [ 45%]
+tests\fce_omega\test_passthrough_fce_omega.py ....                       [ 47%]
+tests\fce_omega\test_residue_accumulation.py .                           [ 47%]
+tests\fce_omega\test_source_provenance.py ..                             [ 48%]
+tests\fce_omega_functional\test_01_baseline_invariance.py ....           [ 50%]
+tests\fce_omega_functional\test_02_event_translation.py ........         [ 53%]
+tests\fce_omega_functional\test_03_residue_accumulation.py ..            [ 54%]
+tests\fce_omega_functional\test_04_assimilation_vs_residue.py ..         [ 55%]
+tests\fce_omega_functional\test_05_omega_irreversibility.py ...          [ 56%]
+tests\fce_omega_functional\test_06_omega_not_truth.py ...                [ 58%]
+tests\fce_omega_functional\test_07_advisory_channel.py ....              [ 59%]
+tests\fce_omega_functional\test_08_multiperspectival_normalization.py .. [ 60%]
+.                                                                        [ 61%]
+tests\fce_omega_functional\test_09_directed_interaction.py ....          [ 62%]
+tests\fce_omega_functional\test_10_coagulated_reference_field.py ....    [ 64%]
+tests\fce_omega_functional\test_11_provenance_chain.py ...               [ 65%]
+tests\fce_omega_functional\test_12_persistence_reload.py ...             [ 67%]
+tests\fce_omega_functional\test_13_vendor_integrity.py .....             [ 69%]
+tests\fce_omega_functional\test_14_reproduce_script.py ....              [ 70%]
+tests\fce_omega_functional\test_15_functional_report.py ..               [ 71%]
+tests\fce_omega_functional\test_16_center_isolated_anchor.py ........    [ 75%]
+tests\fce_omega_functional\test_17_r10b_integrated_reproduction.py ..... [ 77%]
+....                                                                     [ 79%]
+tests\natural_branch_flip\test_branch_flip.py ..........                 [ 83%]
+tests\natural_coupling\test_natural_pressure.py ..............           [ 89%]
+tests\organism_driven\test_cognitive_coupling.py ........                [ 93%]
+tests\passthrough\test_d_cortex_passthrough.py ....                      [ 94%]
+tests\passthrough\test_memory_engine_runtime_passthrough.py ......       [ 97%]
+tests\passthrough\test_tf_engine_passthrough.py ......                   [100%]
+
+============================ 231 passed in 14.79s =============================

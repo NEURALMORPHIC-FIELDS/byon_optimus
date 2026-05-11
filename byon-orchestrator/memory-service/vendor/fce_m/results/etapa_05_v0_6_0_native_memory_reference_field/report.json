@@ -1,0 +1,18 @@
+{
+  "n_ufme_tests": 140,
+  "n_fce_omega_unit_tests": 20,
+  "n_fce_omega_functional_tests": 108,
+  "n_tests_total": 268,
+  "observer_active_passive_invariance": true,
+  "residue_detected": true,
+  "omega_irreversibility": true,
+  "advisory_no_truth_override": true,
+  "multiperspectival_normalization": true,
+  "provenance_complete": true,
+  "persistence_roundtrip": true,
+  "vendor_layout_clean": true,
+  "notes": [
+    "workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'contested_expression', 'high_residue']",
+    "Integration mode: NATIVE MEMORY PROTOTYPE (v0.6.0). OmegaRecord is the irreversible historical fact; ReferenceField is the derived functional field that reads future events morphogenetically (aligned, contested, residue_amplifying, etc.) and may fluctuate in strength / expression_state. Truth-status remains runtime-authoritative; no UFME write-back."
+  ]
+}

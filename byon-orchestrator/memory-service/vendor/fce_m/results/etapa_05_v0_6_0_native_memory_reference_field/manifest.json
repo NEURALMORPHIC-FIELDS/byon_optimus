@@ -1,0 +1,44 @@
+{
+  "etapa": "05",
+  "version": "v0.6.0",
+  "short_name": "native_memory_reference_field",
+  "date": "2026-05-11",
+  "previous_total_tests": 254,
+  "new_total_tests": 268,
+  "tests_added": [
+    "tests/fce_omega_functional/test_20_reference_field_native_memory.py (14 tests)"
+  ],
+  "files_modified": [
+    "unified_fragmergent_memory/runtime/reference_field.py (new module)",
+    "unified_fragmergent_memory/facade/config.py",
+    "unified_fragmergent_memory/facade/memory_store.py",
+    "unified_fragmergent_memory/runtime/fce_omega_observer.py",
+    "tests/fce_omega_functional/test_12_persistence_reload.py",
+    "tests/fce_omega_functional/test_20_reference_field_native_memory.py (new)",
+    "tools/fce_functional_report.py (note update)",
+    "CHANGELOG.md (v0.6.0 section)"
+  ],
+  "capabilities_confirmed": [
+    "OmegaRecord vs ReferenceField separation: historical fact vs functional field",
+    "RF created only from OmegaRecord; centers without Omega cannot have RF",
+    "field_vector = normalize(0.5*Phi_s + 0.5*delta_X_unit) frozen at coagulation",
+    "morphogenetic event classification: aligned / expression_reinforcing / tensioned / orthogonal / contested_expression / residue_amplifying",
+    "RF strength + expression_state fluctuate (active/contested/inexpressed); OmegaRecord remains immutable",
+    "two coagulated centers produce OmegaFieldInteraction trace; centers without Omega cannot enter Omega-field",
+    "omega_field interaction never creates Omega on a third co-active center; threshold rule still required",
+    "priority_only mode surfaces RF events as advisory feedback (rf_aligned, rf_contested_expression, rf_residue_amplifying, omega_field_resonance, omega_field_interference)",
+    "no epistemic override: slot_event zones stay intact through any RF activity",
+    "persist/load roundtrips RF + events + omega_field_interactions (payload v0.6.0)",
+    "default OFF preserves v0.5.1 byte-identical"
+  ],
+  "limitations_remaining": [
+    "no self-application loop: feedback is still inspectable metadata, no autonomous queue mutation",
+    "no first-class RelationRegistry: relation candidates remain ephemeral RelationCandidate items",
+    "field_vector is hybrid Phi_s + delta_X blend; not pure semantic embedding (no learned representation)",
+    "omega_field interaction only between co-active pairs; no temporal cross-episode aggregation",
+    "in-episode aggregation still flattens within-episode observations into one delta_X per center"
+  ],
+  "integration_mode": "passive_with_advisory",
+  "invariants_preserved": true,
+  "notes": "First version where memory becomes INTERNAL FORM. OmegaRecord = irreversible fact, ReferenceField = derived functional field that reads future events. The system can now classify alignment / contestation / residue against past coagulations without altering truth or memory."
+}

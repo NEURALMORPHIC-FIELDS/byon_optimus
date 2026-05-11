@@ -1,0 +1,18 @@
+{
+  "n_ufme_tests": 140,
+  "n_fce_omega_unit_tests": 20,
+  "n_fce_omega_functional_tests": 94,
+  "n_tests_total": 254,
+  "observer_active_passive_invariance": true,
+  "residue_detected": true,
+  "omega_irreversibility": true,
+  "advisory_no_truth_override": true,
+  "multiperspectival_normalization": true,
+  "provenance_complete": true,
+  "persistence_roundtrip": true,
+  "vendor_layout_clean": true,
+  "notes": [
+    "workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'high_residue', 'contested_expression']",
+    "Integration mode: SEMI-ACTIVE on priorities only (v0.5.1). fce_advisory_mode default 'read_only' preserves v0.5.0 byte exactly; 'priority_only' emits bounded FCEAdvisoryFeedback with full provenance. The runtime adapter, audit_log, slot zones and Omega registry are unchanged in either mode."
+  ]
+}

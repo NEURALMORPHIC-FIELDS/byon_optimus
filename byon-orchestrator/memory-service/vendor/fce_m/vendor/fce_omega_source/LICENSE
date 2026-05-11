@@ -1,0 +1,86 @@
+FCE-Ω: Fragmergent Causal Exponentiation with Omega-Coagulation
+Proprietary License — All Rights Reserved
+
+Copyright (c) 2024-2026 Vasile Lucian Borbeleac
+FRAGMERGENT TECHNOLOGY S.R.L., Cluj-Napoca, Romania
+European Patent Application EP25216372.0
+
+================================================================================
+
+1. OWNERSHIP
+
+   All material in this repository — including but not limited to source code,
+   mathematical formulations, experimental regimes, documentation, figures,
+   logos, and the project name "FCE-Ω" / "Fragmergent Causal Exponentiation
+   with Omega-Coagulation" — is the exclusive intellectual property of
+   Vasile Lucian Borbeleac and FRAGMERGENT TECHNOLOGY S.R.L. (the "Owner").
+
+   Architectural methods, the Contextual Exponentiation Operator, the
+   Omega-Coagulation Registry, and related constructs are subject to
+   European Patent Application EP25216372.0 and any continuations,
+   divisionals, or foreign counterparts. No license, express or implied, to
+   any patent claim is granted by this license.
+
+2. PERMITTED USE
+
+   Subject to full compliance with this license, the Owner grants a
+   non-exclusive, non-transferable, revocable, royalty-free permission to
+   any person or entity to:
+
+   (a) view and download this repository;
+   (b) reproduce the framework for the sole purposes of academic study,
+       scientific peer review, and non-commercial research;
+   (c) cite the framework in scholarly publications, provided the citation
+       conforms to the BibTeX entry in README.md and references both the
+       Owner and Patent Application EP25216372.0.
+
+3. PROHIBITED USE
+
+   Without prior written authorization from the Owner, the following are
+   expressly prohibited:
+
+   (a) any commercial use, including but not limited to incorporation into
+       commercial products, services, consulting deliverables, or paid
+       training material;
+   (b) creation, distribution, or public communication of derivative works,
+       adaptations, or translations;
+   (c) sublicensing, relicensing, or redistribution under any other license
+       (open-source or proprietary);
+   (d) implementation in production AI systems, decision-making systems, or
+       any system whose output influences third parties commercially;
+   (e) removal or alteration of copyright, patent, or attribution notices.
+
+4. ATTRIBUTION
+
+   Any permitted use under Section 2 must preserve, in all copies and
+   substantial portions of the work, the following notice:
+
+       © 2024-2026 Vasile Lucian Borbeleac / FRAGMERGENT TECHNOLOGY S.R.L.
+       Patent EP25216372.0. Used under proprietary license.
+
+5. NO WARRANTY
+
+   THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+   THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER
+   IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+   CONNECTION WITH THE WORK OR THE USE OR OTHER DEALINGS IN THE WORK.
+
+6. TERMINATION
+
+   Any breach of Sections 3 or 4 terminates this license automatically and
+   immediately. Upon termination, all permitted uses cease and any copies in
+   the user's possession must be destroyed within thirty (30) days.
+
+7. CONTACT
+
+   Commercial licensing, research collaboration, and authorization requests:
+   FRAGMERGENT TECHNOLOGY S.R.L.
+   Cluj-Napoca, Romania
+
+8. GOVERNING LAW
+
+   This license is governed by the laws of Romania and the applicable law
+   of the European Union. Disputes are subject to the exclusive jurisdiction
+   of the competent courts of Cluj-Napoca, Romania.

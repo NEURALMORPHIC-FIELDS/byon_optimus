@@ -1,0 +1,170 @@
+{
+  "report_kind": "academic_repository_format",
+  "version": "v0.6.0",
+  "date": "2026-05-11",
+  "source": "C:/Users/Lucian/Desktop/fragmergent-causal-exponentiation memory/",
+  "destination": "C:/Users/Lucian/Desktop/fragmergent-causal-exponentiation-memory/",
+  "github_target": "https://github.com/NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation-memory",
+
+  "files_created": [
+    "README.md",
+    "PAPER.md",
+    "assets/logo_fragmergent_causal_exponentiation_memory.png",
+    "docs/ARCHITECTURE.md",
+    "docs/METHODOLOGY.md",
+    "docs/RESULTS.md",
+    "docs/FUNCTIONAL_VALIDATION.md",
+    "docs/NATIVE_MEMORY_MODEL.md",
+    "docs/LIMITATIONS.md",
+    "docs/REPRODUCIBILITY.md",
+    "requirements.txt",
+    "results/repository_academic_format_report.txt",
+    "results/repository_academic_format_report.json"
+  ],
+
+  "files_migrated": [
+    "unified_fragmergent_memory/",
+    "tests/",
+    "experiments/",
+    "tools/",
+    "results/etapa_00_v0_4_0_baseline/",
+    "results/etapa_01_v0_4_1_center_isolated_anchor/",
+    "results/etapa_02_v0_4_2_r10b_integrated/",
+    "results/etapa_03_v0_5_0_multiperspectival_observer/",
+    "results/etapa_04_v0_5_1_semi_active_priority_feedback/",
+    "results/etapa_05_v0_6_0_native_memory_reference_field/",
+    "results/fce_functional_report.txt",
+    "results/fce_functional_report.json",
+    "results/pytest_full_transcript.txt",
+    "results/pytest_functional_only.txt",
+    "vendor/fce_omega_source/ (without .git nested)",
+    "docs/EVOLUTION_PROTOCOL.md",
+    "misiunea.txt",
+    "pyproject.toml (rewritten)",
+    "reproduce.sh (header updated)",
+    "CHANGELOG.md",
+    "CITATION.cff (rewritten)",
+    "LICENSE"
+  ],
+
+  "files_excluded": [
+    "ChatGPT Image May 7, 2026, 01_52_30 PM.png",
+    "fragmergent_memory_engine_runtime/",
+    "paper/",
+    "vendor/fce_omega_source/.git/",
+    "**/__pycache__/",
+    "**/.pytest_cache/",
+    "**/*.egg-info/",
+    "**/*.pyc"
+  ],
+
+  "files_moved_to_archive": [],
+
+  "logo_integration": {
+    "path": "assets/logo_fragmergent_causal_exponentiation_memory.png",
+    "size_bytes": 1035345,
+    "referenced_in": [
+      "README.md",
+      "PAPER.md",
+      "docs/ARCHITECTURE.md"
+    ],
+    "uses_absolute_windows_path": false
+  },
+
+  "tests": {
+    "full_suite": {
+      "command": "python -m pytest -q",
+      "result": "268 passed",
+      "duration_seconds": 16.28
+    },
+    "fce_m_validation_subset": {
+      "command": "python -m pytest tests/fce_omega/ tests/fce_omega_functional/ -q",
+      "result": "128 passed",
+      "duration_seconds": 2.38,
+      "note": "Reproduces on any clean checkout; does NOT require external Desktop folders."
+    }
+  },
+
+  "final_structure_top_level": [
+    "assets/",
+    "unified_fragmergent_memory/",
+    "vendor/",
+    "experiments/",
+    "tests/",
+    "tools/",
+    "results/",
+    "docs/",
+    "README.md",
+    "PAPER.md",
+    "CHANGELOG.md",
+    "CITATION.cff",
+    "LICENSE",
+    "misiunea.txt",
+    "pyproject.toml",
+    "requirements.txt",
+    "reproduce.sh"
+  ],
+
+  "invariants_preserved": {
+    "no_nested_git": true,
+    "no_stale_egg_info": true,
+    "no_pycache": true,
+    "no_pytest_cache": true,
+    "no_absolute_windows_path_in_documentation": true,
+    "logo_via_relative_path": true,
+    "vendor_source_unchanged_python_files": true,
+    "test_count_268": true,
+    "fce_m_subset_128_self_contained": true
+  },
+
+  "limitations_remaining": [
+    {
+      "id": "external-source-paths",
+      "description": "Legacy UFME source wrappers reference three external Desktop folders via absolute paths. Full 268-suite needs them; 128-test FCE-M subset does not.",
+      "severity": "documentation-blocker-only",
+      "documented_in": "docs/REPRODUCIBILITY.md"
+    },
+    {
+      "id": "no-self-application-loop",
+      "description": "Advisory feedback is inspectable metadata only.",
+      "severity": "by-design-v0.6.0",
+      "next_target": "v0.7.0"
+    },
+    {
+      "id": "no-relation-registry",
+      "description": "RelationCandidate items are observer-local, not first-class registry.",
+      "severity": "by-design-v0.6.0",
+      "next_target": "v0.7.0"
+    },
+    {
+      "id": "heuristic-field-vector",
+      "description": "ReferenceField.field_vector = normalize(0.5*Phi_s + 0.5*delta_X); not a learned embedding.",
+      "severity": "by-design-v0.6.0",
+      "next_target": "v0.8.0"
+    },
+    {
+      "id": "co-active-only-omega-field-interactions",
+      "description": "OmegaFieldInteraction emitted only for pairs co-active in same consolidate pass.",
+      "severity": "by-design-v0.6.0"
+    },
+    {
+      "id": "in-episode-aggregation",
+      "description": "Multiple within-episode observations aggregated to one delta_X before agent step.",
+      "severity": "by-design-v0.6.0"
+    }
+  ],
+
+  "release_recommendations": [
+    "Resolve external-source dependency before public CI: add env-var fallbacks or vendor the three external projects.",
+    "Set up CI to run the 128-test FCE-M validation subset on every push.",
+    "Tag v0.6.0-native-memory-prototype after the user authorizes commit + push.",
+    "CHANGELOG.md sections v0.4.0 -> v0.6.0 already follow Added / Changed / Validated / Limitations convention."
+  ],
+
+  "git_status_before_commit": {
+    "destination_is_git_repo": false,
+    "git_init_executed": false,
+    "commits": 0,
+    "recommended_commit_message": "v0.6.0 academic research repository format for FCE-M"
+  }
+}

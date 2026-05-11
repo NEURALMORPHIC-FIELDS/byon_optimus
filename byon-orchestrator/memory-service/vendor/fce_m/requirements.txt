@@ -1,0 +1,18 @@
+# FCE-M: Fragmergent Causal Exponentiation Memory — runtime requirements
+#
+# Mirrors the runtime dependencies declared in pyproject.toml so users
+# who prefer requirements.txt-based installs can run the test suite
+# end-to-end without `pip install -e .`.
+#
+# For development extras (pytest, coverage, ruff, mypy), see
+# pyproject.toml's [project.optional-dependencies] / dev group:
+#   python -m pip install -e ".[dev]"
+
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+
+# Test/dev (optional, kept here for convenience). Comment these out for
+# strict runtime-only installs.
+pytest>=7.0
+pytest-cov>=4.0

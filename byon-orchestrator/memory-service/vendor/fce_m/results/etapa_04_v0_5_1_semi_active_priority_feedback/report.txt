@@ -1,0 +1,20 @@
+FCE-Omega functional integration report
+=======================================
+  UFME unit tests:               140
+  FCE-Omega unit tests:          20
+  FCE-Omega functional tests:    94
+  total tests:                   254
+
+Functional capability checks (PASS=True):
+  observer active/passive invariance: True
+  residue detected:                   True
+  Omega irreversibility:              True
+  advisory no-truth-override:         True
+  multiperspectival normalization:    True
+  provenance complete:                True
+  persistence roundtrip:              True
+  vendor layout clean:                True
+
+Notes:
+  - workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'high_residue', 'contested_expression']
+  - Integration mode: SEMI-ACTIVE on priorities only (v0.5.1). fce_advisory_mode default 'read_only' preserves v0.5.0 byte exactly; 'priority_only' emits bounded FCEAdvisoryFeedback with full provenance. The runtime adapter, audit_log, slot zones and Omega registry are unchanged in either mode.

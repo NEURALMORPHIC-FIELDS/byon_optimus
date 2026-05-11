@@ -1,0 +1,18 @@
+{
+  "n_ufme_tests": 140,
+  "n_fce_omega_unit_tests": 20,
+  "n_fce_omega_functional_tests": 81,
+  "n_tests_total": 241,
+  "observer_active_passive_invariance": true,
+  "residue_detected": true,
+  "omega_irreversibility": true,
+  "advisory_no_truth_override": true,
+  "multiperspectival_normalization": true,
+  "provenance_complete": true,
+  "persistence_roundtrip": true,
+  "vendor_layout_clean": true,
+  "notes": [
+    "workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'high_residue', 'contested_expression']",
+    "Integration mode: PASSIVE + advisory (v0.5.0). Multiperspectival observer composes directional inter-center interactions when centers are co-active in the same consolidate pass. Anchor remains per-center; reference-field influence from Omega neighbors is normalized by (N-1) and cannot auto-coagulate. R10b coagulation reproduced via check_coagulation rule."
+  ]
+}

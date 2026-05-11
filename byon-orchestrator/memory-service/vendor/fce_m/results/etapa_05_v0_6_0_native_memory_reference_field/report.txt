@@ -1,0 +1,20 @@
+FCE-Omega functional integration report
+=======================================
+  UFME unit tests:               140
+  FCE-Omega unit tests:          20
+  FCE-Omega functional tests:    108
+  total tests:                   268
+
+Functional capability checks (PASS=True):
+  observer active/passive invariance: True
+  residue detected:                   True
+  Omega irreversibility:              True
+  advisory no-truth-override:         True
+  multiperspectival normalization:    True
+  provenance complete:                True
+  persistence roundtrip:              True
+  vendor layout clean:                True
+
+Notes:
+  - workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'contested_expression', 'high_residue']
+  - Integration mode: NATIVE MEMORY PROTOTYPE (v0.6.0). OmegaRecord is the irreversible historical fact; ReferenceField is the derived functional field that reads future events morphogenetically (aligned, contested, residue_amplifying, etc.) and may fluctuate in strength / expression_state. Truth-status remains runtime-authoritative; no UFME write-back.

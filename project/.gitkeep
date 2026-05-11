@@ -1,0 +1,3 @@
+# Executor workspace directory
+# Contents are runtime data and are gitignored
+# This is the isolated workspace where the air-gapped Executor operates

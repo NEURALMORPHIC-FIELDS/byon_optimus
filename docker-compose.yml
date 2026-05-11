@@ -1,0 +1,553 @@
+# BYON Optimus - Docker Compose Configuration
+# =============================================
+#
+# Multi-Agent Orchestration System with FAISS Memory
+# Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac
+#
+# Architecture:
+#   - memory-service: FAISS IndexFlatIP semantic memory (REQUIRED)
+#   - byon-worker: Reads inbox, builds evidence, generates plans (Agent A)
+#   - byon-auditor: Validates plans, manages user approval, signs orders (Agent B)
+#   - byon-executor: AIR-GAPPED execution engine - NO network access (Agent C)
+#   - openclaw-gateway: Communication platform gateway (ports 3000, 8080)
+#   - redis: Message queue for channels
+#
+# CRITICAL: The executor has network_mode: none (true air-gap)
+# CRITICAL: Memory service MUST be healthy before agents start
+
+services:
+  # ============================================
+  # FAISS Memory Service (REQUIRED!)
+  # ============================================
+  # Patent: EP25216372.0 - Omni-Qube-Vault
+  # Backend: FAISS IndexFlatIP (cosine similarity)
+  # Features:
+  #   - Real semantic search via sentence-transformers
+  #   - Per-type indices (code/conversation/fact)
+  #   - Persistent storage with auto-save
+  # ============================================
+  memory-service:
+    build:
+      context: ./byon-orchestrator/memory-service
+      dockerfile: Dockerfile
+    container_name: byon-memory
+    restart: unless-stopped
+    environment:
+      - MEMORY_SERVICE_HOST=0.0.0.0
+      - MEMORY_SERVICE_PORT=8000
+      - MEMORY_STORAGE_PATH=/app/memory_storage
+      - PYTHONUNBUFFERED=1
+      # O3: Rate limiting
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-100}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+      # O5: Redis cache
+      - REDIS_URL=redis://redis:6379/1
+      - MEMORY_CACHE_TTL=${MEMORY_CACHE_TTL:-300}
+    volumes:
+      - ./memory:/app/memory_storage:rw
+    networks:
+      - byon-network
+    ports:
+      - "8001:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================
+  # Agent Worker (A) - Evidence & Plan Builder
+  # ============================================
+  # Role: Reads inbox messages, builds evidence packs,
+  #       generates execution plans, consults memory
+  # ============================================
+  byon-worker:
+    build:
+      context: ./byon-orchestrator
+      dockerfile: Dockerfile
+      target: worker
+    container_name: byon-worker
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - AGENT_ROLE=worker
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MEMORY_SERVICE_URL=http://memory-service:8000
+      - HANDOFF_PATH=/handoff
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      # LLM Configuration
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      - LLM_MODEL=${LLM_MODEL:-claude-sonnet-4-6}
+      # FCE-M morphogenetic memory layer
+      - MEMORY_BACKEND=${MEMORY_BACKEND:-hybrid}
+      - FCEM_ENABLED=${FCEM_ENABLED:-true}
+      - FCEM_ADVISORY_MODE=${FCEM_ADVISORY_MODE:-priority_only}
+      - FCEM_REFERENCE_FIELDS_ENABLED=${FCEM_REFERENCE_FIELDS_ENABLED:-true}
+      - FCEM_MULTIPERSPECTIVAL_ENABLED=${FCEM_MULTIPERSPECTIVAL_ENABLED:-true}
+      # Channel status for status API (matches openclaw-config/openclaw.json plugins)
+      - CHANNEL_TELEGRAM=true
+      - CHANNEL_DISCORD=true
+      - CHANNEL_WHATSAPP=true
+    volumes:
+      - ./handoff/inbox:/handoff/inbox:rw
+      - ./handoff/worker_to_auditor:/handoff/worker_to_auditor:rw
+      - ./handoff/executor_to_worker:/handoff/executor_to_worker:ro
+      - ./keys:/keys:ro
+    ports:
+      - "3002:3002"
+    networks:
+      - byon-network
+    depends_on:
+      memory-service:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3002/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    # SECURITY: Run as non-root user
+    user: "1001:1001"
+    # Resource limits for Worker
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  # ============================================
+  # Agent Auditor (B) - Validation & Approval
+  # ============================================
+  # Role: Validates plans, enforces policies,
+  #       manages user approval, signs execution orders
+  # ============================================
+  byon-auditor:
+    build:
+      context: ./byon-orchestrator
+      dockerfile: Dockerfile
+      target: auditor
+    container_name: byon-auditor
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - AGENT_ROLE=auditor
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MEMORY_SERVICE_URL=http://memory-service:8000
+      - HANDOFF_PATH=/handoff
+      - KEYS_PATH=/keys
+      - USER_WEBHOOK_URL=${USER_WEBHOOK_URL:-}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./handoff/worker_to_auditor:/handoff/worker_to_auditor:ro
+      - ./handoff/auditor_to_user:/handoff/auditor_to_user:rw
+      - ./handoff/auditor_to_executor:/handoff/auditor_to_executor:rw
+      - ./keys:/keys:rw
+    networks:
+      - byon-network
+    depends_on:
+      memory-service:
+        condition: service_healthy
+      byon-worker:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3003/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    # SECURITY: Run as non-root user
+    user: "1001:1001"
+    # Resource limits for Auditor
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  # ============================================
+  # Agent Executor (C) - AIR-GAPPED Execution
+  # ============================================
+  # SECURITY: NO network access, NO API keys
+  # Role: Executes signed orders, produces receipts
+  # Errors go back to Worker for analysis
+  # ============================================
+  byon-executor:
+    build:
+      context: ./byon-orchestrator
+      dockerfile: Dockerfile
+      target: executor
+    container_name: byon-executor
+    # CRITICAL: No network access - true air-gap
+    network_mode: none
+    # Manual trigger only - not auto-restart
+    restart: "no"
+    environment:
+      - NODE_ENV=production
+      - AGENT_ROLE=executor
+      # NO ANTHROPIC_API_KEY - executor is air-gapped!
+      - PROJECT_ROOT=/project
+      - HANDOFF_PATH=/handoff
+      - KEYS_PATH=/keys
+      - MAX_ITERATIONS=10
+      - EXECUTION_TIMEOUT=1800000
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./handoff/auditor_to_executor:/handoff/auditor_to_executor:ro
+      - ./handoff/executor_to_worker:/handoff/executor_to_worker:rw
+      - ./project:/project:rw
+      - ./keys:/keys:ro
+    # SECURITY: Run as non-root user
+    user: "1001:1001"
+    # Resource limits for security
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # HEALTHCHECK: File-based check (network_mode: none prevents network-based checks)
+    healthcheck:
+      test: [ "CMD", "test", "-f", "/tmp/healthy" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+
+  # ============================================
+  # OpenClaw Gateway - UNIFIED Communication Platform
+  # ============================================
+  # Role: SINGLE entry point for all BYON Optimus functionality
+  # Features:
+  #   - Chat interface (all 20+ channels)
+  #   - BYON Dashboard (Optimus tab)
+  #   - Approvals workflow
+  #   - Memory search & audit
+  #   - Execution monitoring
+  # All channels go through OpenClaw (Telegram, Discord, etc.)
+  # ============================================
+  openclaw-gateway:
+    build:
+      context: ./Byon_bot/openclaw-main
+      dockerfile: Dockerfile
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    command: [ "node", "openclaw.mjs", "gateway", "--bind", "lan", "--port", "3000", "--allow-unconfigured" ]
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--max-old-space-size=2048
+      - OPENCLAW_AUTO_APPROVE_DEVICES=true
+      - OPENCLAW_DEVICE_PAIRING=auto
+      # BYON Integration (Phase 3: Single Entry Point)
+      - BYON_ENABLED=true
+      - BYON_UNIFIED_UI=true
+      - BYON_MEMORY_URL=http://memory-service:8000
+      - BYON_WORKER_URL=http://byon-worker:3002
+      - BYON_AUDITOR_URL=http://byon-auditor:3003
+      - BYON_HANDOFF_PATH=/handoff
+      # SECURITY: Set a strong token in .env (generate with: openssl rand -hex 32)
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN:?OPENCLAW_GATEWAY_TOKEN must be set}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      # Channel credentials from env
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - DISCORD_TOKEN=${DISCORD_TOKEN:-}
+      - SLACK_TOKEN=${SLACK_TOKEN:-}
+      - WHATSAPP_PHONE_ID=${WHATSAPP_PHONE_ID:-}
+      - WHATSAPP_TOKEN=${WHATSAPP_TOKEN:-}
+      - SIGNAL_CLI_PATH=${SIGNAL_CLI_PATH:-}
+      # Gmail integration (gog + Pub/Sub)
+      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:-}
+      - GMAIL_ACCOUNT=${GMAIL_ACCOUNT:-}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-}
+      # Browser relay binding for Docker (allows Chrome extension to connect)
+      - RELAY_BIND_ALL=true
+    volumes:
+      # BYON Handoff directories - FULL ACCESS for UI to read/write approvals
+      - ./handoff/inbox:/handoff/inbox:rw
+      - ./handoff/outbox:/handoff/outbox:ro
+      - ./handoff/auditor_to_user:/handoff/auditor_to_user:ro
+      - ./handoff/auditor_to_executor:/handoff/auditor_to_executor:ro
+      - ./handoff/executor_to_worker:/handoff/executor_to_worker:ro
+      - ./handoff/worker_to_auditor:/handoff/worker_to_auditor:ro
+      - ./handoff/user_to_auditor:/handoff/user_to_auditor:rw
+      # OpenClaw data
+      - ./Byon_bot/openclaw-main/data:/app/data:rw
+      # OpenClaw config (trustedProxies for Docker network)
+      - ./openclaw-config:/home/node/.openclaw:rw
+      # Gmail CLI (gog) credentials
+      - ./openclaw-config/gogcli:/home/node/.config/gogcli:rw
+      # Project documentation access for OpenClaw
+      - ./README.md:/project/README.md:ro
+      - ./INSTALL.md:/project/INSTALL.md:ro
+      - ./docs/planning/JOHNSON_PLAN.md:/project/JOHNSON_PLAN.md:ro
+      - ./docker-compose.yml:/project/docker-compose.yml:ro
+      - ./byon-orchestrator:/project/byon-orchestrator:ro
+    networks:
+      - byon-network
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+      # Browser Relay port for Chrome Extension (controlPort + 1 = 3003)
+      # Extension expects 18792, we map it to the internal relay port
+      - "18792:3003"
+    depends_on:
+      memory-service:
+        condition: service_healthy
+      byon-worker:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    # Resource limits for Gateway
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 3G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================
+  # Supporting Services
+  # ============================================
+
+  # Redis for message queue
+  redis:
+    image: redis:7-alpine
+    container_name: byon-redis
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    volumes:
+      - redis-data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - byon-network
+    command: >
+      sh -c "if [ -n \"$$REDIS_PASSWORD\" ]; then
+        redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_PASSWORD;
+      else
+        redis-server /usr/local/etc/redis/redis.conf;
+      fi"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Resource limits for Redis
+    # AUDIT FIX: Increased memory to match redis.conf maxmemory 1gb
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1536M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  # File watcher for handoff directories
+  watcher:
+    image: node:22-alpine
+    container_name: byon-watcher
+    restart: unless-stopped
+    working_dir: /app
+    command: node watcher.js
+    volumes:
+      - ./Byon_bot/watcher:/app:ro
+      - ./handoff:/handoff:ro
+    networks:
+      - byon-network
+    depends_on:
+      - byon-worker
+      - byon-auditor
+    # AUDIT FIX: Added healthcheck (was missing)
+    healthcheck:
+      test: [ "CMD", "node", "-e", "console.log('healthy')" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Resource limits for Watcher
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  # ============================================
+  # MONITORING STACK (AUDIT ADDITION)
+  # ============================================
+  # Added per monitoring audit recommendation
+  # Provides metrics visualization and alerting
+  # ============================================
+
+  # Prometheus - Metrics collection
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: byon-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - byon-network
+    ports:
+      - "9090:9090"
+    depends_on:
+      memory-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # Grafana - Metrics visualization
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: byon-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD must be set}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - byon-network
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+  # ============================================
+  # OPEN_BYON Control UI (DEPRECATED - Merged into OpenClaw Gateway)
+  # ============================================
+  # The BYON UI functionality has been unified into the OpenClaw UI.
+  # Access the unified dashboard at: http://localhost:3000 → "Optimus" tab
+  #
+  # This service is commented out as of Phase 3 consolidation.
+  # To restore standalone BYON UI, uncomment the service below.
+  # ============================================
+  # byon-ui:
+  #   build:
+  #     context: ./byon-orchestrator/ui
+  #     dockerfile: Dockerfile
+  #   container_name: byon-ui
+  #   restart: unless-stopped
+  #   environment:
+  #     - NODE_ENV=production
+  #     - UI_PORT=3001
+  #     - MEMORY_SERVICE_URL=http://memory-service:8000
+  #     - GATEWAY_URL=http://openclaw-gateway:3000
+  #     - HANDOFF_DIR=/handoff
+  #   volumes:
+  #     - ./handoff:/handoff:ro
+  #   networks:
+  #     - byon-network
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     memory-service:
+  #       condition: service_healthy
+  #     byon-worker:
+  #       condition: service_started
+  #   healthcheck:
+  #     test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     start_period: 10s
+  #     retries: 3
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.5'
+  #         memory: 512M
+  #       reservations:
+  #         cpus: '0.1'
+  #         memory: 128M
+
+  # ============================================
+  # Networks
+  # ============================================
+networks:
+  byon-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  redis-data:
+    driver: local
+  # AUDIT ADDITION: Monitoring data volumes
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local

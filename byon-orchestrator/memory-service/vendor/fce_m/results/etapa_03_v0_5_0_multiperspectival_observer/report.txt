@@ -1,0 +1,20 @@
+FCE-Omega functional integration report
+=======================================
+  UFME unit tests:               140
+  FCE-Omega unit tests:          20
+  FCE-Omega functional tests:    81
+  total tests:                   241
+
+Functional capability checks (PASS=True):
+  observer active/passive invariance: True
+  residue detected:                   True
+  Omega irreversibility:              True
+  advisory no-truth-override:         True
+  multiperspectival normalization:    True
+  provenance complete:                True
+  persistence roundtrip:              True
+  vendor layout clean:                True
+
+Notes:
+  - workload coag_count=1 Z_max=0.556 n_centers=2 hints=['coagulated_reference', 'high_residue', 'contested_expression']
+  - Integration mode: PASSIVE + advisory (v0.5.0). Multiperspectival observer composes directional inter-center interactions when centers are co-active in the same consolidate pass. Anchor remains per-center; reference-field influence from Omega neighbors is normalized by (N-1) and cannot auto-coagulate. R10b coagulation reproduced via check_coagulation rule.

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plan-draft.schema.json",
+  "title": "PlanDraft",
+  "description": "Proposed plan of actions created by Worker, validated by Auditor",
+  "type": "object",
+  "required": [
+    "document_type",
+    "plan_id",
+    "timestamp",
+    "based_on_evidence",
+    "intent",
+    "actions",
+    "risk_level",
+    "rollback_possible",
+    "estimated_iterations",
+    "hash"
+  ],
+  "properties": {
+    "document_type": { "type": "string", "const": "PLAN_DRAFT" },
+    "document_version": { "type": "string", "const": "1.0" },
+    "plan_id": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "based_on_evidence": { "type": "string", "minLength": 1 },
+    "intent": { "type": "string", "minLength": 1 },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Action" }
+    },
+    "risk_level": { "type": "string", "enum": ["low", "medium", "high"] },
+    "rollback_possible": { "type": "boolean" },
+    "estimated_iterations": { "type": "integer", "minimum": 1 },
+    "memory_context": { "type": "object" },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "Action": {
+      "type": "object",
+      "required": ["action_id", "type", "target", "parameters", "estimated_risk", "rollback_possible"],
+      "properties": {
+        "action_id": { "type": "string", "minLength": 1 },
+        "type": {
+          "type": "string",
+          "enum": ["code_edit", "file_create", "file_delete", "file_write", "file_modify", "test_run", "lint_run", "build_run", "shell_exec"]
+        },
+        "target": { "type": "string", "minLength": 1 },
+        "parameters": { "type": "object" },
+        "estimated_risk": { "type": "string", "enum": ["low", "medium", "high"] },
+        "rollback_possible": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}

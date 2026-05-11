@@ -1,0 +1,36 @@
+{
+  "etapa": "02",
+  "version": "v0.4.2",
+  "short_name": "r10b_integrated",
+  "date": "2026-05-11",
+  "previous_total_tests": 222,
+  "new_total_tests": 231,
+  "tests_added": [
+    "tests/fce_omega_functional/test_17_r10b_integrated_reproduction.py (9 tests)"
+  ],
+  "files_modified": [
+    "experiments/r10b_integrated_phoenix.py (new)",
+    "experiments/__init__.py (new)",
+    "tests/fce_omega_functional/test_17_r10b_integrated_reproduction.py (new)",
+    "tools/fce_functional_report.py (note update)",
+    "CHANGELOG.md (v0.4.2 section)"
+  ],
+  "capabilities_confirmed": [
+    "Omega coagulation produced END TO END by check_coagulation rule (not synthetic)",
+    "realistic thresholds: theta_s=0.10, tau_coag=3 (not theta=0/tau=1)",
+    "trajectory: S_t peaks 0.178 -> 0.102 (3 cycles above theta) -> Omega=1 -> decays to 0.003 with Omega=1 preserved",
+    "post-perturbation: disputed writes drive S_t to 0.003, Omega stays 1, omega_id/episode/S_t_at_coag immutable",
+    "runtime slot_event log preserves zone=DISPUTED for the contested writes (no truth override)",
+    "provenance complete: source_episodes and source_events backtrack to slot_events",
+    "persist/load roundtrip preserves Omega record across reload"
+  ],
+  "limitations_remaining": [
+    "S_t trajectory peaks early then decays (in-episode aggregation + Z accumulation); not the sustained-plateau shape from FCE-Omega standalone regimes",
+    "U_a is first-order Lie expansion in observer (I + c*outer(u,u)), not full exp(Phi_a) \u2014 chosen for cost",
+    "single-center R10b only; multi-center compositional R10b (R10c?) requires v0.5.0 observer",
+    "directed interactions inter-center still not wired in observer (Etapa 3 / v0.5.0)"
+  ],
+  "integration_mode": "passive_with_advisory",
+  "invariants_preserved": true,
+  "notes": "First demonstration that the integrated FCE-Omega + UFME runtime can REPRODUCE the central FCE-Omega event (\u03a9 coagulation by rule), not just preserve it. Trajectory artifact: results/etapa_02_v0_4_2_r10b_integrated/r10b_trajectory.{json,txt}."
+}

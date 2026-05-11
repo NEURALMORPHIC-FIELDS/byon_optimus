@@ -1,0 +1,62 @@
+cff-version: 1.2.0
+title: "FCE-M: Fragmergent Causal Exponentiation Memory"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: "Borbeleac"
+    given-names: "Vasile Lucian"
+    affiliation: "FRAGMERGENT TECHNOLOGY S.R.L."
+    city: "Cluj-Napoca"
+    country: "RO"
+version: "0.6.0"
+date-released: "2026-05-11"
+license: "BSD-3-Clause"
+repository-code: "https://github.com/NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation-memory"
+abstract: >-
+  FCE-M is a prototype implementation of a native morphogenetic memory
+  layer that integrates the FCE-Omega (Fragmergent Causal
+  Exponentiation with Omega-Coagulation) field-theoretic framework on
+  top of UFME (Unified Fragmergent Memory Engine). The system enforces
+  a strict architectural separation: UFME manages memory, D_Cortex
+  verifies epistemic truth, FCE-Omega measures morphogenetic becoming
+  (assimilation, residue, coagulation, reference). The central
+  contribution is the explicit distinction between OmegaRecord (the
+  irreversible historical fact of coagulation) and ReferenceField (the
+  derived functional field that classifies future events
+  morphogenetically without overriding epistemic truth). Validated
+  through 268 functional and unit tests across five evolution stages
+  ending in v0.6.0 Native Memory Prototype.
+keywords:
+  - "native memory"
+  - "morphogenetic dynamics"
+  - "omega coagulation"
+  - "reference field"
+  - "cognitive substrate"
+  - "perspective exponentiation"
+  - "self-index"
+  - "residue dynamics"
+  - "multiperspectival observer"
+  - "advisory feedback"
+  - "irreversibility"
+  - "epistemic truth separation"
+  - "FCE-Omega"
+  - "UFME"
+  - "fragmergent causal exponentiation"
+  - "non-diluting integration"
+identifiers:
+  - type: url
+    value: "https://github.com/NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation-memory"
+    description: "GitHub repository"
+references:
+  - type: software
+    title: "Unified Fragmergent Memory Engine (UFME)"
+    authors:
+      - family-names: "Borbeleac"
+        given-names: "Vasile Lucian"
+    notes: "Cognitive memory operating layer that FCE-M builds upon."
+  - type: software
+    title: "FCE-Omega: Fragmergent Causal Exponentiation with Omega-Coagulation"
+    authors:
+      - family-names: "Borbeleac"
+        given-names: "Vasile Lucian"
+    notes: "Field-theoretic morphogenetic framework, vendored at vendor/fce_omega_source/."

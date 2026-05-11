@@ -1,0 +1,12 @@
+{
+  "document_type": "ATTRACTOR",
+  "document_version": "1.0",
+  "attractor_id": "a3f1c2d4e5f60718293a4b5c6d7e8f90a3f1c2d4e5f60718293a4b5c6d7e8f90",
+  "label": "BYON-OpenClaw integration",
+  "support": 42,
+  "score": 0.87,
+  "last_activity": "2026-02-01T18:42:00Z",
+  "ctx_ids": [1021, 1088, 1140, 1156, 1178],
+  "domains": ["integration", "memory", "security"],
+  "tags": ["byon", "openclaw", "fhrss"]
+}

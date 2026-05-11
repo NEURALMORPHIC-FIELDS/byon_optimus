@@ -1,0 +1,256 @@
+{
+  "system_identity": {
+    "name": "BYON Optimus",
+    "version": "1.0.0",
+    "description": "Bring Your Own Network - Autonomous Agent Orchestration System",
+    "patent_reference": "EP25216372.0 - OmniVault",
+    "creator": "Lucian"
+  },
+  "architecture": {
+    "overview": "BYON Optimus is a multi-agent system that processes messages from communication channels (Telegram, Discord, WhatsApp), builds evidence-based plans, validates them through human-in-the-loop approval, and executes them in an air-gapped environment.",
+    "components": [
+      {
+        "name": "Worker Agent",
+        "port": 3002,
+        "role": "Message processor and plan builder",
+        "capabilities": [
+          "Watches inbox for incoming messages from channels",
+          "Builds evidence packages using GMV (Global Memory Vectors)",
+          "Creates execution plans based on user requests",
+          "Manages channel connections (Telegram, Discord, WhatsApp)",
+          "Stores and retrieves context from Memory Service"
+        ],
+        "endpoints": {
+          "/health": "Health check",
+          "/status": "Current worker state and statistics",
+          "/stats": "Detailed statistics"
+        }
+      },
+      {
+        "name": "Auditor Agent",
+        "port": 3003,
+        "role": "Security validator and plan signer",
+        "capabilities": [
+          "Validates plans against security policies",
+          "Signs approved plans with Ed25519 digital signature",
+          "Enforces GMV compliance",
+          "Manages approval workflow (auto-approve low risk, manual for high risk)",
+          "Maintains audit log for compliance"
+        ],
+        "endpoints": {
+          "/health": "Health check",
+          "/status": "Auditor state and pending approvals",
+          "/stats": "Detailed statistics",
+          "/pending": "List pending approvals",
+          "/history": "Approval history",
+          "/audit-log": "Security audit log"
+        },
+        "security": {
+          "signing_algorithm": "Ed25519",
+          "key_storage": "In-memory (ephemeral per session)",
+          "risk_levels": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        }
+      },
+      {
+        "name": "Executor",
+        "role": "Air-gapped execution environment",
+        "network_mode": "none",
+        "capabilities": [
+          "Executes signed orders in isolated environment",
+          "No network access (true air-gap)",
+          "Reads orders from handoff directory",
+          "Writes receipts back to handoff directory"
+        ],
+        "security": {
+          "isolation": "Docker network_mode: none",
+          "communication": "File-based handoff only",
+          "verification": "Checks Ed25519 signature before execution"
+        }
+      },
+      {
+        "name": "Memory Service",
+        "port": 8000,
+        "role": "FHRSS+FCPE persistent memory",
+        "capabilities": [
+          "73,000x compression ratio (FCPE)",
+          "100% data recovery at 40-50% data loss (FHRSS)",
+          "Semantic search across code, conversations, and facts",
+          "Persistent storage with fractal redundancy"
+        ],
+        "api": {
+          "method": "POST to /",
+          "actions": {
+            "store": "Store new context",
+            "search": "Search by type",
+            "search_all": "Search across all types",
+            "stats": "Get storage statistics",
+            "test_recovery": "Test FHRSS recovery capability",
+            "retrieve": "Get context by ID"
+          }
+        }
+      },
+      {
+        "name": "OpenClaw Gateway",
+        "port": 3000,
+        "role": "Unified UI and API gateway",
+        "capabilities": [
+          "Single entry point for all BYON services",
+          "WebSocket-based chat interface",
+          "REST API proxy to all agents",
+          "SSE stream for real-time updates"
+        ],
+        "api_routes": {
+          "/api/worker/status": "Worker status",
+          "/api/auditor/status": "Auditor status",
+          "/api/executor/status": "Executor status",
+          "/api/memory/stats": "Memory statistics",
+          "/api/memory/search": "Memory search",
+          "/api/inbox": "Inbox messages",
+          "/api/approvals": "Pending approvals",
+          "/sse/unified": "Real-time event stream"
+        }
+      }
+    ]
+  },
+  "technologies": {
+    "FHRSS": {
+      "full_name": "Fractal-Holographic Redundant Storage System",
+      "description": "Stores data with fractal redundancy patterns that allow complete reconstruction even with significant data loss",
+      "recovery_capability": "100% at 50% loss (RS r=2, parity intact), 98.4% at 10% adversarial",
+      "overhead": "3.25x storage overhead (FULL, r=2)",
+      "profiles": [
+        "FULL",
+        "BALANCED",
+        "MINIMAL"
+      ]
+    },
+    "FCPE": {
+      "full_name": "Fractal-Chaotic Persistent Encoding",
+      "description": "Compression algorithm using chaotic dynamics and fractal patterns",
+      "compression_ratio": "73,000:1 typical",
+      "embedding_dimension": 384,
+      "use_case": "Semantic embedding storage"
+    },
+    "GMV": {
+      "full_name": "Global Memory Vectors",
+      "description": "Context vectors that capture the global state of conversation and system knowledge",
+      "purpose": "Ensures consistency across agent interactions",
+      "storage": "Memory Service with FHRSS redundancy"
+    },
+    "MACP": {
+      "full_name": "Machine Agent Communication Protocol",
+      "version": "1.1",
+      "description": "Protocol for structured communication between agents",
+      "message_types": [
+        "evidence",
+        "plan",
+        "order",
+        "receipt",
+        "status"
+      ]
+    }
+  },
+  "data_flow": {
+    "message_processing": [
+      "1. User sends message via Telegram/Discord/WhatsApp",
+      "2. Channel bridge writes message to /handoff/inbox",
+      "3. Worker Agent picks up message from inbox",
+      "4. Worker queries Memory Service for relevant context (GMV)",
+      "5. Worker builds evidence package and execution plan",
+      "6. Plan is sent to Auditor for validation",
+      "7. Auditor validates plan against security policies",
+      "8. If approved, Auditor signs plan with Ed25519",
+      "9. Signed order is written to /handoff/auditor_to_executor",
+      "10. Executor reads and verifies signed order",
+      "11. Executor runs order in air-gapped environment",
+      "12. Executor writes receipt to /handoff/executor_to_worker",
+      "13. Worker processes receipt and responds to user"
+    ],
+    "handoff_directories": {
+      "/handoff/inbox": "Incoming messages from channels",
+      "/handoff/outbox": "Outgoing messages to channels",
+      "/handoff/worker_to_auditor": "Plans awaiting approval",
+      "/handoff/auditor_to_user": "Plans requiring user approval",
+      "/handoff/auditor_to_executor": "Signed execution orders",
+      "/handoff/executor_to_worker": "Execution receipts"
+    }
+  },
+  "security_model": {
+    "principles": [
+      "Zero trust between components",
+      "Cryptographic verification of all orders",
+      "Air-gapped execution environment",
+      "Human-in-the-loop for high-risk operations",
+      "Complete audit trail"
+    ],
+    "risk_assessment": {
+      "low": "Read-only operations, status queries",
+      "medium": "File modifications, API calls",
+      "high": "System changes, external communications",
+      "critical": "Financial transactions, credential access"
+    },
+    "approval_flow": {
+      "auto_approve": "Low risk operations only",
+      "user_approve": "Medium and above risk",
+      "multi_approve": "Critical operations (future)"
+    }
+  },
+  "configuration": {
+    "environment_variables": {
+      "MEMORY_SERVICE_URL": "URL of memory service (default: http://memory-service:8000)",
+      "WORKER_HTTP_PORT": "Worker health server port (default: 3002)",
+      "AUDITOR_HTTP_PORT": "Auditor health server port (default: 3003)",
+      "AUTO_APPROVE_RISK_LEVEL": "Auto-approve threshold (none/low)",
+      "STRICT_GMV": "Require GMV validation (true/false)",
+      "HANDOFF_PATH": "Base path for handoff directories",
+      "INBOX_PATH": "Path to inbox directory"
+    },
+    "docker_compose": {
+      "network": "byon-network (172.28.0.0/16)",
+      "volumes": [
+        "./handoff:/handoff",
+        "./memory:/app/memory_storage"
+      ]
+    }
+  },
+  "api_examples": {
+    "store_code": {
+      "action": "store",
+      "type": "code",
+      "content": "function example() { return 42; }",
+      "metadata": {
+        "filename": "example.js",
+        "language": "javascript"
+      }
+    },
+    "store_conversation": {
+      "action": "store",
+      "type": "conversation",
+      "content": "User asked about BYON architecture",
+      "metadata": {
+        "channel": "telegram",
+        "user_id": "123"
+      }
+    },
+    "store_fact": {
+      "action": "store",
+      "type": "fact",
+      "content": "BYON Optimus uses Ed25519 for signing execution orders",
+      "metadata": {
+        "category": "security",
+        "verified": true
+      }
+    },
+    "search": {
+      "action": "search_all",
+      "query": "how does BYON sign orders",
+      "top_k": 5,
+      "threshold": 0.3
+    }
+  }
+}

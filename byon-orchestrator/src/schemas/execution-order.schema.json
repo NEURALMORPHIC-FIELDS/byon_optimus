@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "execution-order.schema.json",
+  "title": "ExecutionOrder",
+  "description": "Signed execution order from Auditor to Executor",
+  "type": "object",
+  "required": [
+    "order_id",
+    "timestamp",
+    "based_on_plan",
+    "approved_by",
+    "approved_at",
+    "actions",
+    "constraints",
+    "rollback",
+    "signature",
+    "hash"
+  ],
+  "properties": {
+    "document_type": { "type": "string", "const": "EXECUTION_ORDER" },
+    "document_version": { "type": "string", "const": "1.0" },
+    "order_id": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "based_on_plan": { "type": "string", "minLength": 1 },
+    "approved_by": { "type": "string", "minLength": 1 },
+    "approved_at": { "type": "string", "format": "date-time" },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action_id", "type", "target"],
+        "properties": {
+          "action_id": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["code_edit", "file_create", "file_delete", "file_write", "file_modify", "test_run", "lint_run", "build_run", "shell_exec"]
+          },
+          "target": { "type": "string" },
+          "parameters": { "type": "object" },
+          "estimated_risk": { "type": "string", "enum": ["low", "medium", "high"] },
+          "rollback_possible": { "type": "boolean" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["max_iterations"],
+      "properties": {
+        "max_iterations": { "type": "integer", "minimum": 1 },
+        "timeout_minutes": { "type": "integer", "minimum": 1 },
+        "timeout_seconds": { "type": "integer", "minimum": 1 },
+        "memory_limit_mb": { "type": "integer", "minimum": 1 },
+        "disk_limit_mb": { "type": "integer", "minimum": 1 },
+        "allowed_paths": { "type": "array", "items": { "type": "string" } },
+        "forbidden_operations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "rollback": {
+      "type": "object",
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "instructions": { "type": "string" },
+        "checkpoint_id": { "type": "string" }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": ["algorithm", "public_key", "signature"],
+      "properties": {
+        "algorithm": { "type": "string", "const": "Ed25519" },
+        "public_key": { "type": "string", "minLength": 1 },
+        "signature": { "type": "string", "minLength": 1 }
+      }
+    },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

@@ -1,0 +1,43 @@
+R10b integrated reproduction (phoenix::identity)
+================================================
+  theta_s=0.1  tau_coag=3  D=16  seed=42
+  germinal_episodes=8  perturbation_episodes=8
+
+  Omega produced by RULE (check_coagulation): True
+  Was Omega set synthetically? False
+  Coagulated at episode=3 cycle=3
+  S_t_at_coagulation=0.10227263408038409
+  kappa_at_coagulation=0.45762860150420276
+  AR_at_coagulation=0.6768090295332438
+  sine_type=integrative
+  omega_id=a91dd7187d0d632e
+  duration_above_threshold=3
+
+  Post-perturbation invariants:
+    omega_remained_1                       : True
+    omega_id_immutable                     : True
+    coagulation_episode_immutable          : True
+    S_t_at_coagulation_immutable           : True
+    runtime_log_last_disputed_zone_intact  : True
+    source_episodes_complete               : True
+    source_events_complete                 : True
+    persist_load_roundtrip_ok              : True
+
+Trajectory:
+  phase           ep  cyc      S_t     AR  kappa    rho      Z omega new
+  germinal         1    1   0.1783  0.681  0.521  0.334  0.334     0  
+  germinal         2    2   0.1340  0.682  0.490  0.631  0.660     0  
+  germinal         3    3   0.1023  0.677  0.458  0.903  0.981     1 +
+  germinal         4    4   0.0785  0.666  0.423  1.159  1.294     1  
+  germinal         5    5   0.0607  0.652  0.389  1.404  1.599     1  
+  germinal         6    6   0.0474  0.634  0.359  1.642  1.893     1  
+  germinal         7    7   0.0372  0.613  0.332  1.877  2.178     1  
+  germinal         8    8   0.0292  0.589  0.308  2.110  2.453     1  
+  perturbation   100    9   0.0265  0.562  0.294  2.328  2.328     1  
+  perturbation   101   10   0.0229  0.533  0.277  2.551  2.247     1  
+  perturbation   102   11   0.0188  0.502  0.248  2.782  2.105     1  
+  perturbation   103   12   0.0146  0.470  0.216  3.019  2.042     1  
+  perturbation   104   13   0.0109  0.436  0.185  3.260  2.043     1  
+  perturbation   105   14   0.0078  0.400  0.158  3.508  2.068     1  
+  perturbation   106   15   0.0050  0.363  0.125  3.763  2.062     1  
+  perturbation   107   16   0.0029  0.323  0.093  4.025  2.159     1  

@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fragmergent-causal-exponentiation-memory"
+version = "0.6.0"
+description = "FCE-M: native morphogenetic memory layer integrating the FCE-Omega field-theoretic framework on top of the Unified Fragmergent Memory Engine (UFME). OmegaRecord becomes ReferenceField; memory becomes internal structure of reference."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "BSD-3-Clause" }
+authors = [
+    { name = "Vasile Lucian Borbeleac" },
+]
+keywords = [
+    "native memory",
+    "morphogenetic dynamics",
+    "omega coagulation",
+    "reference field",
+    "cognitive substrate",
+    "perspective exponentiation",
+    "self-index",
+    "residue dynamics",
+    "multiperspectival observer",
+    "advisory feedback",
+    "irreversibility",
+    "epistemic truth separation",
+    "FCE-Omega",
+    "UFME",
+    "fragmergent causal exponentiation",
+    "non-diluting integration",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+d_cortex = ["torch>=2.0"]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "ruff>=0.1.0", "mypy>=1.0"]
+docs = ["sphinx>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation-memory"
+Repository = "https://github.com/NEURALMORPHIC-FIELDS/fragmergent-causal-exponentiation-memory"
+
+[tool.setuptools.packages.find]
+include = ["unified_fragmergent_memory*"]
+exclude = ["tests*", "experiments*", "vendor*", "docs*", "results*", "tools*", "assets*"]
+
+[tool.setuptools.package-data]
+"unified_fragmergent_memory" = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

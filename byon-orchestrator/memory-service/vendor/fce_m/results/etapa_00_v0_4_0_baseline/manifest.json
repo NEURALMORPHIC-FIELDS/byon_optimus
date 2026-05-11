@@ -1,0 +1,28 @@
+{
+  "etapa": "00",
+  "version": "v0.4.0",
+  "short_name": "baseline",
+  "date": "2026-05-11",
+  "previous_total_tests": 213,
+  "new_total_tests": 213,
+  "tests_added": [],
+  "files_modified": [],
+  "capabilities_confirmed": [
+    "FCE-Omega passive integration over UFME (v0.4.0)",
+    "Omega Registry irreversibility",
+    "advisory hints read-only",
+    "persistence roundtrip",
+    "provenance complete",
+    "multiperspectival normalization bounded"
+  ],
+  "limitations_remaining": [
+    "global anchor coupling across centers (closed in v0.4.1)",
+    "in-episode aggregation: one delta_X per (center, episode)",
+    "Z_norm is not a reliable discrimination axis (use AR / kappa)",
+    "directed interactions inter-center not wired in observer (Etapa 3 / v0.5.0)",
+    "R0-R11 not reproduced explicitly in integrated runtime (Etapa 2 / v0.4.2)"
+  ],
+  "integration_mode": "passive_with_advisory",
+  "invariants_preserved": true,
+  "notes": "ETAPA 0 baseline lock. Confirms 213 passing pre-v0.4.1. Manifest hand-written: stage_finalize re-runs pytest against the current tree, which post-dates the baseline. pytest_summary.txt is the actual baseline snapshot showing '213 passed'. Going forward stage_finalize is the source of truth at the END of each stage; only ETAPA 0 needed this retroactive correction."
+}

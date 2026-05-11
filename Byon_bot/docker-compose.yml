@@ -1,0 +1,193 @@
+# Byon Bot Multi-Agent System
+# Docker Compose Configuration
+#
+# Architecture:
+# - memory-service: FHRSS+FCPE memory system (REQUIRED!)
+# - agent-worker: Reads inbox, generates evidence/plans
+# - agent-auditor: Validates plans, requests user approval, signs orders
+# - agent-executor: AIR-GAPPED, executes code via Jupyter kernel
+#
+# IMPORTANT: The executor has NO network access (network_mode: none)
+# CRITICAL: FHRSS+FCPE memory is REQUIRED - agents will NOT start without it!
+
+version: '3.8'
+
+services:
+  # ============================================
+  # FHRSS+FCPE Memory Service (REQUIRED!)
+  # ============================================
+  # Patent: EP25216372.0 - OmniVault
+  # Capabilities:
+  #   - 73,000x compression ratio
+  #   - 100% recovery at 40% data loss
+  #   - Semantic search for code and conversations
+  # ============================================
+  memory-service:
+    build:
+      context: ./shared/memory
+      dockerfile: Dockerfile
+    container_name: byon-memory
+    restart: unless-stopped
+    environment:
+      - MEMORY_MODE=server
+      - MEMORY_PORT=8765
+      - STORAGE_PATH=/memory
+    volumes:
+      - ./memory:/memory:rw
+    networks:
+      - byon-network
+    ports:
+      - "8765:8765"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import fhrss_fcpe; print('OK')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================
+  # Agent Worker (A)
+  # ============================================
+  agent-worker:
+    build:
+      context: .
+      dockerfile: agent-worker/Dockerfile
+    container_name: byon-worker
+    restart: unless-stopped
+    environment:
+      - ROLE=worker
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MEMORY_SERVICE_URL=http://memory-service:8765
+      - MEMORY_STORE_PATH=/memory
+      - HANDOFF_PATH=/handoff
+    volumes:
+      - ./handoff/inbox:/handoff/inbox:ro
+      - ./handoff/worker_to_auditor:/handoff/worker_to_auditor:rw
+      - ./handoff/executor_to_worker:/handoff/executor_to_worker:ro
+      - ./memory/worker:/memory:rw
+      - ./project:/project:ro
+    networks:
+      - byon-network
+    depends_on:
+      memory-service:
+        condition: service_healthy  # CRITICAL: Wait for memory to be ready
+      redis:
+        condition: service_started
+
+  # ============================================
+  # Agent Auditor (B)
+  # ============================================
+  agent-auditor:
+    build:
+      context: .
+      dockerfile: agent-auditor/Dockerfile
+    container_name: byon-auditor
+    restart: unless-stopped
+    environment:
+      - ROLE=auditor
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - HANDOFF_PATH=/handoff
+      - KEYS_PATH=/keys
+      - USER_WEBHOOK_URL=${USER_WEBHOOK_URL:-}
+    volumes:
+      - ./handoff/worker_to_auditor:/handoff/worker_to_auditor:ro
+      - ./handoff/auditor_to_user:/handoff/auditor_to_user:rw
+      - ./handoff/auditor_to_executor:/handoff/auditor_to_executor:rw
+      - ./keys:/keys:ro
+    networks:
+      - byon-network
+    depends_on:
+      - agent-worker
+
+  # ============================================
+  # Agent Executor (C) - AIR-GAPPED
+  # ============================================
+  # SECURITY: This agent has NO network access and NO API keys
+  # Errors are reported back to Worker for analysis
+  agent-executor:
+    build:
+      context: .
+      dockerfile: agent-executor/Dockerfile
+    container_name: byon-executor
+    # CRITICAL: No network access - true air-gap
+    network_mode: none
+    restart: "no"  # Manual trigger only
+    environment:
+      - ROLE=executor
+      # NO ANTHROPIC_API_KEY - executor is air-gapped!
+      - PROJECT_ROOT=/project
+      - HANDOFF_PATH=/handoff
+      - MAX_ITERATIONS=10
+      - EXECUTION_TIMEOUT=1800000
+    volumes:
+      - ./handoff/auditor_to_executor:/handoff/auditor_to_executor:ro
+      - ./handoff/executor_to_worker:/handoff/executor_to_worker:rw
+      - ./project:/project:rw
+      - ./keys/public:/keys:ro
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+
+  # ============================================
+  # Supporting Services
+  # ============================================
+
+  # Redis for message queue (Worker channels)
+  redis:
+    image: redis:7-alpine
+    container_name: byon-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - byon-network
+    command: redis-server --appendonly yes
+
+  # File watcher for handoff directories
+  watcher:
+    image: node:22-alpine
+    container_name: byon-watcher
+    restart: unless-stopped
+    working_dir: /app
+    command: node watcher.js
+    volumes:
+      - ./watcher:/app:ro
+      - ./handoff:/handoff:ro
+    networks:
+      - byon-network
+    depends_on:
+      - agent-worker
+      - agent-auditor
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  byon-network:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  redis-data:

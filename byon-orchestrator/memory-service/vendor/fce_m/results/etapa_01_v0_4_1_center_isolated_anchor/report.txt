@@ -1,0 +1,20 @@
+FCE-Omega functional integration report
+=======================================
+  UFME unit tests:               140
+  FCE-Omega unit tests:          20
+  FCE-Omega functional tests:    62
+  total tests:                   222
+
+Functional capability checks (PASS=True):
+  observer active/passive invariance: True
+  residue detected:                   True
+  Omega irreversibility:              True
+  advisory no-truth-override:         True
+  multiperspectival normalization:    True
+  provenance complete:                True
+  persistence roundtrip:              True
+  vendor layout clean:                True
+
+Notes:
+  - workload coag_count=1 Z_max=0.556 n_centers=2 hints=['contested_expression', 'coagulated_reference', 'high_residue']
+  - Integration mode: PASSIVE + advisory (v0.4.1). Advisory channel exposes read-only hints; no UFME write-back. Anchor is per-center; disputed writes on B do not modulate A.
