@@ -1,4 +1,5 @@
 {
+  "_v0_6_4_notice": "HISTORICAL BOOTSTRAP (pre-v0.6). This JSON corresponds to the v0.1 / v0.2 bootstrap pipeline (loaded by memory-bootstrap/bootstrap-memory.py). The active canonical-facts seeding for the v0.6.4 system is in byon-orchestrator/scripts/lib/byon-system-facts.mjs (18-entry corpus, seeded idempotently into memory-service AND injected into LLM system prompts via renderCanonicalFactsBlock). The 'FHRSS+FCPE / 73,000x / 100% recovery' figures inside the entries below describe the pre-v0.6 backend; the active backend is hybrid FAISS + FCE-M v0.6.0. Do not use this file as the source of truth for the v0.6.4 architecture.",
   "system_identity": {
     "name": "BYON Optimus",
     "version": "1.0.0",

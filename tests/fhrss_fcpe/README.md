@@ -1,4 +1,6 @@
-# FHRSS+FCPE Test Suite
+# FHRSS+FCPE Test Suite (legacy reference-implementation suite)
+
+> **v0.6.4 banner.** This test suite is scoped to the **pre-v0.6 FHRSS+FCPE Python reference implementation** preserved at `INFINIT_MEMORYCONTEXT/`. It is **not** the test suite for the current production memory backend. The current backend is the hybrid FAISS + FCE-M v0.6.0 stack (`byon-orchestrator/memory-service/`), whose tests live under `byon-orchestrator/tests/` (unit, integration, security, campaign) and the deep test suites under `byon-orchestrator/scripts/byon-fcem-deep-suite.mjs` / `byon-orchestrator/scripts/byon-coagulation-harness.mjs`. The "73,000x compression" / "100% recovery at 40% loss" claims validated below apply to the legacy Python implementation and are kept here for scientific reference and patent-record continuity. For the current architecture see `../../docs/RESEARCH_PROGRESS_v0.6.md`.
 
 Comprehensive test suite for validating FHRSS (Fractal-Holographic Redundant Storage System) with Reed-Solomon GF(256) dual parity and FCPE (Fractal-Chaotic Persistent Encoding) claims.
 

@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_v0_6_4_note": "HISTORICAL technical-reference specification, generated 2026-02-02 for the v0.1 / v0.2 milestone. The 'FHRSS+FCPE: 73,000x compression with 100% recovery at 40% data loss' and 'compression_ratio: 73000' figures inside this document describe the pre-v0.6 backend. The current active memory substrate is hybrid FAISS + FCE-M v0.6.0; the stats endpoint emits 'fcpe_dim' / 'fhrss_profile' / 'fhrss_overhead' as backward-compatible field names whose values describe the FAISS substrate (see docs/BYON_API.md v0.6.4 response example). Authoritative current state: docs/RESEARCH_PROGRESS_v0.6.md.",
   "document_type": "TECHNICAL_REFERENCE_SPECIFICATION",
   "document_id": "TRS-BYON-OPTIMUS-2026-001",
   "version": "1.0.0",

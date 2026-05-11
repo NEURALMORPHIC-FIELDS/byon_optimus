@@ -699,7 +699,7 @@ Write-Host ""
 Write-Host "  SECURITY:" -ForegroundColor Cyan
 Write-Host "    Executor: AIR-GAPPED (network_mode: none)"
 Write-Host "    Signing: Ed25519 (keys/auditor.private.pem)"
-Write-Host "    Memory: FHRSS+FCPE (73,000x compression, 100% recovery at 40% loss)"
+Write-Host "    Memory: Hybrid FAISS + FCE-M v0.6.0 (semantic recall + morphogenetic advisory)"
 Write-Host "    Network: WFP Semantic Guard (EXECUTION_INTENT authorization)"
 Write-Host ""
 Write-Host "  Patent: EP25216372.0 - OmniVault - V.L. Borbeleac" -ForegroundColor Gray

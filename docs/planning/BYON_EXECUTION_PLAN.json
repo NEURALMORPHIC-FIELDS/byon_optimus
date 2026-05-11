@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_v0_6_4_note": "HISTORICAL execution plan, drafted 2026-02-01 for the v0.1 / v0.2 OpenClaw integration milestone. The 'FHRSS+FCPE / 73,000x compression / 100% recovery at 40% loss' rationales inside this document describe the pre-v0.6 backend; the current active memory substrate is hybrid FAISS + FCE-M v0.6.0. Authoritative current state: docs/RESEARCH_PROGRESS_v0.6.md.",
   "document_type": "BYON_EXECUTION_PLAN",
   "document_version": "1.0",
   "meta": {

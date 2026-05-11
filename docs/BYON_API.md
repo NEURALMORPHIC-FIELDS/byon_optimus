@@ -143,19 +143,27 @@ Response:
 GET /stats
 ```
 
-Response:
+Response (v0.6.4 actual shape):
 ```json
 {
-    "total_contexts": 1523,
+    "version": "4.0.0-faiss",
+    "num_contexts": 1523,
     "by_type": {
         "code": 856,
         "conversation": 412,
         "fact": 255
     },
-    "storage_bytes": 2048576,
-    "compression_ratio": 73000
+    "fcpe_dim": 384,
+    "fhrss_profile": "FAISS-IndexFlatIP",
+    "fhrss_overhead": "1.0x (no encoding overhead)",
+    "total_storage_mb": 1.95,
+    "storage_path": "/app/memory_storage",
+    "backend": "FAISS IndexFlatIP (cosine similarity via inner product)",
+    "cache": { "hits": 0, "misses": 0 }
 }
 ```
+
+> The `fcpe_dim` and `fhrss_*` keys are retained for backward compatibility with v0.1/v0.2 clients; in v0.6.4 they describe the FAISS substrate (`fcpe_dim` is the embedding dimensionality, `fhrss_profile` is the FAISS index profile, `fhrss_overhead` is the encoding overhead). The earlier "`compression_ratio: 73000`" field is no longer emitted by the memory-service.
 
 ## Protocol Types
 

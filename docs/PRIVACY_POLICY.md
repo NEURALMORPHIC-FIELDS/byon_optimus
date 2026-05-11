@@ -4,6 +4,8 @@
 **Last Updated:** February 2, 2026
 **Version:** 1.0.0
 
+> **v0.6.4 banner.** This policy was drafted against the v0.1 / v0.2 architecture. The data-handling principles (data minimisation, retention model, user rights, third-party processors) remain valid, but the active memory substrate is now the hybrid **FAISS + FCE-M v0.6.0** stack — not the FHRSS+FCPE backend referenced in some prose below. The "73,000x compression" figure in section 4 / data minimisation is historical (pre-v0.6 backend) and is not an active claim of the current orchestrator. Current architecture: [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
+
 ---
 
 ## 1. Introduction

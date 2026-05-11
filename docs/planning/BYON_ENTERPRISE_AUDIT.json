@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_v0_6_4_note": "HISTORICAL audit, dated 2026-02-02 (pre-v0.6). The FHRSS+FCPE / 73,000x / 100% recovery figures inside this document describe the v0.1 / v0.2 backend. The current active memory substrate is hybrid FAISS + FCE-M v0.6.0; current operational classification is Level 2 of 4 (Morphogenetic Advisory Memory). Authoritative current state: docs/RESEARCH_PROGRESS_v0.6.md.",
   "document_type": "ENTERPRISE_SYSTEM_AUDIT",
   "document_id": "AUDIT-BYON-OPTIMUS-2026-001",
   "version": "1.0.0",

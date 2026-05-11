@@ -2,6 +2,8 @@
 
 **Patent: EP25216372.0 - Omni-Qube-Vault - Vasile Lucian Borbeleac**
 
+> **v0.6.4 banner.** This UI plan was written against the v0.1 / v0.2 architecture (FHRSS+FCPE memory backend, OpenClaw as the primary UI surface, Claude 3 Haiku as the default LLM). The terminology table, compression numbers (`73,000x compression ratio`, `100% recovery at 40% data loss`, `fcpe_dim: 73000`), the OpenClaw gateway routing diagrams, and the mocked-up dashboard payloads inside this document describe **that pre-v0.6 state** and are kept here as a historical UI-design reference. The current production architecture is hybrid FAISS + FCE-M v0.6.0, with `claude-sonnet-4-6` as the default LLM and a Baileys-based WhatsApp bridge as the active conversational surface (OpenClaw runtime is not bundled). A previous version of this document also carried a real local-UI token, which has since been redacted and replaced with `<LOCAL_UI_TOKEN>`; rotate any gateway token that was at any time present in the publicly-visible history of this file. Authoritative current state: [`../RESEARCH_PROGRESS_v0.6.md`](../RESEARCH_PROGRESS_v0.6.md). Cleanup audit trail: [`../../test-results/legacy-cleanup-v0.6.4.md`](../../test-results/legacy-cleanup-v0.6.4.md).
+
 ---
 
 ## System Terminology (Official Definitions)

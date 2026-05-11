@@ -1,3 +1,4 @@
+[v0.6.4 banner] HISTORICAL chat transcript / brainstorming log captured before v0.6.0. The "73,000x compression / mega-compression" claims and the FHRSS+FCPE framing throughout this file describe the pre-v0.6 backend. The current architecture is hybrid FAISS + FCE-M v0.6.0; for the active state see docs/RESEARCH_PROGRESS_v0.6.md. This file is preserved verbatim as project history.
 
 You said:
 Claude bot.. what can you tell me, and it changed its name to molt bot
