@@ -124,9 +124,9 @@ byon-orchestrator/
 │   │   └── protocol.ts       # MACP type definitions
 │   └── services/
 │       └── signature-service.ts
-├── memory-service/           # FHRSS+FCPE Memory (Python)
+├── memory-service/           # Memory Service (Python) — hybrid FAISS + FCE-M v0.6.0
 │   ├── memory_service.py
-│   └── fhrss_fcpe_unified.py
+│   └── fhrss_fcpe_unified.py # legacy wrapper (pre-v0.6, kept for backward-compat import)
 └── dist/                     # Compiled output
 ```
 
@@ -174,7 +174,7 @@ docker-compose ps
 ### Worker Agent
 - `INBOX_PATH` - Path to inbox directory
 - `HANDOFF_PATH` - Path to handoff directory
-- `MEMORY_SERVICE_URL` - URL for FHRSS+FCPE memory service
+- `MEMORY_SERVICE_URL` - URL for memory service (hybrid FAISS + FCE-M v0.6.0)
 
 ### Auditor Agent
 - `HANDOFF_PATH` - Path to handoff directory
@@ -213,7 +213,9 @@ GET  /health         - Health check
 GET  /status         - Execution status
 ```
 
-## FHRSS+FCPE Memory System
+## Memory System (FAISS + FCE-M v0.6.0)
+
+> Pre-v0.6 backend was FHRSS+FCPE; see the historical bullet at the bottom of this section. The active substrate is the hybrid stack described below.
 
 The memory service provides a hybrid backend:
 

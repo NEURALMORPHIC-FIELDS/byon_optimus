@@ -101,7 +101,7 @@ BYON Optimus integrates the **hybrid FAISS + FCE-M v0.6.0** memory backend (form
 **Role**: Infinite memory, audit trail, calendar indexing.
 
 **Components**:
-- FHRSS+FCPE Memory Service
+- Hybrid FAISS + FCE-M v0.6.0 Memory Service (legacy backend: FHRSS+FCPE)
 - Audit Service
 - Calendar Index
 - Global Memory Vitalizer (GMV)
@@ -219,7 +219,7 @@ interface MemoryContext {
 
 Non-decision daemon that maintains emergent memory state:
 
-- **Read-only** on FHRSS+FCPE data
+- **Read-only** on the hybrid FAISS + FCE-M store (legacy FHRSS+FCPE data on pre-v0.6 deployments)
 - **Write-only** metadata outputs
 - Computes Attractors (semantic clusters)
 - Calculates system coherence
@@ -228,7 +228,7 @@ Non-decision daemon that maintains emergent memory state:
 
 ```yaml
 services:
-  memory-service:       # Python FHRSS+FCPE wrapper
+  memory-service:       # Python hybrid FAISS + FCE-M v0.6.0 (legacy: FHRSS+FCPE wrapper)
   byon-worker:          # TypeScript worker agent
   byon-auditor:         # TypeScript auditor + signer
   byon-executor:        # AIR-GAPPED executor
