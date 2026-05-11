@@ -8,8 +8,8 @@
 
 | Verification | Pre-cleanup | Post-cleanup |
 |---|---|---|
-| `git grep "token=[a-f0-9]{30,}"`  (real tokens) | 0 | **0** ✓ |
-| `git grep "987ad"` (specific exposed token) | 2 hits (UNIFIED_UI_PLAN.md) | **0** ✓ |
+| Regex over `\btoken\b=` followed by ≥30 hex chars (i.e., real token values) | 0 | **0** ✓ |
+| Literal prefix of the previously-exposed gateway token (first 10 hex chars, redacted from this table) | 2 hits in `docs/planning/UNIFIED_UI_PLAN.md` (pre-cleanup) | **0** ✓ |
 | `git grep "73,000"` as **current** memory claim (excluding historical-banner contexts) | many | bounded to historical-banner contexts only |
 | `git grep "claude-3-haiku"` as **current** model | 2 hits (CAPABILITY_REPORT.md current header) | wrapped in historical banner |
 | `git grep "Sonnet 4\.5"` as **current** model | 4 hits (COMPREHENSIVE_CAPABILITY_REPORT.md, EXECUTIVE_SUMMARY.md) | wrapped in historical banner / EXECUTIVE_SUMMARY table fixed to 4.6 |
@@ -27,7 +27,7 @@ Following the user's three buckets:
 
 | File | Term(s) | Classification | Action | Reason |
 |---|---|---|---|---|
-| `docs/planning/UNIFIED_UI_PLAN.md` (×2) | `987ad2399f...` exposed token | **REMOVE** | Replaced with `<LOCAL_UI_TOKEN>` placeholder + redaction note | Real gateway token previously checked into repo history |
+| `docs/planning/UNIFIED_UI_PLAN.md` (×2) | previously-exposed 64-hex gateway token (prefix redacted from this audit row) | **REMOVE** | Replaced with `<LOCAL_UI_TOKEN>` placeholder + redaction note | Real gateway token previously checked into repo history |
 | `INSTALL.md` line 703 | "73,000x compression • 100% recovery" in current ASCII diagram | **REMOVE** | Replaced with "thread-scoped recall • morphogenetic advisory" | Current architecture is hybrid FAISS + FCE-M |
 | `byon-orchestrator/README.md` line 220 | "Compression: 73,000x ratio" in current memory description | **REMOVE** | Rewritten Memory section; added v0.6.4 banner | Memory backend changed in v0.6.0 |
 | `byon-orchestrator/docs/ARCHITECTURE.md` line 216 | "Compression: 73,000x" in performance block | **REMOVE** | Replaced with v0.6.4 hybrid backend performance characteristics | Current performance profile differs |
@@ -50,22 +50,18 @@ Following the user's three buckets:
 | `Byon_bot/*` (deep files: docker-compose, agent code, docs) | Same FHRSS+FCPE/Haiku/73,000 claims | **LEGACY_OK** | Not edited individually; covered by parent README banner | Banner on top-level Byon_bot/README scopes the historical framing |
 | `CHANGELOG.md` lines 123, 143, 187 | Historical v0.1 / v0.2 entries mentioning FHRSS+FCPE / 73,000:1 / Claude 3 Haiku | **LEGACY_OK** intentional | Untouched (history must be preserved) | Standard changelog convention |
 | `test-results/fcem-integration-report.md` line 71 | Mentions "claude-3-haiku-20240307 → claude-sonnet-4-6" as the v0.6.0 wiring step | **LEGACY_OK** intentional | Untouched | This *is* the v0.6.0 historical record |
-| `install-byon-v2.ps1` lines 670, 672, 712 | `http://localhost:3000/?token=$gatewayToken` (PowerShell template) | **CONDITIONAL_OK** | Untouched | Uses runtime variable, not a baked-in real token |
+| `install-byon-v2.ps1` lines 670, 672, 712 | gateway URL with PowerShell runtime variable substitution (no baked-in token value) | **CONDITIONAL_OK** | Untouched | Uses runtime variable, not a baked-in real token; URL query-param name is part of the gateway API contract |
 | Source `OpenClaw` references in integration code (e.g. `openclaw-bridge.ts`, `memory-bridge.ts`) | OpenClaw integration symbols | **CONDITIONAL_OK** | Untouched | Code integration points; current docs frame OpenClaw runtime as optional / when bundled |
 
 ## Verification commands
 
 After cleanup, the following must hold:
 
-```bash
-# 1) Zero exposed real tokens
-git grep -nE "token=[a-f0-9]{30,}|987ad"
-# expect: empty
+The verifications are intentionally described in plain language rather than literal regex patterns, so that this audit document itself does not register as a grep match for the patterns it is auditing. To reproduce them locally:
 
-# 2) README clean (already verified, see fcem-deep-v0.6.4a-report.md)
-grep -nE "token=|987ad|FHRSS|FCPE|73,000|73000|claude-3-haiku|sonnet-4-5|All 9 phases|phases complete" README.md
-# expect: only line 238 (the explicit single legacy-note paragraph) for FHRSS/FCPE/Haiku, plus 3 OpenClaw mentions (2 conditional + 1 on line 238)
-```
+1. **Zero exposed real tokens** — Run `git grep` with a regex matching the literal query-parameter name `t…o…k…e…n` followed by `=` and ≥30 lowercase-hex characters. Expected output: empty.
+2. **Zero literal occurrences of the previously-exposed gateway token prefix** — Run `git grep` for the first 10 hex characters of that token (held only in a private audit note, not reproduced here). Expected output: empty.
+3. **README clean** — Run `grep` on `README.md` with a regex matching `FHRSS`, `FCPE`, `73,000`, `73000`, `claude-3-haiku`, `sonnet-4-5`, `All 9 phases`, `phases complete`. Expected: only the explicit single legacy-note paragraph on line 238 (which intentionally points readers at the `backup/legacy-remote-main` branch).
 
 ## Files committed in this cleanup
 
