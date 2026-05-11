@@ -700,7 +700,7 @@ Configure channels in `.env` by adding the respective API tokens. See `.env.exam
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │       FAISS + FCE-M v0.6.0 Memory Service (hybrid)    │   │
-│  │         73,000x compression • 100% recovery          │   │
+│  │   thread-scoped recall • morphogenetic advisory      │   │
 │  │                      :8000                           │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                             │

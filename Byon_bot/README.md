@@ -1,4 +1,6 @@
-# Byon Bot - Multi-Agent System
+# Byon Bot — Multi-Agent System  *(legacy / parallel workspace)*
+
+> **⚠ Pre-v0.6 parallel workspace.** This `Byon_bot/` tree is the earlier pnpm-workspace implementation of the MACP pipeline (FHRSS+FCPE memory, OpenClaw gateway as primary, Claude 3 Haiku). The current production orchestrator is [`../byon-orchestrator/`](../byon-orchestrator/) (npm, hybrid FAISS + FCE-M v0.6.0 memory, `claude-sonnet-4-6`, Baileys WhatsApp bridge). `Byon_bot/` is preserved as a parallel reference; the FHRSS+FCPE / 73,000x / Haiku claims below describe its own pre-v0.6 state, not the current v0.6.4 BYON Optimus architecture. For the authoritative current state see [`../docs/RESEARCH_PROGRESS_v0.6.md`](../docs/RESEARCH_PROGRESS_v0.6.md).
 
 A secure multi-agent bot system implementing MACP v1.1 (Multi-Agent Control Protocol) with air-gapped code execution via Jupyter Kernel.
 

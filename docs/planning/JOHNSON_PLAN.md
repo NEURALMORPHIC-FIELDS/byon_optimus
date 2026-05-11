@@ -11,10 +11,10 @@
 **Project**: Byon_bot
 **Version**: 1.0
 **Created**: 2026-01-31
-**Updated**: 2026-02-02
-**Status**: IMPLEMENTATION COMPLETE
+**Updated**: 2026-02-02 (historical snapshot; superseded by v0.6.4 research line)
+**Status**: HISTORICAL — pre-v0.6.x integration completion record
 
-> **✅ BYON Optimus Integration**: All 9 phases complete. See `BYON_EXECUTION_PLAN.json` and `BYON_PROGRESSION.json` for details.
+> **⚠ Historical record (pre-v0.6).** "All 9 phases complete" describes the v0.1.0 → v0.2.0 MACP-pipeline implementation milestones, finalised 2026-02-02. The project subsequently moved into a research phase (v0.6.0 → v0.6.4) that integrates FCE-M v0.6.0 as a morphogenetic memory substrate. The current operational classification is **Level 2 of 4** (Morphogenetic Advisory Memory); Omega coagulation through the conversational loop has *not* been demonstrated under default thresholds. The authoritative current status lives in [`../RESEARCH_PROGRESS_v0.6.md`](../RESEARCH_PROGRESS_v0.6.md).
 
 ---
 

@@ -574,8 +574,8 @@ pre{
           <div class="small">Audit trail verification</div>
           <pre id="integrity">{"status":"ok","chain_length":0,"last_verified":"--"}</pre>
           <hr />
-          <div class="kv">Compression: <b>73,000x</b> (FCPE)</div>
-          <div class="kv">Recovery: <b>100% @ 50% loss</b> (FHRSS)</div>
+          <div class="kv">Memory backend: <b>FAISS + FCE-M v0.6.0</b></div>
+          <div class="kv">Recall scope: <b>thread (default)</b></div>
         </div>
       </div>
     </div>
@@ -634,7 +634,7 @@ pre{
  * - OpenClaw: SINGLE communication platform
  * - BYON: Orchestrator (Worker + Auditor)
  * - Executor: AIR-GAPPED (network_mode: none)
- * - Memory: FHRSS+FCPE (73,000x compression, 100% recovery @ 50% loss)
+ * - Memory: hybrid FAISS + FCE-M v0.6.0 (semantic recall + morphogenetic advisory)
  * - GMV: Global Memory Vitalizer (metadata-only daemon)
  *
  * V2 Improvements:
@@ -689,7 +689,7 @@ const CHANNELS = BOOT.channels || [
 ];
 
 const INTEGRATIONS = BOOT.integrations || [
-  { id:"memory", name:"FHRSS+FCPE Memory", enabled:true, notes:"Primary memory system (73,000x compression)" },
+  { id:"memory", name:"FAISS + FCE-M v0.6.0 Memory", enabled:true, notes:"Hybrid backend: FAISS retrieval + FCE-M morphogenetic advisory (v0.6.4)" },
   { id:"gmv", name:"Global Memory Vitalizer", enabled:true, notes:"Metadata daemon (read-only memory access)" },
   { id:"calendar", name:"Calendar Index", enabled:true, notes:"Audit trail time indexing" },
   { id:"git", name:"Git", enabled:true, notes:"Repo operations via executor" },
@@ -1424,8 +1424,8 @@ document.getElementById("memTestRecovery").onclick = async () => {
   } catch (e) {
     document.getElementById("integrity").textContent = JSON.stringify({
       status: "ok",
-      note: "FHRSS+FCPE guarantees 100% recovery @ 50% loss",
-      compression: "73,000x",
+      note: "Hybrid FAISS + FCE-M v0.6.0 backend; thread-scoped recall + morphogenetic advisory",
+      backend: "FAISS IndexFlatIP + FCE-M v0.6.0",
       last_verified: new Date().toISOString()
     }, null, 2);
   }

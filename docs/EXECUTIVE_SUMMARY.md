@@ -24,8 +24,8 @@
 | Feature | Competitors | BYON |
 |---------|-------------|------|
 | **Security** | Basic or none | Military-grade (Ed25519 + air-gap) |
-| **AI** | Plugin/addon | Native Claude Sonnet 4.5 |
-| **Memory** | Standard DB | Patent-protected FHRSS (100% recovery @ 40% loss) |
+| **AI** | Plugin/addon | Native Claude Sonnet 4.6 (v0.6.4 default) |
+| **Memory** | Standard DB | Hybrid FAISS + FCE-M v0.6.0 (Patent EP25216372.0) |
 | **Audit** | Logs only | Complete cryptographic trail |
 | **Approval** | Manual | Automated 3-tier validation |
 | **Secrets** | .env files | Secure Vault (GPG + ask-always policy) |

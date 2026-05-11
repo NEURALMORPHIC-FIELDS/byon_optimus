@@ -4858,7 +4858,7 @@ IN
 openssl rand -hex 32
 
 OUT
-987ad2399f0e70b75238d2b3dd586545e2635b8a92572e0e6e9fb70b7fb2a5d5
+<LOCAL_UI_TOKEN>  # redacted; see .env.example for placeholder usage
 Adding the token to .env:
 
 Read c:\Users\Lucian\Desktop\byon_optimus\.env (lines 141-170)
@@ -5414,7 +5414,7 @@ Summary:
    
    - **.env** - Added OPENCLAW_GATEWAY_TOKEN
      ```
-     OPENCLAW_GATEWAY_TOKEN=987ad2399f0e70b75238d2b3dd586545e2635b8a92572e0e6e9fb70b7fb2a5d5
+     OPENCLAW_GATEWAY_TOKEN=<LOCAL_UI_TOKEN>   # redacted from public history; generate locally with `openssl rand -hex 32`
      ```
 
    - **C:\Users\Lucian\.openclaw\openclaw.json** - OpenClaw CLI configuration

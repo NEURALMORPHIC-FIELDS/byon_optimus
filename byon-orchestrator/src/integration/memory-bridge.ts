@@ -11,13 +11,16 @@
  * Memory Bridge
  * =============
  *
- * Bridge între BYON Orchestrator și sistemul de memorie FHRSS+FCPE.
- * Oferă acces unificat la toate tipurile de memorie.
+ * Bridge between the BYON Orchestrator and the memory subsystem.
+ * Provides unified access to all memory layers.
  *
- * Memory Providers:
- * 1. FHRSS+FCPE (Primary) - Infinite memory with 73,000x compression
- * 2. memory-core (Fallback) - OpenClaw's built-in memory
- * 3. lancedb (Optional) - Vector database for embeddings
+ * Memory providers (v0.6.4):
+ * 1. FAISS (Primary, semantic retrieval) — IndexFlatIP, 384-dim
+ * 2. FCE-M v0.6.0 (Primary, morphogenetic advisory) — BSD-3-Clause vendored
+ * 3. memory-core (Fallback) — OpenClaw's built-in memory when available
+ * 4. lancedb (Optional) — Vector database for embeddings
+ * Pre-v0.6 legacy backend (FHRSS+FCPE monolithic) is preserved at
+ * INFINIT_MEMORYCONTEXT/ for reference only.
  *
  * CRITICAL:
  * - BYON MUST NOT START without memory service

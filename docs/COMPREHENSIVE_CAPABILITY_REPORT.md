@@ -1,19 +1,21 @@
-# BYON Optimus v3.0 — Comprehensive Capability Report
+# BYON Optimus v3.0 — Comprehensive Capability Report (historical)
 
-**Date:** 2026-02-04 03:14 UTC  
-**System:** BYON Orchestrator + OpenClaw Gateway  
-**Version:** Phase 13 COMPLETE  
-**Purpose:** Identify implementation opportunities and use cases
+> **Historical document — pre-v0.6.x.** Memory backend, LLM model and phase status here reflect the 2026-02-04 v3.0 / Phase 13 snapshot. Current state (v0.6.4): hybrid FAISS + FCE-M v0.6.0 memory; default LLM `claude-sonnet-4-6`; operational classification Level 2 / 4. See [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), and [`../test-results/`](../test-results/) for the present capability surface.
+
+**Date:** 2026-02-04 03:14 UTC (original)
+**System:** BYON Orchestrator + OpenClaw Gateway (when bundled)
+**Version:** Phase 13 (v3.0, superseded by v0.6.4)
+**Purpose:** Identify implementation opportunities and use cases (historical record)
 
 ---
 
-## 📊 EXECUTIVE SUMMARY
+## 📊 EXECUTIVE SUMMARY (historical snapshot)
 
-BYON Optimus is a **multi-agent orchestrator** system with capabilities for:
-- **Enterprise security** (Ed25519, air-gap, approval flow)
-- **Infinite memory** (FHRSS+FCPE, 73,000x compression)
-- **AI processing** (Claude Sonnet 4.5)
-- **Task orchestration** (Worker → Auditor → Executor pipeline)
+At the time of this report (v3.0 / Phase 13) BYON Optimus was characterised as a **multi-agent orchestrator** system with:
+- **Enterprise security** (Ed25519, air-gap, approval flow) — *still current in v0.6.4*
+- **Infinite memory** (FHRSS+FCPE, 73,000x compression) — *superseded; current is hybrid FAISS + FCE-M v0.6.0*
+- **AI processing** (Claude Sonnet 4.5) — *current default is Claude Sonnet 4.6*
+- **Task orchestration** (Worker → Auditor → Executor pipeline) — *still current in v0.6.4*
 
 ---
 

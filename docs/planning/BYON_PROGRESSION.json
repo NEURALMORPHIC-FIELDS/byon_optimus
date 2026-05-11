@@ -37,12 +37,13 @@
   },
 
   "current_state": {
-    "phase": "COMPLETED",
-    "phase_name": "All Phases Completed",
-    "status": "COMPLETED",
-    "next_action": "PROJECT COMPLETE - All 9 phases implemented",
+    "_v0_6_4_note": "Historical snapshot. Current authoritative status is docs/RESEARCH_PROGRESS_v0.6.md (v0.6.0 -> v0.6.4, Level 2 of 4).",
+    "phase": "HISTORICAL - v0.1/v0.2 phases completed 2026-02-02; v0.6.x research line ongoing",
+    "phase_name": "All v0.1/v0.2 phases completed (historical)",
+    "status": "HISTORICAL_COMPLETE",
+    "next_action": "Continue v0.6.x research line - see RESEARCH_PROGRESS_v0.6.md",
     "blockers": [],
-    "last_completed_task": "PHASE_9 Task 9.4 - Documentation created"
+    "last_completed_task": "PHASE_9 Task 9.4 - Documentation created (historical, 2026-02-02)"
   },
 
   "phases_progress": {

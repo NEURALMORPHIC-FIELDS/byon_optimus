@@ -1,4 +1,6 @@
-# FHRSS + FCPE v3.0-RS: Infinite Context Memory System
+# FHRSS + FCPE v3.0-RS: Infinite Context Memory System  *(legacy / reference)*
+
+> **⚠ Reference-only legacy module.** Since BYON Optimus v0.6.0 the active memory backend is the hybrid FAISS + FCE-M v0.6.0 stack at [`../byon-orchestrator/memory-service/`](../byon-orchestrator/memory-service/). This `INFINIT_MEMORYCONTEXT/` directory is preserved as the historical reference implementation of FHRSS+FCPE (Patent EP25216372.0) — it is **not** the substrate that runs in the current v0.6.4 production pipeline. The 73,000:1 compression and 40 %-loss recovery numbers quoted below apply to *this Python implementation* and are kept here for benchmarking, scientific reference and continuity with the patent record; they are not active claims about the v0.6.4 orchestrator. For the current architecture see [`../docs/RESEARCH_PROGRESS_v0.6.md`](../docs/RESEARCH_PROGRESS_v0.6.md).
 
 **Multi-Scale Fault-Tolerant Infinite Context for AI/LLM Applications**
 

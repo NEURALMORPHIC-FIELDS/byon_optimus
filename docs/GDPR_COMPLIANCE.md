@@ -1,7 +1,9 @@
-# BYON Optimus - GDPR Compliance Documentation
+# BYON Optimus — GDPR Compliance Documentation
 
-**Version:** 1.0.0
-**Date:** 2026-02-02
+> **v0.6.4 banner.** This document was authored against the v0.1 / v0.2 architecture (FHRSS+FCPE memory backend). The data-minimisation principles, retention model and lawful-basis analysis remain valid, but the active memory substrate is now hybrid **FAISS + FCE-M v0.6.0**. References to "FCPE 73,000x compression" below are *historical* and apply to the pre-v0.6 backend; storage-footprint and retention guarantees for the current hybrid backend live in [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md) and in the memory-service health endpoints.
+
+**Version:** 1.0.0 (compliance text); architecture references superseded by v0.6.4
+**Date:** 2026-02-02 (original)
 **Data Controller:** Vasile Lucian Borbeleac
 
 ---

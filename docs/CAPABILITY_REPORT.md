@@ -1,9 +1,12 @@
-# BYON Optimus - Capability Report
-## Patent: EP25216372.0 - Omni-Qube-Vault
+# BYON Optimus — Capability Report (historical, v0.1.0)
 
-**Date:** 2026-02-04
-**System Version:** 0.1.0
-**AI Model:** claude-3-haiku-20240307
+> **Historical document — pre-v0.6.x.** This report captures the v0.1.0 capability snapshot from 2026-02-04 (Claude 3 Haiku, pre-FCE-M memory). The default LLM is now `claude-sonnet-4-6`, the memory backend is hybrid FAISS + FCE-M v0.6.0, and capability tracking now lives in [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md) and [`../test-results/`](../test-results/). The original text below is preserved as a historical record.
+
+## Patent: EP25216372.0 — Omni-Qube-Vault
+
+**Date:** 2026-02-04 (original)
+**System Version:** 0.1.0 (superseded by 0.6.4 — see RESEARCH_PROGRESS_v0.6.md)
+**AI Model (at the time of this snapshot):** claude-3-haiku-20240307 *(current: claude-sonnet-4-6)*
 
 ---
 
@@ -167,9 +170,10 @@ def sum_of_numbers(n: int) -> int:
 - Memory context (FHRSS) was not populated in tests
 - Executor cannot access network (by design)
 
-### 5.3 API Key Limitations
-- Only `claude-3-haiku-20240307` available
-- Sonnet/Opus models return 404
+### 5.3 API Key Limitations (historical, v0.1.0 only)
+- Only `claude-3-haiku-20240307` available at the time of this snapshot.
+- Sonnet/Opus models returned 404 in v0.1.0.
+- *Resolved in v0.6.0+: default model is now `claude-sonnet-4-6` (`byon-orchestrator/src/agents/worker/ai-processor.ts`).*
 
 ---
 

@@ -1,8 +1,10 @@
-# Implementation Summary - Production Readiness Tasks
+# Implementation Summary — Production Readiness Tasks (historical, v0.2)
 
-**Date**: 2026-02-02  
-**Status**: ✅ ALL TASKS COMPLETED  
-**Production Readiness**: 88% → 100%
+> **Historical snapshot — pre-v0.6.x.** This document captures the production-readiness checklist completed on 2026-02-02 for the v0.1 → v0.2 milestone (FHRSS+FCPE memory, OpenClaw gateway, Claude 3 Haiku). The "100% production readiness" claim and the 73,000x compression validation numbers below apply to that snapshot. The current state (v0.6.4) is documented in [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md); operational classification is **Level 2 of 4** (Morphogenetic Advisory Memory) and the system is explicitly research-in-progress.
+
+**Date**: 2026-02-02 (original)
+**Status**: ✅ All v0.2 production-readiness tasks completed (historical milestone)
+**Production Readiness**: 88% → 100% *(v0.2 snapshot; v0.6.4 status is research-in-progress, see RESEARCH_PROGRESS_v0.6.md)*
 
 ---
 

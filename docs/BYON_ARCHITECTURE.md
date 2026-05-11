@@ -31,12 +31,12 @@ BYON Optimus integrates the **hybrid FAISS + FCE-M v0.6.0** memory backend (form
 └─────────────────────────┬───────────────────────────────────┘
                           │
 ┌─────────────────────────▼───────────────────────────────────┐
-│                   Memory Layer                               │
+│                   Memory Layer (v0.6.4)                      │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │              FHRSS+FCPE Memory System                 │   │
-│  │   • 73,000x compression via FCPE                      │   │
-│  │   • 100% recovery at 50% data loss via FHRSS          │   │
-│  │   • Semantic search with embeddings                   │   │
+│  │     Hybrid FAISS + FCE-M v0.6.0 Memory Service        │   │
+│  │   • FAISS IndexFlatIP semantic recall (thread-scoped) │   │
+│  │   • FCE-M morphogenetic advisory layer                │   │
+│  │   • OmegaRecord / ReferenceField / residue signals    │   │
 │  └──────────────────────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │           Global Memory Vitalizer (GMV)               │   │
@@ -190,10 +190,16 @@ Benefits:
 
 ## Memory Architecture
 
-### FHRSS+FCPE
+### Hybrid FAISS + FCE-M v0.6.0 (current)
 
-- **FCPE**: Fractal Chaos Pattern Encoding (73,000x compression)
-- **FHRSS**: Fault-Harmonic Recovery Structural System (100% recovery at 50% loss)
+- **FAISS layer** — `IndexFlatIP` with `sentence-transformers/all-MiniLM-L6-v2` 384-dim L2-normalized embeddings; thread-scoped recall by default (v0.6.1), `scope="global"` opt-in.
+- **FCE-M v0.6.0 layer** (BSD-3-Clause, vendored at `byon-orchestrator/memory-service/vendor/fce_m/`) — morphogenetic advisory: OmegaRecord (irreversible coagulation), ReferenceField (interpretation lens), residue accumulation, advisory feedback.
+- Persistence: `faiss_*.bin`, `meta_*.pkl`, `fcem/fcem_snapshot.json`.
+
+### Legacy (historical only)
+
+- **FCPE**: Fractal Chaos Pattern Encoding (73,000x compression) — *pre-v0.6 backend, reference implementation in `INFINIT_MEMORYCONTEXT/`*.
+- **FHRSS**: Fault-Harmonic Recovery Structural System (100% recovery at 50% loss) — *pre-v0.6 fault-tolerance scheme; no longer the active substrate*.
 
 ### Memory Types
 

@@ -199,12 +199,12 @@ function buildComponents(baseDir: string): ComponentEntry[] {
             description: "MACP v1.1 document types: EvidencePack, PlanDraft, ApprovalRequest, ExecutionOrder, JohnsonReceipt.",
         },
         {
-            name: "Memory Service (FHRSS+FCPE)",
-            concept_names: ["memory", "fhrss", "fcpe", "infinite-memory", "semantic-search"],
+            name: "Memory Service (FAISS + FCE-M v0.6.0 hybrid)",
+            concept_names: ["memory", "faiss", "fce-m", "morphogenetic", "advisory", "semantic-search", "thread-scoped"],
             actual_paths: ["byon-orchestrator/memory-service/"],
             line_count: 0, // Python service, line count not tracked here
             status: "implemented",
-            description: "Python Flask service providing FHRSS+FCPE semantic search. Port 8001. 73,000x compression, 100% recovery at 40% loss.",
+            description: "Python FastAPI service providing hybrid FAISS retrieval + FCE-M morphogenetic advisory (vendored under vendor/fce_m/, BSD-3-Clause). Port 8001 host / 8000 container. Thread-scoped recall by default. Pre-v0.6 legacy backend (FHRSS+FCPE) preserved at INFINIT_MEMORYCONTEXT/ for reference.",
         },
         {
             name: "Global Memory Vitalizer (GMV)",

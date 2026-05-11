@@ -12,13 +12,13 @@
  * =====================
  *
  * Handles memory operations for the Worker agent.
- * Integrates with FHRSS+FCPE for infinite memory.
+ * Integrates with the hybrid FAISS + FCE-M v0.6.0 backend.
  *
  * IMPORTANT:
- * - All memory operations are through FHRSS+FCPE
- * - 73,000x compression ratio
- * - 100% data recovery at 50% data loss
+ * - Semantic recall via FAISS IndexFlatIP, thread-scoped by default (v0.6.1)
+ * - Morphogenetic advisory via FCE-M (OmegaRecord, ReferenceField, residue)
  * - Context IDs are returned, not full content
+ * - Historical note: pre-v0.6 used FHRSS+FCPE (see INFINIT_MEMORYCONTEXT/)
  */
 
 import * as crypto from "crypto";

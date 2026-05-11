@@ -2,6 +2,8 @@
 
 **Multi-Agent Control Protocol (MACP) v1.1 Implementation**
 
+> **v0.6.4 banner.** Memory backend is **hybrid FAISS + FCE-M v0.6.0** (the FHRSS+FCPE / 73,000x compression numbers that appear in legacy paragraphs below are historical claims from the pre-v0.6 era; they are no longer the active backend). Default LLM is `claude-sonnet-4-6`. For the current architecture see [`../docs/RESEARCH_PROGRESS_v0.6.md`](../docs/RESEARCH_PROGRESS_v0.6.md) and [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
+
 A secure, air-gapped multi-agent orchestration system for AI task execution with cryptographic verification.
 
 ## Architecture
@@ -213,12 +215,12 @@ GET  /status         - Execution status
 
 ## FHRSS+FCPE Memory System
 
-The memory service provides infinite context memory with fault tolerance:
+The memory service provides a hybrid backend:
 
-- **Max Context**: 2,000,000+ tokens
-- **Recovery**: 100% at 40% data loss
-- **Compression**: 73,000x ratio
-- **Storage**: Persistent SSD-backed
+- **Semantic recall**: FAISS `IndexFlatIP`, 384-dim L2-normalized embeddings (sentence-transformers `all-MiniLM-L6-v2`); thread-scoped by default (v0.6.1)
+- **Morphogenetic advisory**: FCE-M v0.6.0 (BSD-3-Clause, vendored) — OmegaRecord, ReferenceField, residue signaling
+- **Storage**: Persistent SSD-backed (`faiss_*.bin`, `meta_*.pkl`, `fcem/fcem_snapshot.json`)
+- *Historical (pre-v0.6): the legacy FHRSS+FCPE backend (73,000:1 compression / 100% recovery at 40% loss) is no longer the active substrate; see `../INFINIT_MEMORYCONTEXT/` for the reference implementation and CHANGELOG for the migration.*
 
 ### Memory API (Port 8000)
 

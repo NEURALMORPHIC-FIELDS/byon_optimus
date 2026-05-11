@@ -210,11 +210,11 @@ The memory service provides infinite context storage with fault tolerance:
 │  │  └──────────────┘  └──────────────┘  └──────────────┘  │ │
 │  └────────────────────────────────────────────────────────┘ │
 │                                                              │
-│  Performance:                                                │
-│  • Max Context: 2,000,000+ tokens                           │
-│  • Recovery: 100% at 40% data loss                          │
-│  • Compression: 73,000x                                     │
-│  • Speed: 350+ embeddings/sec                               │
+│  Performance (v0.6.4 hybrid backend):                       │
+│  • Semantic retrieval: FAISS IndexFlatIP @ 384-dim          │
+│  • Morphogenetic layer: FCE-M v0.6.0 advisory               │
+│  • Thread-scoped recall by default; scope=global opt-in     │
+│  • Persistent disk-backed indices + FCE snapshot            │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
