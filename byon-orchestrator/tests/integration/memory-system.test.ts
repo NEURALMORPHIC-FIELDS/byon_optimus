@@ -1,12 +1,15 @@
 /**
- * Memory System Integration Tests
+ * Memory System Integration Tests (legacy FHRSS+FCPE API surface)
  * ================================
  *
- * Tests FHRSS+FCPE memory integration:
- * - Store and retrieve operations
- * - Search functionality
- * - Recovery testing
- * - Health monitoring
+ * Tests the pre-v0.6 FHRSS+FCPE memory API contract against an
+ * in-memory mock client (including the legacy `compression_ratio:
+ * 73000` stat). Covered: store/retrieve, search, recovery, health.
+ *
+ * v0.6.4 note: The current production memory-service no longer
+ * emits `compression_ratio`; its stats endpoint shape is documented
+ * at docs/BYON_API.md. This file is preserved for backward-compat
+ * regression of the legacy contract.
  *
  * Patent: EP25216372.0 - OmniVault - Vasile Lucian Borbeleac
  */

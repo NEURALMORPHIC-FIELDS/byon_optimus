@@ -1,10 +1,19 @@
 /**
- * Usage Test Campaign — Domain 4: Memory & FHRSS+FCPE
- * =====================================================
+ * Usage Test Campaign — Domain 4: Memory (legacy FHRSS+FCPE API surface)
+ * ======================================================================
  * TC-036 through TC-060
  *
  * Validates memory storage, semantic search, fact extraction,
- * FHRSS recovery, health checks, and cross-type retrieval.
+ * recovery, health checks, and cross-type retrieval against an
+ * in-memory mock client that mirrors the pre-v0.6 FHRSS+FCPE API
+ * surface (including the legacy `compression_ratio: 73000` stat).
+ *
+ * v0.6.4 note: The current production memory-service no longer
+ * emits `compression_ratio`; its stats endpoint emits
+ * `{version, num_contexts, by_type, fcpe_dim, fhrss_profile,
+ * fhrss_overhead, total_storage_mb, storage_path, backend, cache}`
+ * (see docs/BYON_API.md). This file tests the legacy API contract
+ * for backward-compat regression purposes only.
  *
  * Patent: EP25216372.0 — Vasile Lucian Borbeleac
  */
@@ -12,7 +21,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 
 // ============================================================================
-// MOCK MEMORY CLIENT (mirrors production FHRSS+FCPE interface)
+// MOCK MEMORY CLIENT (mirrors the legacy pre-v0.6 FHRSS+FCPE API surface)
 // ============================================================================
 
 interface MemoryEntry {
