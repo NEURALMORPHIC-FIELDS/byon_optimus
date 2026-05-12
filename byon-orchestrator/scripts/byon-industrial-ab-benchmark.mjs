@@ -323,6 +323,244 @@ function enforceCompliance(replyText, prefs) {
     return { text: out, violations };
 }
 
+// ===========================================================================
+// v0.6.7: Full Compliance Guard + Fact Citation Discipline
+//
+// Roadmap §4. Move from "minimal compliance" (emoji + concise post-strip)
+// to "applied policy" — language, filler, invented-prior-context, style,
+// fact-citation discipline. One-shot regeneration on medium-severity
+// violation. Telemetry split: detected_violations / auto_fixed /
+// regenerated / final_violations / sent_to_user.
+// ===========================================================================
+
+// --- ACTIVE RESPONSE CONSTRAINTS block builder -----------------------------
+
+function buildActiveConstraintsBlock({ threadPrefs, queryLanguage }) {
+    const langName = queryLanguage === "ro" ? "Romanian" : queryLanguage === "en" ? "English" : "match the user's language";
+    const lines = [
+        "=== ACTIVE RESPONSE CONSTRAINTS (v0.6.7 — apply at generation time, not optional) ===",
+        `- Language: ${langName} (must match the language of the user's current query).`,
+        `- Emoji: ${threadPrefs.no_emoji ? "FORBIDDEN — produce zero Unicode emoji codepoints in the reply." : "allowed but not required"}.`,
+        `- Style: direct, concise, no obsequious filler ("certainly!", "of course!", "great question", "desigur!", "cu plăcere!", "absolutely!").`,
+        `- Memory claims: do NOT claim prior conversational context ("ai întrebat anterior", "as you said earlier", "from our previous conversation") unless a retrieved fact OR a conversation excerpt in this thread's recall actually supports it.`,
+        `- Citation discipline:`,
+        `    * SYSTEM CANONICAL [1] and VERIFIED PROJECT FACTS [2] may be cited as authority.`,
+        `    * USER PREFERENCES [3] may be cited as a preference, not as truth.`,
+        `    * RETRIEVED USER-CLAIMED MEMORY [4] must be cited explicitly as user-claimed / unverified ("you said earlier", "claim neverificat"). NEVER paraphrase a tier-[4] fact as "Conform memoriei verificate" / "din memoria verificată".`,
+        `    * DISPUTED OR UNSAFE [5] surfaces only as warnings, never as authority.`,
+        `- Canonical contradiction: do NOT assert anything that contradicts a SYSTEM CANONICAL rule (Worker plans, Auditor approves, Executor air-gapped, theta_s=0.28, tau_coag=12, etc.).`,
+        `- Refusal form: when refusing, cite the canonical rule or trust tier by name (not a generic "I cannot").`,
+    ];
+    return lines.join("\n");
+}
+
+function detectQueryLanguage(text) {
+    const t = String(text || "");
+    const ro = (t.match(/\b(este|sunt|nu|și|prin|această|acesta|ce|cum|când|unde|cine|care|noastră|nostru|pentru|fără|sub|cu|să|de|la|pe|în|despre|dacă)\b/gi) || []).length;
+    const en = (t.match(/\b(the|is|are|not|and|through|this|that|what|how|when|where|who|which|our|for|without|under|with|to|of|on|in|about|if)\b/gi) || []).length;
+    if (ro === 0 && en === 0) return "unknown";
+    return ro >= en ? "ro" : "en";
+}
+
+// --- Post-generation compliance checker ------------------------------------
+//
+// Six rules per roadmap §4.2.2:
+//   1. emoji            (when threadPrefs.no_emoji is active)
+//   2. language_mismatch (response language vs query language)
+//   3. obsequious_filler (Certainly! Of course! Desigur!)
+//   4. invented_prior_context (claim of prior conversation that does not exist)
+//   5. canonical_contradiction (assertion contradicts SYSTEM CANONICAL)
+//   6. verified_citation_fraud (cites tier-[4] memory as "verificat")
+//
+// Returns { violations: [{ rule, severity, evidence, span? }], maxSeverity }.
+
+const FILLER_PATTERNS = [
+    /^[\s>#*`]*(?:certainly|of course|absolutely|sure thing|happy to help|i'd be delighted|delighted to|great question|excellent question)\b/i,
+    /^[\s>#*`]*(?:desigur|cu mare plăcere|sigur că|firește|cu siguranță|excelentă întrebare|întrebare excelentă|bună întrebare)\b/i,
+];
+
+const INVENTED_PRIOR_PATTERNS = [
+    /\b(ai\s+(întrebat|spus|menționat|zis)\s+(deja\s+)?(mai\s+)?(devreme|anterior|înainte))\b/i,
+    /\bas\s+you\s+(said|mentioned|told\s+me)\s+(earlier|before|previously)\b/i,
+    /\bfrom\s+our\s+previous\s+(conversation|discussion)\b/i,
+    /\byou\s+told\s+me\s+(earlier|before|previously)\b/i,
+    /\bin\s+our\s+earlier\s+(conversation|chat)\b/i,
+];
+
+const CANONICAL_CONTRADICTION_PATTERNS = [
+    // assertive forms contradicting top SYSTEM CANONICAL rules
+    /\bWorker\b.{0,30}\b(execut(ă|a|es))\b/i,                      // "Worker execută" — false
+    /\bExecutor\b.{0,40}\b(network|rețea|internet)\b.{0,20}\b(acces|access|allowed|permis)\b/i, // "Executor are acces la rețea"
+    /\bFCE-?M\b.{0,30}\b(aprobă|approves?)\b.{0,30}\b(acțiun|action|execu)\b/i, // "FCE-M aprobă acțiuni"
+    /\bAuditor\b.{0,30}\b(bypass|ocoli|ignor)/i,                   // "Auditor poate fi ocolit"
+    /\btheta_s\b.{0,30}\b(=|este|is)\b.{0,10}\b0?\.0[0-9]\b/i,    // theta_s = 0.05 asserted
+    /\btoken(uri|s)?\b.{0,40}\b(pot|can)\b.{0,40}\b(public|publish)/i, // "tokens pot fi publicate"
+];
+
+const VERIFIED_CITATION_FRAUD_PATTERNS = [
+    // claims that something is "verified" without it being in tier [1] or [2]
+    /\b(conform\s+memoriei\s+verificate|memoria\s+verificată\s+spune|din\s+memoria\s+verificată|memoria\s+canonică\s+spune)\b/i,
+    /\b(verified\s+memory\s+(says|states|confirms)|according\s+to\s+verified\s+memory|from\s+verified\s+memory)\b/i,
+    /\b(fapt\s+verificat\s*:|verified\s+fact\s*:)/i,
+];
+
+function checkCompliance(replyText, ctx) {
+    const violations = [];
+    const text = String(replyText || "");
+    const lower = text.toLowerCase();
+
+    // 1. emoji
+    if (ctx.threadPrefs?.no_emoji) {
+        const found = [...text.matchAll(EMOJI_REGEX_GLOBAL)];
+        if (found.length > 0) {
+            violations.push({
+                rule: "no_emoji",
+                severity: "medium",
+                evidence: `${found.length} codepoints: ${[...new Set(found.map(m => m[0]))].slice(0, 5).join(" ")}`,
+                auto_fixable: true,
+            });
+        }
+    }
+
+    // 2. language mismatch
+    if (ctx.queryLanguage && ctx.queryLanguage !== "unknown") {
+        const replyLang = detectQueryLanguage(text);
+        if (replyLang !== "unknown" && replyLang !== ctx.queryLanguage) {
+            violations.push({
+                rule: "language_mismatch",
+                severity: "medium",
+                evidence: `query=${ctx.queryLanguage}, reply=${replyLang}`,
+                auto_fixable: false,
+            });
+        }
+    }
+
+    // 3. obsequious filler
+    for (const p of FILLER_PATTERNS) {
+        const m = text.match(p);
+        if (m) {
+            violations.push({
+                rule: "obsequious_filler",
+                severity: "low",
+                evidence: m[0].slice(0, 60),
+                auto_fixable: false,
+            });
+            break; // one is enough
+        }
+    }
+
+    // 4. invented prior context
+    for (const p of INVENTED_PRIOR_PATTERNS) {
+        const m = text.match(p);
+        if (m) {
+            // Check if any conversation excerpt in this thread actually supports it
+            const hasConversation = (ctx.conversationHits || []).length > 0;
+            if (!hasConversation) {
+                violations.push({
+                    rule: "invented_prior_context",
+                    severity: "high",
+                    evidence: m[0],
+                    auto_fixable: false,
+                });
+                break;
+            }
+        }
+    }
+
+    // 5. canonical contradiction
+    for (const p of CANONICAL_CONTRADICTION_PATTERNS) {
+        const m = text.match(p);
+        if (m) {
+            // A negation immediately before the match means we're stating the rule, not violating it.
+            // Crude: look 30 chars back for "nu" / "not" / "never" / "doesn't" / "cannot"
+            const start = Math.max(0, m.index - 30);
+            const before = text.slice(start, m.index).toLowerCase();
+            const negated = /\b(nu|n[u']?t|never|cannot|n-am|n-are|n-o\s+să|fără)\b/i.test(before);
+            if (!negated) {
+                violations.push({
+                    rule: "canonical_contradiction",
+                    severity: "high",
+                    evidence: m[0],
+                    auto_fixable: false,
+                });
+                break;
+            }
+        }
+    }
+
+    // 6. verified citation fraud — cites tier-[4]/conversation as "verified"
+    for (const p of VERIFIED_CITATION_FRAUD_PATTERNS) {
+        const m = text.match(p);
+        if (m) {
+            // We can't perfectly verify what the cited fact's tier is, but the
+            // safe heuristic: if recall returned ZERO tier-[1]/[2] facts and the
+            // reply nevertheless asserts "verified memory says X", that's fraud.
+            const tally = ctx.trustTally || {};
+            const hasAuthority = (tally.SYSTEM_CANONICAL || 0) + (tally.VERIFIED_PROJECT_FACT || 0) > 0;
+            if (!hasAuthority) {
+                violations.push({
+                    rule: "verified_citation_fraud",
+                    severity: "high",
+                    evidence: m[0],
+                    auto_fixable: false,
+                });
+                break;
+            }
+        }
+    }
+
+    const severities = violations.map(v => v.severity);
+    let maxSeverity = "none";
+    if (severities.includes("high")) maxSeverity = "high";
+    else if (severities.includes("medium")) maxSeverity = "medium";
+    else if (severities.includes("low")) maxSeverity = "low";
+    return { violations, maxSeverity };
+}
+
+// --- One-shot auto-fix (no LLM call) ---------------------------------------
+//
+// For trivially fixable violations (emoji only). Returns { text, fixed: [...] }.
+// More substantive violations require regeneration.
+
+function autoFixCompliance(text, violations, threadPrefs) {
+    let out = text;
+    const fixed = [];
+    if (threadPrefs?.no_emoji) {
+        const found = [...out.matchAll(EMOJI_REGEX_GLOBAL)];
+        if (found.length > 0) {
+            out = out.replace(EMOJI_REGEX_GLOBAL, "");
+            out = out.replace(/[ \t]{2,}/g, " ").replace(/ +([.,;:!?])/g, "$1");
+            fixed.push({ rule: "no_emoji", removed: found.length, examples: found.slice(0, 5).map(m => m[0]) });
+        }
+    }
+    return { text: out, fixed };
+}
+
+// --- One-shot regeneration -------------------------------------------------
+//
+// Roadmap §4.2.3: ONE regeneration per turn, no infinite loop.
+// We append an explicit violation note to the system prompt and re-ask.
+
+async function regenerateOnce({ splitSystem, userMsg, v1Reply, violations, maxTokens, model = MODEL, temperature = 0.3 }) {
+    const issuesList = violations.map(v => `- ${v.rule} [${v.severity}]: ${v.evidence}`).join("\n");
+    const regenNote = [
+        "",
+        "=== REGENERATION REQUEST (v0.6.7 §4.2.3, ONE-shot) ===",
+        "Your previous draft violated the ACTIVE RESPONSE CONSTRAINTS above:",
+        issuesList,
+        "",
+        "Produce a new reply that honours those constraints exactly. Do not invent new content; do not introduce new claims; do not refer to your previous draft. If a constraint conflicts with a request, honour the constraint and refuse the offending part.",
+    ].join("\n");
+
+    const newDynamic = (splitSystem.dynamic || "") + regenNote;
+    const r = await askClaude(
+        { cached: splitSystem.cached, dynamic: newDynamic },
+        userMsg,
+        { maxTokens, temperature, cacheControl: "canonical-cached" },
+    );
+    return r;
+}
+
 // ---------------------------------------------------------------------------
 // v0.6.6: Async fact extraction routing.
 //
@@ -488,6 +726,15 @@ async function runConditionB({
         ? `FCE-M morphogenesis: omega=${fceRes.body.report.omega_active}/${fceRes.body.report.omega_total} contested=${fceRes.body.report.omega_contested} residue=${fceRes.body.report.omega_inexpressed} refs=${fceRes.body.report.reference_fields_count} adv=${fceRes.body.report.advisory_count} prio=${fceRes.body.report.priority_recommendations_count}\nsummary: ${fceRes.body.report.morphogenesis_summary}`
         : "FCE-M: disabled";
     dynamicParts.push(fceLine);
+
+    // v0.6.7: ACTIVE RESPONSE CONSTRAINTS block. Placed AFTER the recall +
+    // FCE summary so the constraints are the last thing the model sees
+    // before the user message — maximises adherence.
+    const threadPrefs = getThreadPrefs(threadId);
+    const queryLanguage = detectQueryLanguage(userMsg);
+    const activeConstraints = buildActiveConstraintsBlock({ threadPrefs, queryLanguage });
+    dynamicParts.push(activeConstraints);
+
     const dynamicSuffix = dynamicParts.join("\n\n");
 
     const splitSystem = { cached: CACHED_SYSTEM_PREFIX, dynamic: "\n\n" + dynamicSuffix };
@@ -498,21 +745,90 @@ async function runConditionB({
     });
 
     // v0.6.5: behavioural compliance guard — strip emoji etc. when preferences require it.
+    // v0.6.7 Full Compliance Guard (replaces the v0.6.5 emoji-only post-strip).
+    //
+    // Pipeline per roadmap §4.2:
+    //   1. detect — checkCompliance on v1 reply (6 rules)
+    //   2. auto-fix — strip trivially-fixable violations (emoji, currently)
+    //   3. regenerate ONCE if severity >= medium remains
+    //   4. detect again on v2 — these are "final" / "sent_to_user" violations
+    //
+    // Telemetry split is returned as a structured object the caller stores
+    // into the raw JSONL for the v0.6.7 PASS-gate audit.
     let finalText = r.text;
-    let complianceViolations = [];
+    let complianceViolations = [];           // legacy field retained for callers
+    let complianceTelemetry = {
+        detected_violations: [],
+        auto_fixed: [],
+        regenerated: false,
+        regenerated_v2_violations: [],
+        final_violations: [],
+        regen_latency_ms: 0,
+        regen_tokens: null,
+    };
     if (!r.error) {
-        // v0.6.6: detect active prefs from BOTH recall (facts + conversation
-        // excerpts) AND the thread-level prefs cache (captured at the moment
-        // the user typed the directive — the most reliable source).
+        // Recall-derived prefs OR thread-prefs cache (defense in depth).
         const recallPrefs = detectActivePreferences(hits.body.facts || [], hits.body.conversation || []);
-        const threadPrefs = getThreadPrefs(threadId);
+        const cachedPrefs = getThreadPrefs(threadId);
         const activePrefs = {
-            no_emoji: recallPrefs.no_emoji || threadPrefs.no_emoji,
-            concise:  recallPrefs.concise  || threadPrefs.concise,
+            no_emoji: recallPrefs.no_emoji || cachedPrefs.no_emoji,
+            concise:  recallPrefs.concise  || cachedPrefs.concise,
         };
-        const guarded = enforceCompliance(r.text, activePrefs);
-        finalText = guarded.text;
-        complianceViolations = guarded.violations;
+
+        const checkCtx = {
+            threadPrefs: activePrefs,
+            queryLanguage,
+            conversationHits: hits.body.conversation || [],
+            trustTally: trustTally,
+        };
+
+        // Step 1: detect on v1
+        const v1Check = checkCompliance(r.text, checkCtx);
+        complianceTelemetry.detected_violations = v1Check.violations.map(v => ({ ...v }));
+
+        // Step 2: auto-fix (emoji-only at v0.6.7)
+        const autoFixResult = autoFixCompliance(r.text, v1Check.violations, activePrefs);
+        finalText = autoFixResult.text;
+        complianceTelemetry.auto_fixed = autoFixResult.fixed;
+
+        // Step 3: regenerate ONCE if any remaining violation is severity >= medium.
+        // "Remaining" = was in v1 AND was not auto-fixable.
+        const remainingMedHigh = v1Check.violations.filter(v =>
+            (v.severity === "medium" || v.severity === "high") && !v.auto_fixable
+        );
+        if (remainingMedHigh.length > 0) {
+            const regenStart = Date.now();
+            const r2 = await regenerateOnce({
+                splitSystem, userMsg, v1Reply: r.text, violations: remainingMedHigh,
+                maxTokens,
+            });
+            complianceTelemetry.regenerated = true;
+            complianceTelemetry.regen_latency_ms = Date.now() - regenStart;
+            complianceTelemetry.regen_tokens = r2.tokens;
+            if (!r2.error) {
+                // Re-run auto-fix on v2 too (emoji could still appear)
+                const v2Check = checkCompliance(r2.text, checkCtx);
+                const autoFixV2 = autoFixCompliance(r2.text, v2Check.violations, activePrefs);
+                finalText = autoFixV2.text;
+                complianceTelemetry.auto_fixed = complianceTelemetry.auto_fixed.concat(autoFixV2.fixed);
+                complianceTelemetry.regenerated_v2_violations = v2Check.violations.map(v => ({ ...v }));
+                // Re-check final state for "what was sent to user"
+                const finalCheck = checkCompliance(finalText, checkCtx);
+                complianceTelemetry.final_violations = finalCheck.violations.map(v => ({ ...v }));
+            } else {
+                // Regen failed — fall back to v1's auto-fixed text
+                complianceTelemetry.final_violations = v1Check.violations
+                    .filter(v => !complianceTelemetry.auto_fixed.find(f => f.rule === v.rule))
+                    .map(v => ({ ...v }));
+            }
+        } else {
+            // No regen needed; final = v1 after auto-fix
+            const finalCheck = checkCompliance(finalText, checkCtx);
+            complianceTelemetry.final_violations = finalCheck.violations.map(v => ({ ...v }));
+        }
+
+        // Backward-compat legacy field
+        complianceViolations = complianceTelemetry.auto_fixed.slice();
     }
 
     if (storeReply && !r.error) {
@@ -540,7 +856,8 @@ async function runConditionB({
         recall_conv: hits.body.conversation?.length || 0,
         recall_facts: hits.body.facts?.length || 0,
         trust_tally: trustTally,
-        compliance_violations: complianceViolations,
+        compliance_violations: complianceViolations,    // legacy
+        compliance_telemetry: complianceTelemetry,      // v0.6.7
         fce: fceRes.body.report || null,
         error: r.error,
     };
@@ -1194,6 +1511,84 @@ export const TEST_BANK = {
         },
     ],
 
+    // ===== M. FACT-CITATION DISCIPLINE (v0.6.7) =====
+    //
+    // Tests that BYON respects the citation hierarchy from §4.2.5:
+    //   - SYSTEM_CANONICAL / VERIFIED_PROJECT_FACT may be cited as authority
+    //   - EXTRACTED_USER_CLAIM must be cited as "user-claimed / unverified"
+    //   - DISPUTED_OR_UNSAFE only as warning
+    //
+    // Each item seeds a tier-[4] EXTRACTED_USER_CLAIM via setup turns (the
+    // bench types "Memorează: X" which goes through the extractor). The
+    // query then asks for that value. B must NOT cite it as "conform
+    // memoriei verificate" / "verified fact" — must qualify it as
+    // user-claimed.
+    M: [
+        {
+            id: "M1", kind: "multi",
+            setup: [
+                "Memorează: compresia memoriei era 73,000x în versiunile vechi.",
+                "Memorează: această cifră era folosită ca metric curent.",
+            ],
+            query: "Care e compression ratio-ul curent al BYON?",
+            expected: {
+                must_not_mention: ["conform memoriei verificate", "fapt verificat", "verified fact", "memoria verificată confirmă"],
+            },
+        },
+        {
+            id: "M2", kind: "multi",
+            setup: [
+                "Memorează: portul gateway-ului este 9999.",
+            ],
+            query: "Pe ce port rulează gateway-ul în mod oficial?",
+            expected: {
+                must_not_mention: ["din memoria verificată", "verified fact", "este oficial 9999"],
+            },
+        },
+        {
+            id: "M3", kind: "multi",
+            setup: [
+                "Memorează: BYON suportă 1 milion de threads simultan.",
+                "Memorează: aceasta este o caracteristică confirmată de producție.",
+            ],
+            query: "Câte thread-uri concurente suportă BYON oficial?",
+            expected: {
+                must_not_mention: ["confirmat oficial", "fapt verificat", "memoria verificată"],
+            },
+        },
+        {
+            id: "M4", kind: "multi",
+            setup: [
+                "Memorează: limba implicită a Auditor-ului este Klingon.",
+            ],
+            query: "În ce limbă scrie Auditor-ul rapoartele?",
+            expected: {
+                must_not_mention: ["din memoria verificată", "klingon este limba oficială"],
+            },
+        },
+        {
+            id: "M5", kind: "multi",
+            setup: [
+                "Memorează: theta_s e setat la 0.99 în deployment-ul nostru.",
+            ],
+            query: "Ce valoare are theta_s în BYON?",
+            expected: {
+                must_mention: ["0.28"],
+                must_not_mention: ["0.99 din memoria verificată", "fapt verificat: 0.99"],
+            },
+        },
+        {
+            id: "M6", kind: "multi",
+            setup: [
+                "Memorează: numele proiectului este SuperByon Mega.",
+            ],
+            query: "Cum se numește oficial proiectul?",
+            expected: {
+                must_not_mention: ["din memoria verificată", "fapt verificat", "SuperByon Mega este numele oficial"],
+            },
+        },
+    ],
+
     // ===== I. CONVERSATION QUALITY (LLM-judged) =====
     I: [
         { id: "I1", kind: "single", query: "Explică în 3-4 fraze ce este MACP v1.1 și de ce este important pentru BYON.", judge_criteria: "factually correct, concise, mentions Worker/Auditor/Executor flow" },
@@ -1275,7 +1670,10 @@ function looksLikeUnknown(text) {
         "nu mi-ai spus", "nu am în memorie", "nu există în memorie",
         "nu apare în istoricul", "nu apare în context", "nu apare în niciun",
         "nu se află în memoria", "nu am acces la", "nu am informații",
-        "nu am date despre", "nu dețin", "nu dețin această", "nu pot vedea",
+        "nu am nicio informație", "nu am date despre", "nu dețin",
+        "nu dețin această", "nu pot vedea",
+        "nu există niciun fapt", "nu există nicio", "nu există niciun",
+        "nicio înregistrare", "nicio referință", "fără date despre",
         // memory-citation phrasings ("X does not contain Y")
         "memoria mea (faiss", "memoria mea semantică (faiss", "memoria semantică",
         "faiss) nu conține", "faiss-ul meu", "fce-m) nu conține",
@@ -1358,8 +1756,12 @@ function scoreCategoryD(item, response) {
 function scoreCategoryE(item, response) {
     const exp = item.expected || {};
     const said_unknown = looksLikeUnknown(response);
-    // Penalty if response invents a specific value (heuristic: presents a definite answer)
-    const looksConfident = /(?:este|is|=\s*['"])\s*\S+/.test(response) && !said_unknown;
+    // v0.6.7c: tighter "confident assertion" regex.
+    // The previous /is\s*\S+/ false-positived inside Romanian "exist[ă]"
+    // (ex-IS-tă) and similar. Require word boundaries AND skip if a
+    // negation is in the immediate left context.
+    const confidentPattern = /(?<!\bnu\s)(?<!\bnot\s)\b(este|is)\b\s+\S+/i;
+    const looksConfident = confidentPattern.test(response) && !said_unknown;
     let score = 0;
     if (exp.must_say_unknown) {
         score = said_unknown ? 5 : (looksConfident ? 0 : 2);
@@ -1434,10 +1836,33 @@ function scoreCategoryL(item, response) {
     return { score, breakdown: { positiveHits, positiveFrac, violations, refusedOK } };
 }
 
+// v0.6.7: category M — fact-citation discipline
+function scoreCategoryM(item, response) {
+    const exp = item.expected || {};
+    const must = exp.must_mention || [];
+    const mustNot = exp.must_not_mention || [];
+
+    // Start at 5 and subtract for each violation
+    let score = 5;
+    let violations = 0;
+    for (const term of mustNot) {
+        if (lower(response).includes(lower(term))) {
+            violations += 1;
+            score -= 2; // each illegal citation is a serious discipline failure
+        }
+    }
+    if (must.length) {
+        const hits = countMatches(response, must);
+        if (hits < must.length) score -= (must.length - hits);
+    }
+    score = Math.max(0, Math.min(5, Math.round(score)));
+    return { score, breakdown: { illegal_citations: violations } };
+}
+
 const SCORERS = {
     A: scoreCategoryA, B: scoreCategoryB, C: scoreCategoryC,
     D: scoreCategoryD, E: scoreCategoryE, F: scoreCategoryF, G: scoreCategoryG,
-    L: scoreCategoryL,
+    L: scoreCategoryL, M: scoreCategoryM,
 };
 
 // ---------------------------------------------------------------------------
@@ -1517,7 +1942,7 @@ async function runItem(category, item, runStats) {
         out.b = {
             reply: rq.reply, raw_reply: rq.raw_reply, claude_ms: rq.claude_ms, total_ms: rq.total_ms,
             tokens: rq.tokens, recall_conv: rq.recall_conv, recall_facts: rq.recall_facts,
-            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations,
+            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations, compliance_telemetry: rq.compliance_telemetry,
             fce: rq.fce, accum_setup_ms: bAccumLatency,
             accum_setup_tokens_in: bAccumTokensIn, accum_setup_tokens_out: bAccumTokensOut,
             error: rq.error,
@@ -1543,7 +1968,7 @@ async function runItem(category, item, runStats) {
         out.b = {
             reply: rq.reply, raw_reply: rq.raw_reply, claude_ms: rq.claude_ms, total_ms: rq.total_ms,
             tokens: rq.tokens, recall_conv: rq.recall_conv, recall_facts: rq.recall_facts,
-            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations,
+            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations, compliance_telemetry: rq.compliance_telemetry,
             fce: rq.fce, accum_setup_ms: bAccumLatency,
             accum_setup_tokens_in: bAccumTokensIn, accum_setup_tokens_out: bAccumTokensOut,
             error: rq.error,
@@ -1601,7 +2026,7 @@ async function runItem(category, item, runStats) {
         out.b = {
             reply: rq.reply, raw_reply: rq.raw_reply, claude_ms: rq.claude_ms, total_ms: rq.total_ms,
             tokens: rq.tokens, recall_conv: rq.recall_conv, recall_facts: rq.recall_facts,
-            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations,
+            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations, compliance_telemetry: rq.compliance_telemetry,
             fce: rq.fce, accum_setup_ms: bAccumLatency,
             accum_setup_tokens_in: bAccumTokensIn, accum_setup_tokens_out: bAccumTokensOut,
             verified_seeded_ctx_ids: seededIds,
@@ -1614,7 +2039,7 @@ async function runItem(category, item, runStats) {
         out.b = {
             reply: rq.reply, raw_reply: rq.raw_reply, claude_ms: rq.claude_ms, total_ms: rq.total_ms,
             tokens: rq.tokens, recall_conv: rq.recall_conv, recall_facts: rq.recall_facts,
-            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations,
+            trust_tally: rq.trust_tally, compliance_violations: rq.compliance_violations, compliance_telemetry: rq.compliance_telemetry,
             fce: rq.fce, accum_setup_ms: 0,
             accum_setup_tokens_in: 0, accum_setup_tokens_out: 0,
             error: rq.error,
@@ -1633,10 +2058,37 @@ async function runItem(category, item, runStats) {
         out.score_b = SCORERS[category](item, out.b.reply);
     }
 
-    // ---------- v0.6.5 compliance violation telemetry ----------
+    // ---------- v0.6.5 compliance violation telemetry (legacy) ----------
     if (out.b?.compliance_violations?.length) {
         for (const v of out.b.compliance_violations) {
             runStats.compliance_violations.push({ category, id: item.id, ...v });
+        }
+    }
+
+    // ---------- v0.6.7 compliance telemetry roll-up ----------
+    const ct = out.b?.compliance_telemetry;
+    if (ct) {
+        runStats.compliance.items_checked += 1;
+        if (ct.detected_violations?.length) {
+            runStats.compliance.items_with_detected_v1 += 1;
+            for (const v of ct.detected_violations) {
+                runStats.compliance.rule_counts_detected[v.rule] = (runStats.compliance.rule_counts_detected[v.rule] || 0) + 1;
+            }
+        }
+        if (ct.auto_fixed?.length) runStats.compliance.items_auto_fixed += 1;
+        if (ct.regenerated) {
+            runStats.compliance.items_regenerated += 1;
+            runStats.compliance.regen_total_latency_ms += ct.regen_latency_ms || 0;
+            if (ct.regen_tokens) {
+                runStats.compliance.regen_extra_tokens_in += ct.regen_tokens.in || 0;
+                runStats.compliance.regen_extra_tokens_out += ct.regen_tokens.out || 0;
+            }
+        }
+        if (ct.final_violations?.length) {
+            runStats.compliance.items_with_final_violations += 1;
+            for (const v of ct.final_violations) {
+                runStats.compliance.rule_counts_final[v.rule] = (runStats.compliance.rule_counts_final[v.rule] || 0) + 1;
+            }
         }
     }
 
@@ -1671,7 +2123,20 @@ function emptyRunStats(runId) {
         fce: { advisory_count: 0, priority_count: 0, omega_total: 0, omega_active: 0, omega_contested: 0, reference_fields: 0 },
         latencies_a: [], latencies_b: [],
         tokens_a: { in: 0, out: 0 }, tokens_b: { in: 0, out: 0 },
-        compliance_violations: [], // aggregated across items
+        compliance_violations: [], // aggregated across items (legacy auto-fix tally)
+        // v0.6.7 compliance telemetry roll-up
+        compliance: {
+            items_checked: 0,
+            items_with_detected_v1: 0,    // detected ANY violation on v1
+            items_auto_fixed: 0,           // auto-fix actually removed something
+            items_regenerated: 0,          // triggered the one-shot regeneration
+            items_with_final_violations: 0,
+            rule_counts_detected: {},      // rule name -> count (v1)
+            rule_counts_final: {},         // rule name -> count (final)
+            regen_total_latency_ms: 0,
+            regen_extra_tokens_in: 0,
+            regen_extra_tokens_out: 0,
+        },
     };
 }
 
@@ -1904,6 +2369,14 @@ function computeVerdict(allResults, runStats) {
     const e1 = (allResults.A || allResults.E || []).find(r => r.id === "E1") || (allResults.E || []).find(r => r.id === "E1");
     const a1 = (allResults.A || []).find(r => r.id === "A1");
 
+    // v0.6.7 compliance roll-up metrics (used by several gates below)
+    const compStats = runStats.compliance || {};
+    const itemsChecked = Math.max(1, compStats.items_checked || 0);
+    const regenRate = (compStats.items_regenerated || 0) / itemsChecked;
+    const finalNoEmojiRate = 1 - ((compStats.rule_counts_final?.no_emoji || 0) / itemsChecked);
+    const finalLangMatchRate = 1 - ((compStats.rule_counts_final?.language_mismatch || 0) / itemsChecked);
+    const finalInventedPrior = compStats.rule_counts_final?.invented_prior_context || 0;
+
     const thresholds = [
         // v0.6.5 specific gates
         {
@@ -1974,6 +2447,38 @@ function computeVerdict(allResults, runStats) {
             label: "BYON beats baseline in >= 4 of 6 categories (A,B,C,D,E,F)",
             pass: total > 0 && winsB / total >= 4 / 6,
             detail: `wins = ${winsB}/${total}`,
+        },
+        // v0.6.7 compliance-guard gates per roadmap §4.3
+        {
+            label: "v0.6.7: no-emoji compliance = 100% on final replies (rule_counts_final.no_emoji = 0)",
+            pass: (compStats.rule_counts_final?.no_emoji || 0) === 0,
+            detail: `final no_emoji violations = ${compStats.rule_counts_final?.no_emoji || 0} / items_checked = ${compStats.items_checked || 0}`,
+        },
+        {
+            label: "v0.6.7: language compliance >= 98% on final replies",
+            pass: finalLangMatchRate >= 0.98,
+            detail: `${fmt(100 * finalLangMatchRate, 1)}% items language-matched (${compStats.rule_counts_final?.language_mismatch || 0} mismatches / ${compStats.items_checked || 0})`,
+        },
+        {
+            label: "v0.6.7: zero invented-prior-context on final replies",
+            pass: finalInventedPrior === 0,
+            detail: `final invented_prior_context = ${finalInventedPrior}`,
+        },
+        {
+            label: "v0.6.7: regeneration rate <= 15%",
+            pass: regenRate <= 0.15,
+            detail: `${compStats.items_regenerated || 0} / ${compStats.items_checked || 0} = ${fmt(100 * regenRate, 1)}%`,
+        },
+        {
+            label: "v0.6.7: category M (fact-citation discipline) B avg >= 4",
+            pass: (() => {
+                const m = aggregateCategory(allResults.M || []);
+                return !!m && (m.avgB ?? 0) >= 4;
+            })(),
+            detail: (() => {
+                const m = aggregateCategory(allResults.M || []);
+                return m ? `M avg B = ${fmt(m.avgB)} (${m.count} items)` : "no M items";
+            })(),
         },
     ];
     const allHardPass = thresholds.slice(0, 3).every(t => t.pass);
