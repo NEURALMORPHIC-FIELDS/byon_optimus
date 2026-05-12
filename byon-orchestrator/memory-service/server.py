@@ -482,6 +482,18 @@ async def handle_request(request: Dict[str, Any]):
             "report": get_fcem().morphogenesis_report(request.get("query")),
         }
 
+    # ------------------------------------------------------------------
+    # v0.6.6: Operator-Verified Facts (channel-gated write path)
+    # ------------------------------------------------------------------
+    elif action == "verified_fact_add":
+        return await verified_fact_add(request)
+
+    elif action == "verified_fact_revoke":
+        return await verified_fact_revoke(request)
+
+    elif action == "verified_fact_list":
+        return await verified_fact_list(request)
+
     else:
         raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
 
@@ -731,6 +743,222 @@ async def test_recovery(request: Dict[str, Any]) -> Dict[str, Any]:
         "loss_percent": loss_percent,
         "realistic_test": result.get("realistic_test", False)
     }
+
+# ----------------------------------------------------------------------
+# v0.6.6: Operator-Verified Facts
+#
+# The VERIFIED_PROJECT_FACT trust tier exists since v0.6.5 in
+# fact-extractor.mjs::classifyTrust, but until this release there was
+# no production write path. v0.6.6 adds:
+#
+#   - verified_fact_add: only path that can set trust=VERIFIED_PROJECT_FACT.
+#     Server REJECTS the call unless channel == "operator-cli" — there is
+#     no conversational path to this tier. Requires non-empty evidence,
+#     operator, subject, predicate, object.
+#
+#   - verified_fact_revoke: marks revoked=true + revoked_at + revoked_reason.
+#     formatFactsForPrompt in fact-extractor.mjs filters revoked facts out
+#     of recall blocks at the next TTL.
+#
+#   - verified_fact_list: read-only listing of all currently active
+#     verified facts (optionally filtered by scope).
+#
+# These endpoints are intentionally low-magic: they piggy-back on the
+# existing store_fact path and the inferTrustFromHit recall-time
+# classifier. The trust tier propagates through fact-extractor.mjs unchanged.
+# ----------------------------------------------------------------------
+
+OPERATOR_CLI_CHANNEL = "operator-cli"
+
+def _ensure_operator_channel(request: Dict[str, Any]) -> None:
+    """Reject any verified-fact write that does not come from the operator CLI."""
+    data = request.get("data", {}) or {}
+    channel = data.get("channel") or request.get("channel")
+    if channel != OPERATOR_CLI_CHANNEL:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"verified_fact_* writes require channel='{OPERATOR_CLI_CHANNEL}'. "
+                f"Got channel={channel!r}. "
+                "There is no conversational path to VERIFIED_PROJECT_FACT."
+            ),
+        )
+
+
+async def verified_fact_add(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a VERIFIED_PROJECT_FACT. Channel-gated.
+
+    Required fields in `data`:
+      - subject, predicate, object  (the canonical fact triple)
+      - operator                    (who is asserting it)
+      - evidence                    (free-text source citation)
+
+    Optional:
+      - scope        (default "global")
+      - supersedes   (list of existing ctx_ids this overrides)
+    """
+    _ensure_operator_channel(request)
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+
+    subject = (data.get("subject") or "").strip()
+    predicate = (data.get("predicate") or "").strip()
+    obj = (data.get("object") or "").strip()
+    operator = (data.get("operator") or "").strip()
+    evidence = (data.get("evidence") or "").strip()
+    scope = (data.get("scope") or "global").strip()
+    supersedes = data.get("supersedes") or []
+
+    missing = [k for k, v in {
+        "subject": subject, "predicate": predicate, "object": obj,
+        "operator": operator, "evidence": evidence,
+    }.items() if not v]
+    if missing:
+        raise HTTPException(status_code=400, detail=f"verified_fact_add missing required fields: {missing}")
+
+    fact_text = f"{subject} {predicate.replace('_', ' ')} {obj}"
+    tags = [
+        "verified_project_fact",
+        subject.replace(" ", "_"),
+        f"trust:VERIFIED_PROJECT_FACT",
+        f"scope:{scope}",
+        f"operator:{operator}",
+    ]
+    if supersedes:
+        tags.extend([f"supersedes:{s}" for s in supersedes])
+
+    # Store via the standard fact path so recall + trust inference work
+    # unchanged. Verified facts go to thread_id=None (global scope) so the
+    # operator-asserted truth is visible across all threads.
+    ctx_id = h.store_fact(
+        fact=fact_text,
+        source=f"operator-verified:{operator}",
+        tags=tags,
+        thread_id=None,  # GLOBAL — verified facts are project-wide
+        channel=OPERATOR_CLI_CHANNEL,
+        trust="VERIFIED_PROJECT_FACT",
+        disputed=False,
+        disputed_pattern=None,
+    )
+
+    # Side-record provenance metadata for audit (read back via verified_fact_list)
+    h.content_cache[ctx_id]["verified_metadata"] = {
+        "operator": operator,
+        "evidence": evidence,
+        "scope": scope,
+        "supersedes": supersedes,
+        "created_at": time.time(),
+        "revoked": False,
+    }
+    h._save_content_cache()
+
+    return {
+        "success": True,
+        "ctx_id": ctx_id,
+        "fact": fact_text,
+        "trust": "VERIFIED_PROJECT_FACT",
+        "operator": operator,
+        "evidence": evidence,
+        "scope": scope,
+    }
+
+
+async def verified_fact_revoke(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Mark a previously-verified fact as revoked. Channel-gated."""
+    _ensure_operator_channel(request)
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+
+    ctx_id = data.get("ctx_id")
+    reason = (data.get("reason") or "").strip()
+    operator = (data.get("operator") or "").strip()
+
+    if ctx_id is None or not reason or not operator:
+        raise HTTPException(
+            status_code=400,
+            detail="verified_fact_revoke requires data.ctx_id, data.reason, data.operator",
+        )
+
+    entry = h.content_cache.get(ctx_id)
+    if not entry:
+        raise HTTPException(status_code=404, detail=f"ctx_id {ctx_id} not found")
+
+    md = entry.get("metadata", {})
+    if md.get("trust") != "VERIFIED_PROJECT_FACT":
+        raise HTTPException(
+            status_code=400,
+            detail=f"ctx_id {ctx_id} is not a VERIFIED_PROJECT_FACT (trust={md.get('trust')!r})",
+        )
+
+    # In-place metadata update: mark disputed, append __revoked__ tag, so the
+    # recall path (inferTrustFromHit) downgrades it to DISPUTED_OR_UNSAFE and
+    # formatFactsForPrompt hides it from the VERIFIED block.
+    md["disputed"] = True
+    md["disputed_pattern"] = "operator_revoked"
+    md["trust"] = "DISPUTED_OR_UNSAFE"
+    tags = list(md.get("tags") or [])
+    if "__revoked__" not in tags:
+        tags.append("__revoked__")
+        tags.append("__disputed__")
+        tags.append("trust:DISPUTED_OR_UNSAFE")
+    md["tags"] = tags
+
+    # Audit trail
+    verified_md = entry.setdefault("verified_metadata", {})
+    verified_md["revoked"] = True
+    verified_md["revoked_at"] = time.time()
+    verified_md["revoked_reason"] = reason
+    verified_md["revoked_by"] = operator
+    h._save_content_cache()
+
+    return {
+        "success": True,
+        "ctx_id": ctx_id,
+        "revoked": True,
+        "revoked_by": operator,
+        "revoked_reason": reason,
+    }
+
+
+async def verified_fact_list(request: Dict[str, Any]) -> Dict[str, Any]:
+    """List active VERIFIED_PROJECT_FACT entries (revoked excluded by default)."""
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+    include_revoked = bool(data.get("include_revoked"))
+    scope_filter = data.get("scope")
+
+    out = []
+    for ctx_id, entry in h.content_cache.items():
+        md = entry.get("metadata", {})
+        if md.get("trust") != "VERIFIED_PROJECT_FACT":
+            # Revoked facts have their trust rewritten to DISPUTED_OR_UNSAFE.
+            # Include them only when explicitly requested.
+            if include_revoked and "__revoked__" in (md.get("tags") or []):
+                pass
+            else:
+                continue
+
+        vmd = entry.get("verified_metadata", {}) or {}
+        if scope_filter and vmd.get("scope") != scope_filter:
+            continue
+
+        out.append({
+            "ctx_id": ctx_id,
+            "fact": entry.get("content", ""),
+            "operator": vmd.get("operator"),
+            "evidence": vmd.get("evidence"),
+            "scope": vmd.get("scope"),
+            "supersedes": vmd.get("supersedes", []),
+            "created_at": vmd.get("created_at"),
+            "revoked": vmd.get("revoked", False),
+            "revoked_at": vmd.get("revoked_at"),
+            "revoked_reason": vmd.get("revoked_reason"),
+            "revoked_by": vmd.get("revoked_by"),
+        })
+
+    out.sort(key=lambda e: e.get("created_at") or 0, reverse=True)
+    return {"success": True, "count": len(out), "facts": out}
+
 
 async def get_stats() -> Dict[str, Any]:
     """Get memory statistics"""
