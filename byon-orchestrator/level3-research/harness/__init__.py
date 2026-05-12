@@ -38,6 +38,14 @@ from .telemetry import (
     signal_to_dict,
     summary_event_to_dict,
 )
+from .audit import (
+    L3_GATE_IDS,
+    REPORT_VERSION,
+    build_audit,
+    render_json,
+    render_markdown,
+    write_reports,
+)
 
 __all__ = [
     "LongNaturalTranscriptHarness",
@@ -48,4 +56,11 @@ __all__ = [
     "compute_s_t",
     "signal_to_dict",
     "summary_event_to_dict",
+    # audit module
+    "L3_GATE_IDS",
+    "REPORT_VERSION",
+    "build_audit",
+    "render_json",
+    "render_markdown",
+    "write_reports",
 ]

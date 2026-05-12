@@ -1,0 +1,480 @@
+{
+  "report_version": "level3-ab-audit.v1",
+  "schema_version": "level3-research.harness.v1",
+  "generated_at_commit_sha": "ac7d22979681a6965b06a7eecd5ceedabba06613",
+  "branch": "research/level-3-natural-omega",
+  "advisory_only": true,
+  "metric_source": "research_surrogate_v1_not_fce_production",
+  "runs": {
+    "A": {
+      "branch": "research/level-3-natural-omega",
+      "commit_sha": "ac7d22979681a6965b06a7eecd5ceedabba06613",
+      "transcript_id": "transcript_A_byon_arch_v1_500",
+      "seed": 42,
+      "n_rows": 500,
+      "n_events": 624,
+      "n_centers": 22,
+      "n_summaries": 105,
+      "n_potential_omega_signals": 49,
+      "metric_source": "research_surrogate_v1_not_fce_production",
+      "schema_version": "level3-research.harness.v1"
+    },
+    "B": {
+      "branch": "research/level-3-natural-omega",
+      "commit_sha": "ac7d22979681a6965b06a7eecd5ceedabba06613",
+      "transcript_id": "transcript_B_byon_arch_v1_500",
+      "seed": 1337,
+      "n_rows": 500,
+      "n_events": 596,
+      "n_centers": 21,
+      "n_summaries": 130,
+      "n_potential_omega_signals": 76,
+      "metric_source": "research_surrogate_v1_not_fce_production",
+      "schema_version": "level3-research.harness.v1"
+    }
+  },
+  "z_metabolism": {
+    "A": {
+      "z_total_final": 151.39999999999998,
+      "z_active_final": 34.750000000000014,
+      "z_resolved_final": 71.9833333333333,
+      "z_archived_final": 44.66666666666666,
+      "z_active_ratio_of_total": 0.22952443857331584,
+      "resolved_plus_archived_ratio": 0.7704755614266842,
+      "b_t_min": 0.05277044854881274,
+      "b_t_max": 1.0,
+      "b_t_final": 0.8333333333333334,
+      "invariant_ok": true,
+      "audit_flags": [],
+      "conservation_holds": true
+    },
+    "B": {
+      "z_total_final": 144.39999999999995,
+      "z_active_final": 22.300000000000004,
+      "z_resolved_final": 62.300000000000004,
+      "z_archived_final": 59.800000000000004,
+      "z_active_ratio_of_total": 0.154432132963989,
+      "resolved_plus_archived_ratio": 0.8455678670360114,
+      "b_t_min": 0.0934579439252337,
+      "b_t_max": 1.0,
+      "b_t_final": 0.5263157894736842,
+      "invariant_ok": true,
+      "audit_flags": [],
+      "conservation_holds": true
+    }
+  },
+  "summary_behavior": {
+    "A": {
+      "n_summaries": 105,
+      "summaries_per_perspective": {
+        "factual": 50,
+        "security_boundary": 34,
+        "project_state": 10,
+        "domain_verified": 11
+      },
+      "summaries_per_center": {
+        "byon::macp_pipeline::factual": 10,
+        "byon::security_boundary::security_boundary": 16,
+        "byon::auditor_signature::security_boundary": 2,
+        "byon::general::factual": 23,
+        "byon::fce_m::factual": 4,
+        "byon::trust_hierarchy::factual": 13,
+        "byon::executor_air_gap::security_boundary": 7,
+        "byon::unsafe_memory::security_boundary": 6,
+        "byon::release_state::project_state": 3,
+        "byon::domain_verified::domain_verified": 4,
+        "byon::GDPR::domain_verified": 2,
+        "byon::AI_Act::domain_verified": 2,
+        "byon::ISO::domain_verified": 1,
+        "byon::P-100::domain_verified": 1,
+        "byon::DIN::domain_verified": 1,
+        "byon::project_state::project_state": 5,
+        "byon::level_state::project_state": 2,
+        "byon::token_policy::security_boundary": 3
+      },
+      "z_reduction_total": 116.64999999999996,
+      "summaries_by_reason": {
+        "expression_pattern_stable": 92,
+        "receipt_success_chain": 8,
+        "correction_chain": 5
+      }
+    },
+    "B": {
+      "n_summaries": 130,
+      "summaries_per_perspective": {
+        "factual": 77,
+        "project_state": 11,
+        "security_boundary": 30,
+        "domain_verified": 12
+      },
+      "summaries_per_center": {
+        "byon::macp_pipeline::factual": 11,
+        "byon::general::factual": 35,
+        "byon::trust_hierarchy::factual": 20,
+        "byon::level_state::project_state": 3,
+        "byon::fce_m::factual": 11,
+        "byon::security_boundary::security_boundary": 12,
+        "byon::auditor_signature::security_boundary": 2,
+        "byon::unsafe_memory::security_boundary": 8,
+        "byon::domain_verified::domain_verified": 4,
+        "byon::DIN::domain_verified": 2,
+        "byon::ISO::domain_verified": 2,
+        "byon::GDPR::domain_verified": 1,
+        "byon::AI_Act::domain_verified": 2,
+        "byon::executor_air_gap::security_boundary": 3,
+        "byon::project_state::project_state": 6,
+        "byon::token_policy::security_boundary": 5,
+        "byon::ci_state::project_state": 1,
+        "byon::release_state::project_state": 1,
+        "byon::P-100::domain_verified": 1
+      },
+      "z_reduction_total": 122.09999999999994,
+      "summaries_by_reason": {
+        "expression_pattern_stable": 121,
+        "correction_chain": 5,
+        "receipt_success_chain": 4
+      }
+    }
+  },
+  "potential_omega_signals": {
+    "A": {
+      "n_signals": 49,
+      "advisory_only_count": 49,
+      "advisory_only_validation_passes": true,
+      "signals_per_bucket": {
+        "byon::security_boundary::security_boundary": 6,
+        "byon::general::factual": 6,
+        "byon::trust_hierarchy::factual": 16,
+        "byon::unsafe_memory::security_boundary": 6,
+        "byon::project_state::project_state": 2,
+        "byon::macp_pipeline::factual": 8,
+        "byon::fce_m::factual": 5
+      },
+      "signals_per_center": {
+        "byon::security_boundary::security_boundary": 6,
+        "byon::general::factual": 6,
+        "byon::trust_hierarchy::factual": 16,
+        "byon::unsafe_memory::security_boundary": 6,
+        "byon::project_state::project_state": 2,
+        "byon::macp_pipeline::factual": 8,
+        "byon::fce_m::factual": 5
+      },
+      "signals_per_perspective": {
+        "security_boundary": 12,
+        "factual": 35,
+        "project_state": 2
+      },
+      "top_buckets_by_signal_count": [
+        [
+          "byon::trust_hierarchy::factual",
+          16
+        ],
+        [
+          "byon::macp_pipeline::factual",
+          8
+        ],
+        [
+          "byon::security_boundary::security_boundary",
+          6
+        ],
+        [
+          "byon::general::factual",
+          6
+        ],
+        [
+          "byon::unsafe_memory::security_boundary",
+          6
+        ],
+        [
+          "byon::fce_m::factual",
+          5
+        ],
+        [
+          "byon::project_state::project_state",
+          2
+        ]
+      ],
+      "confidence_min": 0.41685134121351675,
+      "confidence_max": 0.9664919872064907,
+      "confidence_avg": 0.6556483689557265,
+      "source_cycle_ids_length_min": 12,
+      "source_cycle_ids_length_max": 12,
+      "source_cycle_ids_length_unique": [
+        12
+      ]
+    },
+    "B": {
+      "n_signals": 76,
+      "advisory_only_count": 76,
+      "advisory_only_validation_passes": true,
+      "signals_per_bucket": {
+        "byon::general::factual": 25,
+        "byon::security_boundary::security_boundary": 7,
+        "byon::trust_hierarchy::factual": 23,
+        "byon::unsafe_memory::security_boundary": 7,
+        "byon::release_state::project_state": 1,
+        "byon::macp_pipeline::factual": 11,
+        "byon::token_policy::security_boundary": 2
+      },
+      "signals_per_center": {
+        "byon::general::factual": 25,
+        "byon::security_boundary::security_boundary": 7,
+        "byon::trust_hierarchy::factual": 23,
+        "byon::unsafe_memory::security_boundary": 7,
+        "byon::release_state::project_state": 1,
+        "byon::macp_pipeline::factual": 11,
+        "byon::token_policy::security_boundary": 2
+      },
+      "signals_per_perspective": {
+        "factual": 59,
+        "security_boundary": 16,
+        "project_state": 1
+      },
+      "top_buckets_by_signal_count": [
+        [
+          "byon::general::factual",
+          25
+        ],
+        [
+          "byon::trust_hierarchy::factual",
+          23
+        ],
+        [
+          "byon::macp_pipeline::factual",
+          11
+        ],
+        [
+          "byon::security_boundary::security_boundary",
+          7
+        ],
+        [
+          "byon::unsafe_memory::security_boundary",
+          7
+        ],
+        [
+          "byon::token_policy::security_boundary",
+          2
+        ],
+        [
+          "byon::release_state::project_state",
+          1
+        ]
+      ],
+      "confidence_min": 0.45152024888013587,
+      "confidence_max": 0.9450715761698346,
+      "confidence_avg": 0.6367315324287248,
+      "source_cycle_ids_length_min": 12,
+      "source_cycle_ids_length_max": 12,
+      "source_cycle_ids_length_unique": [
+        12
+      ]
+    }
+  },
+  "cross_run_overlap": {
+    "exact_text_overlap": 0,
+    "exact_text_overlap_sample": [],
+    "common_centers": [
+      "byon::AI_Act::domain_verified",
+      "byon::DIN::domain_verified",
+      "byon::GDPR::domain_verified",
+      "byon::ISO::domain_verified",
+      "byon::P-100::domain_verified",
+      "byon::adversarial_input::security_boundary",
+      "byon::auditor_signature::security_boundary",
+      "byon::benchmark_state::project_state",
+      "byon::ci_state::project_state",
+      "byon::domain_verified::domain_verified",
+      "byon::executor_air_gap::security_boundary",
+      "byon::fce_m::factual",
+      "byon::general::factual",
+      "byon::level_state::project_state",
+      "byon::macp_pipeline::factual",
+      "byon::project_state::project_state",
+      "byon::release_state::project_state",
+      "byon::security_boundary::security_boundary",
+      "byon::token_policy::security_boundary",
+      "byon::trust_hierarchy::factual",
+      "byon::unsafe_memory::security_boundary"
+    ],
+    "only_in_a_centers": [
+      "byon::cryptographic_signing::factual"
+    ],
+    "only_in_b_centers": [],
+    "common_center_families": [
+      [
+        "AI_Act",
+        "domain_verified"
+      ],
+      [
+        "DIN",
+        "domain_verified"
+      ],
+      [
+        "GDPR",
+        "domain_verified"
+      ],
+      [
+        "ISO",
+        "domain_verified"
+      ],
+      [
+        "P-100",
+        "domain_verified"
+      ],
+      [
+        "adversarial_input",
+        "security_boundary"
+      ],
+      [
+        "auditor_signature",
+        "security_boundary"
+      ],
+      [
+        "benchmark_state",
+        "project_state"
+      ],
+      [
+        "ci_state",
+        "project_state"
+      ],
+      [
+        "domain_verified",
+        "domain_verified"
+      ],
+      [
+        "executor_air_gap",
+        "security_boundary"
+      ],
+      [
+        "fce_m",
+        "factual"
+      ],
+      [
+        "general",
+        "factual"
+      ],
+      [
+        "level_state",
+        "project_state"
+      ],
+      [
+        "macp_pipeline",
+        "factual"
+      ],
+      [
+        "project_state",
+        "project_state"
+      ],
+      [
+        "release_state",
+        "project_state"
+      ],
+      [
+        "security_boundary",
+        "security_boundary"
+      ],
+      [
+        "token_policy",
+        "security_boundary"
+      ],
+      [
+        "trust_hierarchy",
+        "factual"
+      ],
+      [
+        "unsafe_memory",
+        "security_boundary"
+      ]
+    ],
+    "common_signal_buckets": [
+      "byon::general::factual",
+      "byon::macp_pipeline::factual",
+      "byon::security_boundary::security_boundary",
+      "byon::trust_hierarchy::factual",
+      "byon::unsafe_memory::security_boundary"
+    ],
+    "only_in_a_signal_buckets": [
+      "byon::fce_m::factual",
+      "byon::project_state::project_state"
+    ],
+    "only_in_b_signal_buckets": [
+      "byon::release_state::project_state",
+      "byon::token_policy::security_boundary"
+    ],
+    "divergence_areas": {
+      "centers_only_in_a": [
+        "byon::cryptographic_signing::factual"
+      ],
+      "centers_only_in_b": [],
+      "signal_buckets_only_in_a": [
+        "byon::fce_m::factual",
+        "byon::project_state::project_state"
+      ],
+      "signal_buckets_only_in_b": [
+        "byon::release_state::project_state",
+        "byon::token_policy::security_boundary"
+      ]
+    },
+    "a_b_stability_observations": {
+      "a_z_active_ratio": 0.22952443857331584,
+      "b_z_active_ratio": 0.154432132963989,
+      "a_b_t_final": 0.8333333333333334,
+      "b_b_t_final": 0.5263157894736842,
+      "a_invariant_ok": true,
+      "b_invariant_ok": true
+    }
+  },
+  "l3_gates": {
+    "L3-G1": {
+      "status": "PASS",
+      "rationale": "Both runs preserve conservation invariant (z_active+z_resolved+z_archived==z_total) and report z_active/z_total = 0.230 (A), 0.154 (B) — strictly less than 1. Summaries reduce z_active while z_total is preserved."
+    },
+    "L3-G2": {
+      "status": "PARTIAL",
+      "rationale": "Within-run B_t recovery observed: A min=0.053, max=1.000, final=0.833; B min=0.093, max=1.000, final=0.526. Trend rises off the minimum in both runs. PARTIAL because a controlled coagulation-observation experiment is the next step."
+    },
+    "L3-G3": {
+      "status": "PASS",
+      "rationale": "Every summary in A (105 total) and B (130 total) carries a non-empty source_event_ids list. Test `test_12_source_event_ids_complete_in_summary_events` and schema validation in RollingCenterSummary enforce this."
+    },
+    "L3-G4": {
+      "status": "PASS",
+      "rationale": "CenterEventBuffer.archive_event marks events archived but never deletes the underlying row. Test `test_11_raw_events_recoverable_after_archive` verifies on harness runs. Provenance + tombstone pointers remain addressable after archival."
+    },
+    "L3-G5": {
+      "status": "PASS",
+      "rationale": "A signals: 49 total, 49 carry advisory_only=True. B signals: 76 total, 76 carry advisory_only=True. Detector contract + harness `_verify_invariants` both enforce."
+    },
+    "L3-G6": {
+      "status": "PASS",
+      "rationale": "Harness never invokes check_coagulation, never creates OmegaRecord, never calls OmegaRegistry.register, never sets is_omega_anchor. AST-based static checks in `test_17_no_omega_or_registry_or_check_coagulation_in_runner` verify this in the runner module. The conditional 'unless check_coagulation fires' is therefore vacuously satisfied."
+    },
+    "L3-G7": {
+      "status": "NOT_TESTED_YET",
+      "rationale": "No OmegaRecord created (research scope intentionally stops before coagulation). ReferenceField creation path therefore not exercised in this audit. Requires a controlled coagulation-observation experiment to test."
+    },
+    "L3-G8": {
+      "status": "NOT_TESTED_YET",
+      "rationale": "No OmegaRecord exists to contest post-coagulation. Requires a separate experiment where Omega is allowed to form first."
+    },
+    "L3-G9": {
+      "status": "NOT_TESTED_YET",
+      "rationale": "Production code at byon-orchestrator/src/, scripts/, and memory-service/ is untouched on this research branch (verified via git diff vs origin/main). D/E/F/M/N benchmark suites must run on main, not here. The research branch does not regress production by construction; the explicit benchmark run is a separate gate."
+    },
+    "L3-G10": {
+      "status": "PARTIAL",
+      "rationale": "Two independent transcripts (A seed=42, B seed=1337) replay successfully under identical code. Both produce non-zero advisory-only PotentialOmega signal counts (A 49, B 76) on comparable center families. NO OmegaRecord has been created in either run, so 'second independent run reproduces an Omega' is not yet tested. Operator approval is a separate gating step outside the harness."
+    }
+  },
+  "conclusion": {
+    "level_3_declared": false,
+    "natural_omega_proven": false,
+    "research_feasibility_signal": "POSITIVE",
+    "z_active_semantics_assessment": "PROMISING",
+    "main_remains_level_2_of_4": true,
+    "next_step": "controlled coagulation-observation experiment, still on research branch; check_coagulation remains untouched until the experiment is designed and operator-approved.",
+    "no_production_modification": true,
+    "no_tag_created": true,
+    "no_release_created": true
+  }
+}
