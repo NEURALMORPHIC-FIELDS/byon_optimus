@@ -10,7 +10,7 @@ jobs:
     name: Build and Release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
 
     steps:
@@ -42,6 +42,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compute image repository (lowercased)
+        # GHCR requires repository paths to be entirely lowercase. The
+        # `github.repository` context evaluates to e.g.
+        # `NEURALMORPHIC-FIELDS/byon_optimus`, which is rejected by buildx.
+        # Lowercase it once here and reuse the value in every push tag.
+        id: imgrepo
+        run: |
+          echo "REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Extract version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
@@ -54,8 +63,8 @@ jobs:
           target: worker
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/byon-worker:${{ steps.version.outputs.VERSION }}
-            ghcr.io/${{ github.repository }}/byon-worker:latest
+            ghcr.io/${{ steps.imgrepo.outputs.REPO }}/byon-worker:${{ steps.version.outputs.VERSION }}
+            ghcr.io/${{ steps.imgrepo.outputs.REPO }}/byon-worker:latest
 
       - name: Build and push Auditor
         uses: docker/build-push-action@v5
@@ -65,8 +74,8 @@ jobs:
           target: auditor
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/byon-auditor:${{ steps.version.outputs.VERSION }}
-            ghcr.io/${{ github.repository }}/byon-auditor:latest
+            ghcr.io/${{ steps.imgrepo.outputs.REPO }}/byon-auditor:${{ steps.version.outputs.VERSION }}
+            ghcr.io/${{ steps.imgrepo.outputs.REPO }}/byon-auditor:latest
 
       - name: Build and push Executor
         uses: docker/build-push-action@v5
@@ -76,14 +85,15 @@ jobs:
           target: executor
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/byon-executor:${{ steps.version.outputs.VERSION }}
-            ghcr.io/${{ github.repository }}/byon-executor:latest
+            ghcr.io/${{ steps.imgrepo.outputs.REPO }}/byon-executor:${{ steps.version.outputs.VERSION }}
+            ghcr.io/${{ steps.imgrepo.outputs.REPO }}/byon-executor:latest
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          files: |
-            byon-orchestrator/dist/**
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Per operator policy ("Do not create GitHub Release without separate
+      # confirmation"), this workflow does NOT auto-publish a Release on tag
+      # push. Docker images go to GHCR; the GitHub Release is created
+      # manually (via `gh release create` or the web UI) only when the
+      # operator approves the framing and content explicitly.
+      #
+      # `contents` permission was dropped from `write` to `read` for the
+      # same reason — this workflow has no business creating releases or
+      # mutating refs.
