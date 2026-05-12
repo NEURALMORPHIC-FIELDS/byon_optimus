@@ -1,6 +1,6 @@
 # Level 3 — Natural Omega Research
 
-**Status:** DESIGN DOCUMENT — no implementation, no tag, no Release.
+**Status:** DESIGN DOCUMENT — design questions Q1–Q8 resolved by operator 2026-05-12 (see §0.1 Decision Log). First code commit lands the skeleton + schemas + transcript fixtures (no Omega creation, no `check_coagulation` modifications, no production imports). All subsequent implementation work proceeds on this branch.
 **Branch:** `research/level-3-natural-omega` (separate from `main` and from any prior `research/level-3` work).
 **Branch base:** post-v0.6.9.1 `main` at `15a7c478afcb394169ed74d89060bd494c8ea169`.
 **Operational classification of `main`:** stays **Level 2 of 4 — Morphogenetic Advisory Memory**, unchanged, until a reproducible natural-Omega demonstration is achieved on this branch AND independently audited.
@@ -28,6 +28,25 @@ These are framing constraints, not subject to design trade-offs. Any code in thi
 | C9 | Full provenance is mandatory | `source_event_ids`, summary chain, observer perspective, residue history, timestamps — all stored, all replayable. |
 | C10 | `main` stays Level 2 until reproducible | Even if one Omega forms on this branch, we do NOT update `main` operational classification until: (a) the run is reproducible from raw seed, (b) it survives an audit by the operator OR an independent reader, (c) the `Z_total` / `Z_active` / `Z_resolved` / `Z_archived` accounting holds end-to-end. |
 | C11 | `research/level-3` branch (previous) is untouched | This research lives on the NEW branch `research/level-3-natural-omega`. The older `research/level-3` reference (if any) is preserved as historical state. |
+
+---
+
+## 0.1 Decision log (operator answers to §11 Q1–Q8, 2026-05-12)
+
+The eight open design questions from §11 are resolved as follows. Every later section in this document is interpreted under these decisions. Any deviation during implementation requires a separate amendment commit to this document.
+
+| # | Topic | Decision |
+|---|---|---|
+| Q1 | Harness domain v1 | **BYON-architecture deep-dive.** Richest recurring centers: SYSTEM_CANONICAL, VERIFIED_PROJECT_FACT, DOMAIN_VERIFIED, release history, FCE-M, Auditor / Executor boundaries, trust hierarchy, contradictions, receipts, benchmark results. Operator has the full mental model — most authentic transcript. |
+| Q2 | Transcript length / author | **500 turns, hand-authored / curated.** Not 300 (insufficient signal). Not 1000 (premature). Five-phase structure mandatory: 100 turns architecture-recap / stable-center-formation → 100 turns trust-hierarchy / verified-facts / domain-facts → 100 turns contradictions / adversarial-claims / corrections → 100 turns receipts / benchmark-results / release-decisions → 100 turns return-to-same-centers after drift. Phase order is fixed for v1. |
+| Q3 | LLM-generated summaries | **Not allowed in v1.** `RollingCenterSummary` v1 is deterministic only (correction chains, receipt success, expression_pattern_stable heuristic — see §3.3). LLM summaries remain a v2 research option, gated on an adversarial-summary-test design that is NOT scoped in this branch. |
+| Q4 | Fan-out depth | **4 initial perspectives** for v1: `factual`, `project_state`, `domain_verified`, `security_boundary`. The other 4 (`preference`, `style`, `execution_boundary`, `narrative`) are deferred to v2. The §5.1 table is for reference; v1 implementation honours only the 4 listed here. |
+| Q5 | `PotentialOmegaCenter` window K | **K = 12** to align with `τ_coag = 12`. Detector remains advisory-only. It does not write Omega and does not influence recall priority. |
+| Q6 | Independent reproduction | **Different transcript + different seed, same code.** Run 1 = Transcript A + seed 42. Run 2 = Transcript B + seed 1337. Both must reach the same gates (L3-G1..L3-G9). L3-G10 is satisfied when at least one natural Omega forms under BOTH runs. Same `θ_s = 0.28`, same `τ_coag = 12`, same gate matrix. |
+| Q7 | Harness location | **Local first.** No CI default for Level 3 harness. After runtime / cost / GHCR-space are known, an OPTIONAL `workflow_dispatch`-triggered CI job may be added on this branch. Not in `ci.yml` and not in `release.yml`. |
+| Q8 | Branch isolation rigour | **Parallel directory `byon-orchestrator/level3-research/`.** This package MUST NOT be imported by any production code on `main`. No FCE-M facade hooks. No feature-flagged production paths. The research lives entirely in this directory tree on this branch. Linter / import-guard test (when added) verifies the constraint. |
+
+These eight decisions are locked in. **Branch policy:** implementation begins now on `research/level-3-natural-omega`. `main` stays Level 2 of 4 until §8 L3-G10 holds AND operator explicitly approves a v0.7+ release proposal.
 
 ---
 

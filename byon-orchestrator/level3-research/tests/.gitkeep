@@ -1,0 +1,6 @@
+# Empty directory placeholder.
+#
+# The `tests/` directory is reserved for tests added in subsequent commits
+# (schema parsing, JSONL transcript validation, Z-conservation invariant
+# checks, isolation-guard regression). No tests in the first code commit
+# (schemas only).
