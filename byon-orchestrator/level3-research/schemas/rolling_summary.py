@@ -75,12 +75,30 @@ class TombstoneRef:
     Stored alongside each SummaryEvent so a future replay (or audit) can
     recover the raw payload that the summary digested away. Mandatory for
     L3-G7 (raw events recoverable).
+
+    Commit-5 additions (`reason`, `summary_id`, `archived_at_turn`,
+    `source_event_ids`) are OPTIONAL with safe defaults — every existing
+    construction site that supplied only the original 3 fields continues
+    to work unchanged. The new fields let the summary policy attach the
+    rationale of the archive directly to the tombstone, so a replay can
+    audit "why was this event archived" without consulting the summary.
     """
 
     archived_event_id: str
     archived_at_ts: str          # ISO-8601 UTC
     recovery_path: str           # disk path or memory-service ref to the
                                  # full payload of the archived event
+    # v0.6.9.1 commit-5 (deterministic summary policy v1) additions:
+    reason: str = ""             # operator-locked: "resolved_by_correction_chain"
+                                 # | "confirmed_by_receipt_success"
+                                 # | "compressed_stable_expression_pattern"
+                                 # | "" (legacy / unspecified)
+    summary_id: str = ""         # the RollingCenterSummary.summary_id that
+                                 # created this tombstone (back-pointer)
+    archived_at_turn: int = -1   # turn index when the archive happened
+                                 # (-1 = unknown)
+    source_event_ids: tuple = () # the source_event_ids of the summary that
+                                 # archived this event (provenance trail)
 
 
 @dataclass(frozen=True)
