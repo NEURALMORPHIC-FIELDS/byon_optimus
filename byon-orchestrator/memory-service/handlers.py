@@ -465,8 +465,17 @@ class MemoryHandlers:
 
     def store_fact(self, fact: str, source: str, tags: List[str],
                    thread_id: Optional[str] = None,
-                   channel: Optional[str] = None) -> int:
-        """Store fact memory. thread_id/channel scope the fact (v0.6.1)."""
+                   channel: Optional[str] = None,
+                   trust: Optional[str] = None,
+                   disputed: Optional[bool] = None,
+                   disputed_pattern: Optional[str] = None) -> int:
+        """Store fact memory. thread_id/channel scope the fact (v0.6.1).
+
+        v0.6.5 additions: optional trust/disputed metadata for the Trust-Ranked
+        Memory + Compliance Guard. Defaults preserve backward compatibility —
+        old callers that pass no trust info get None and the formatter infers
+        the tier from tags/source instead.
+        """
         embedding = self.embedder.embed(fact)
 
         metadata = {
@@ -478,6 +487,10 @@ class MemoryHandlers:
             "timestamp": time.time(),
             "thread_id": thread_id,
             "channel": channel,
+            # v0.6.5 trust block
+            "trust": trust,
+            "disputed": bool(disputed) if disputed is not None else False,
+            "disputed_pattern": disputed_pattern,
         }
 
         ctx_id = self.stores[MemoryType.FACT].store(embedding, metadata)

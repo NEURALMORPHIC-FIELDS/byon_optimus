@@ -553,6 +553,9 @@ async def store_memory(request: Dict[str, Any]) -> Dict[str, Any]:
             tags=data.get("tags", []),
             thread_id=thread_id,
             channel=channel,
+            trust=data.get("trust"),
+            disputed=data.get("disputed"),
+            disputed_pattern=data.get("disputed_pattern"),
         )
     else:
         raise HTTPException(status_code=400, detail=f"Unknown memory type: {mem_type}")

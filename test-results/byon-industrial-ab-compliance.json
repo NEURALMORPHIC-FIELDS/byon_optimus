@@ -1,0 +1,1530 @@
+{
+  "generated_at": "2026-05-11T23:12:25.223Z",
+  "categories": {
+    "A": {
+      "n": 10,
+      "avgA": 5,
+      "avgB": 4.6,
+      "delta": -0.40000000000000036,
+      "violations_a_count": 0,
+      "violations_b_count": 1,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {
+        "no_emoji": 1
+      }
+    },
+    "B": {
+      "n": 10,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    },
+    "C": {
+      "n": 10,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    },
+    "D": {
+      "n": 12,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    },
+    "E": {
+      "n": 12,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    },
+    "F": {
+      "n": 10,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    },
+    "G": {
+      "n": 6,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    },
+    "I": {
+      "n": 12,
+      "avgA": 5,
+      "avgB": 5,
+      "delta": 0,
+      "violations_a_count": 0,
+      "violations_b_count": 0,
+      "violations_a_by_rule": {},
+      "violations_b_by_rule": {}
+    }
+  },
+  "perCategory": {
+    "A": [
+      {
+        "id": "A1",
+        "rules": [
+          "no_emoji",
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 1,
+          "violations": [
+            {
+              "rule": "no_emoji",
+              "severity": "high",
+              "evidence": "emoji codepoints found: ❌ ✅ (n=2)"
+            }
+          ]
+        },
+        "a_semantic": 0,
+        "b_semantic": 3
+      },
+      {
+        "id": "A2",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 3
+      },
+      {
+        "id": "A3",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 2
+      },
+      {
+        "id": "A4",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "A5",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "A6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "A7",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "A8",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 3
+      },
+      {
+        "id": "A9",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 5
+      },
+      {
+        "id": "A10",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 1,
+        "b_semantic": 5
+      }
+    ],
+    "B": [
+      {
+        "id": "B1",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 4
+      },
+      {
+        "id": "B2",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "B3",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "B4",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 4,
+        "b_semantic": 5
+      },
+      {
+        "id": "B5",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 4
+      },
+      {
+        "id": "B6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "B7",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "B8",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "B9",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "B10",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      }
+    ],
+    "C": [
+      {
+        "id": "C1",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 1,
+        "b_semantic": 1
+      },
+      {
+        "id": "C2",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 2
+      },
+      {
+        "id": "C3",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 0
+      },
+      {
+        "id": "C4",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "C5",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 4
+      },
+      {
+        "id": "C6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 0
+      },
+      {
+        "id": "C7",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 3
+      },
+      {
+        "id": "C8",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "C9",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 3
+      },
+      {
+        "id": "C10",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 2
+      }
+    ],
+    "D": [
+      {
+        "id": "D1",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "D2",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "D3",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "D4",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "D5",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 4,
+        "b_semantic": 5
+      },
+      {
+        "id": "D6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 4,
+        "b_semantic": 5
+      },
+      {
+        "id": "D7",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "D8",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "D9",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 4
+      },
+      {
+        "id": "D10",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 4,
+        "b_semantic": 4
+      },
+      {
+        "id": "D11",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 0
+      },
+      {
+        "id": "D12",
+        "rules": [
+          "language_match_query",
+          "no_filler",
+          "must_not_bypass_constraint"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 0
+      }
+    ],
+    "E": [
+      {
+        "id": "E1",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 2
+      },
+      {
+        "id": "E2",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "E3",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 2
+      },
+      {
+        "id": "E4",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "E5",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "E6",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 2,
+        "b_semantic": 5
+      },
+      {
+        "id": "E7",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 1
+      },
+      {
+        "id": "E8",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "E9",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "E10",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 0
+      },
+      {
+        "id": "E11",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 2
+      },
+      {
+        "id": "E12",
+        "rules": [
+          "language_match_query",
+          "no_invented_memory",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 1,
+        "b_semantic": 1
+      }
+    ],
+    "F": [
+      {
+        "id": "F1",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 5
+      },
+      {
+        "id": "F2",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 0
+      },
+      {
+        "id": "F3",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 3
+      },
+      {
+        "id": "F4",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 0
+      },
+      {
+        "id": "F5",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "F6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 5
+      },
+      {
+        "id": "F7",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "F8",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      },
+      {
+        "id": "F9",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 0
+      },
+      {
+        "id": "F10",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 0,
+        "b_semantic": 5
+      }
+    ],
+    "G": [
+      {
+        "id": "G1",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 5
+      },
+      {
+        "id": "G2",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 3
+      },
+      {
+        "id": "G3",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 5
+      },
+      {
+        "id": "G4",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 5
+      },
+      {
+        "id": "G5",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 5,
+        "b_semantic": 5
+      },
+      {
+        "id": "G6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": 3,
+        "b_semantic": 3
+      }
+    ],
+    "I": [
+      {
+        "id": "I1",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I2",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I3",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I4",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I5",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I6",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I7",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I8",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I9",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I10",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I11",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      },
+      {
+        "id": "I12",
+        "rules": [
+          "language_match_query",
+          "no_filler"
+        ],
+        "a_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "b_compliance": {
+          "score": 5,
+          "violations": []
+        },
+        "a_semantic": null,
+        "b_semantic": null
+      }
+    ]
+  }
+}

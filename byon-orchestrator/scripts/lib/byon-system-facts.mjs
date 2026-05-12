@@ -183,7 +183,10 @@ export async function seedSystemFacts(mem, { verbose = true } = {}) {
     let errors = 0;
     for (const f of BYON_SYSTEM_FACTS) {
         const factText = `${f.subject} ${f.predicate.replace(/_/g, " ")} ${f.object}`;
-        const tags = [f.kind, f.subject.replace(/\s+/g, "_"), "__system__", "byon-bootstrap"];
+        // v0.6.5: explicit trust marker so the prompt formatter can route
+        // these into the SYSTEM_CANONICAL block (always wins over recalled
+        // facts from conversation).
+        const tags = [f.kind, f.subject.replace(/\s+/g, "_"), "__system__", "byon-bootstrap", "trust:SYSTEM_CANONICAL"];
         try {
             const res = await mem({
                 action: "store",
@@ -193,7 +196,10 @@ export async function seedSystemFacts(mem, { verbose = true } = {}) {
                     source: `byon-bootstrap:${f.kind}`,
                     tags,
                     thread_id: null, // SYSTEM scope per v0.6.2 routing
-                    channel: "system",
+                    channel: "byon-bootstrap",
+                    // v0.6.5 trust metadata
+                    trust: "SYSTEM_CANONICAL",
+                    disputed: false,
                 },
             });
             if (res?.body?.ctx_id !== undefined) {
