@@ -1,0 +1,167 @@
+{
+  "$schema_version": "1.0",
+  "release": "v0.6.9-contextual-pathway-stabilization",
+  "design_doc": "docs/CONTEXTUAL_PATHWAY_STABILIZATION_v0.6.9.md",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_dim": 384,
+  "normalize_embeddings": true,
+  "_notes": "Seed prototypes for Contextual Pathway Stabilization. Each prototype has one canonical seed sentence used to compute a 384-dim centroid via all-MiniLM-L6-v2. Centroid is L2-normalized at load time. The classifier compares the average embedding of the last N=3 user turns against these centroids (cosine similarity). Top-1 = confidence; Shannon entropy over normalized softmax gives entropy. Operator-editable. Add a prototype here when a new domain emerges, but stay conservative: false-stabilization on the wrong domain is the failure mode we protect against.",
+  "prototypes": [
+    {
+      "domain_id": "software_architecture",
+      "display_name": "Software Architecture",
+      "prototype_text": "BYON Optimus orchestrator architecture, Multi-Agent Control Protocol MACP v1.1 pipeline, Worker agent plans EvidencePack and PlanDraft, Auditor agent signs ApprovalRequest with Ed25519 cryptographic signature, Executor agent runs air-gapped without network access, file-based handoff between agents, ExecutionOrder JohnsonReceipt document flow, three-agent separation of duties, system canonical facts, internal software design.",
+      "aliases": ["byon-architecture", "byon_architecture", "macp", "byon-optimus", "orchestrator"],
+      "subdomain_hints": ["MACP pipeline", "trust hierarchy", "handoff protocol", "Ed25519 signing", "air-gap"],
+      "expected_task_modes": ["qa", "citation", "refusal", "code", "adversarial-test"],
+      "active_routes_warm_qa": [
+        "trust:VERIFIED_PROJECT_FACT",
+        "trust:USER_PREFERENCE",
+        "conversation:thread",
+        "fce:summary"
+      ],
+      "suppressed_routes_warm_qa": [
+        "trust:DOMAIN_VERIFIED",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:global"
+      ],
+      "force_full_cold_on_task_modes": ["adversarial-test"]
+    },
+    {
+      "domain_id": "byon_fce_m",
+      "display_name": "BYON FCE-M Morphogenetic Memory",
+      "prototype_text": "FCE-M v0.6.0 morphogenetic advisory memory layer, OmegaRecord coagulation, ReferenceField stability, residue signaling, theta_s 0.28, tau_coag 12, multi-perspectival entries, hybrid FAISS plus FCE-M backend, advisory mode priority_only, Level 2 of 4 operational classification, no Level 3 claim on main.",
+      "aliases": ["fce-m", "fce_m", "morphogenetic", "omega", "reference-field", "residue"],
+      "subdomain_hints": ["OmegaRegistry", "ReferenceField", "residue signaling", "advisory mode", "theta_s", "tau_coag"],
+      "expected_task_modes": ["qa", "citation", "refusal", "adversarial-test"],
+      "active_routes_warm_qa": [
+        "trust:VERIFIED_PROJECT_FACT",
+        "conversation:thread",
+        "fce:summary"
+      ],
+      "suppressed_routes_warm_qa": [
+        "trust:DOMAIN_VERIFIED",
+        "trust:USER_PREFERENCE",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:global"
+      ],
+      "force_full_cold_on_task_modes": ["adversarial-test"]
+    },
+    {
+      "domain_id": "security",
+      "display_name": "Security / Infosec",
+      "prototype_text": "Information security, GDPR data breach notification within 72 hours to national supervisory authority, ISO 27001 controls and audit, vulnerability disclosure, penetration testing, encryption at rest and in transit, access control, secret management, audit trail, threat modeling, OWASP top 10, supply chain security, NIS2 directive, incident response, pseudonymization, encrypted personal data exceptions, cybersecurity compliance, EU GDPR Article 33.",
+      "aliases": ["infosec", "gdpr", "iso27001", "security", "cybersecurity", "data-protection"],
+      "subdomain_hints": ["EU", "GDPR", "ISO 27001", "NIS2", "national authority", "cross-border breach"],
+      "expected_task_modes": ["qa", "citation", "refusal"],
+      "active_routes_warm_qa": [
+        "trust:DOMAIN_VERIFIED",
+        "trust:VERIFIED_PROJECT_FACT",
+        "conversation:thread"
+      ],
+      "suppressed_routes_warm_qa": [
+        "trust:USER_PREFERENCE",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:global"
+      ],
+      "domain_verified_filter": "infosec",
+      "force_full_cold_on_task_modes": ["adversarial-test"]
+    },
+    {
+      "domain_id": "domain_knowledge",
+      "display_name": "Generic Domain-Verified Knowledge",
+      "prototype_text": "Operator-verified domain knowledge, technical regulations, industry standards, certified facts with provenance, jurisdiction-aware claims, citation required, retrieved_at and effective_from and review_after timestamps, source name and source url metadata.",
+      "aliases": ["domain", "domain-verified", "verified-knowledge", "operator-knowledge"],
+      "subdomain_hints": ["EU", "Germany", "Romania", "international"],
+      "expected_task_modes": ["qa", "citation"],
+      "active_routes_warm_qa": [
+        "trust:DOMAIN_VERIFIED",
+        "trust:VERIFIED_PROJECT_FACT",
+        "conversation:thread"
+      ],
+      "suppressed_routes_warm_qa": [
+        "trust:USER_PREFERENCE",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:global",
+        "fce:summary"
+      ],
+      "force_full_cold_on_task_modes": ["adversarial-test"]
+    },
+    {
+      "domain_id": "construction",
+      "display_name": "Construction Codes & Standards",
+      "prototype_text": "Construction codes, materials, installation standards, jurisdiction-specific building rules, Bavarian DIN norms, Romanian P-100, masonry, concrete, thermal insulation U-value, frost depth, freeze-thaw resistance, mortar joints, structural load, foundation, building permit, energy efficiency.",
+      "aliases": ["constructie", "construcții", "constructii", "building", "din", "ce", "p-100", "ec2", "ec6"],
+      "subdomain_hints": ["Germany/Bavaria", "Romania", "EU", "DIN", "P-100", "Eurocode"],
+      "expected_task_modes": ["qa", "citation"],
+      "active_routes_warm_qa": [
+        "trust:DOMAIN_VERIFIED",
+        "trust:VERIFIED_PROJECT_FACT",
+        "conversation:thread"
+      ],
+      "suppressed_routes_warm_qa": [
+        "trust:USER_PREFERENCE",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:global"
+      ],
+      "active_routes_warm_citation": [
+        "trust:DOMAIN_VERIFIED"
+      ],
+      "domain_verified_filter": "construction",
+      "force_full_cold_on_task_modes": ["adversarial-test"]
+    },
+    {
+      "domain_id": "legal_regulatory",
+      "display_name": "Legal / Regulatory / Tax",
+      "prototype_text": "Legal regulation, tax law, VAT rate by jurisdiction, TVA România, MwSt Germany, contract law, labor regulation, civil code, AI Act risk classification, intellectual property, patent law, EP25216372 Omni-Qube-Vault, jurisdictional applicability, statutory deadlines, court decisions, regulatory compliance, fiscal obligation, corporate taxation.",
+      "aliases": ["legal", "law", "tax", "vat", "tva", "regulatory", "ai-act", "patent"],
+      "subdomain_hints": ["EU", "Germany", "Romania", "international", "VAT", "AI Act", "GDPR-legal", "intellectual-property"],
+      "expected_task_modes": ["qa", "citation", "refusal"],
+      "active_routes_warm_qa": [
+        "trust:DOMAIN_VERIFIED",
+        "trust:VERIFIED_PROJECT_FACT",
+        "conversation:thread"
+      ],
+      "suppressed_routes_warm_qa": [
+        "trust:USER_PREFERENCE",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:global"
+      ],
+      "domain_verified_filter": "legal",
+      "force_full_cold_on_task_modes": ["adversarial-test"]
+    },
+    {
+      "domain_id": "general_chat",
+      "display_name": "General Chat / Unknown",
+      "prototype_text": "General conversation, casual questions, no specific technical or regulatory domain, small talk, ambiguous request, user preferences, personal context, unknown subject matter, please clarify, abstain when uncertain.",
+      "aliases": ["chat", "general", "casual", "unknown", "default"],
+      "subdomain_hints": [],
+      "expected_task_modes": ["qa", "abstain", "unknown"],
+      "active_routes_warm_qa": [
+        "trust:SYSTEM_CANONICAL",
+        "trust:VERIFIED_PROJECT_FACT",
+        "trust:USER_PREFERENCE",
+        "trust:DOMAIN_VERIFIED",
+        "trust:EXTRACTED_USER_CLAIM",
+        "conversation:thread",
+        "conversation:global",
+        "fce:summary"
+      ],
+      "suppressed_routes_warm_qa": [],
+      "_note": "general_chat / unknown falls back to COLD behaviour (all routes active). Per §4.3 of design doc: 'unknown | any | fall back to COLD | none'. This prototype is the catch-all when no other domain reaches confidence threshold.",
+      "force_full_cold_on_task_modes": ["adversarial-test", "unknown"]
+    }
+  ],
+  "default_domain_id": "general_chat",
+  "stabilization_thresholds": {
+    "cold_turns_required": 2,
+    "stable_turns_required": 2,
+    "confidence_min": 0.70,
+    "entropy_max_bits": 1.5,
+    "drift_score_threshold": 0.5,
+    "drift_confidence_min": 0.6,
+    "warm_sanity_check_every_n_turns": 5,
+    "adversarial_reopen_min_turns": 3
+  },
+  "_decision_log_reference": "Decisions D1 D2 D3 D4 D5 D6 D7 from docs/CONTEXTUAL_PATHWAY_STABILIZATION_v0.6.9.md section 0. Locked in 2026-05-12."
+}

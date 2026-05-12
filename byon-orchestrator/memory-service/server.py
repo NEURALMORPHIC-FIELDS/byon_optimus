@@ -512,6 +512,15 @@ async def handle_request(request: Dict[str, Any]):
     elif action == "domain_fact_search":
         return await domain_fact_search(request)
 
+    # ------------------------------------------------------------------
+    # v0.6.9: Embedding endpoint for Contextual Pathway Stabilization
+    # ------------------------------------------------------------------
+    elif action == "embed":
+        return await embed_text(request)
+
+    elif action == "embed_batch":
+        return await embed_texts(request)
+
     else:
         raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
 
@@ -1359,6 +1368,52 @@ async def get_stats() -> Dict[str, Any]:
         "total_storage_mb": stats["total_storage_mb"],
         "uptime_seconds": time.time() - start_time if start_time else 0
     }
+
+
+# ============================================================================
+# v0.6.9: Embedding endpoints for Contextual Pathway Stabilization
+# ============================================================================
+# These expose the same all-MiniLM-L6-v2 embedder FAISS already uses, so the
+# orchestrator can classify a user turn (or pre-embed the domain prototypes)
+# without adding a new model dependency. Returned vectors are 384-dim and
+# L2-normalized (cosine == dot product).
+#
+# No channel gate is needed: this is a pure read-only utility that returns the
+# numeric embedding of operator-supplied text. It does NOT mutate state and
+# cannot be used to bypass trust gates.
+
+async def embed_text(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Return L2-normalized 384-dim embedding for `text`."""
+    text = request.get("text", "")
+    if not isinstance(text, str):
+        raise HTTPException(status_code=400, detail="text must be a string")
+    h = get_handlers()
+    vec = h.embedder.embed(text)
+    return {
+        "success": True,
+        "model": getattr(h.embedder, "model_name", "fallback-hash"),
+        "dim": int(vec.shape[0]),
+        "embedding": vec.tolist(),
+    }
+
+
+async def embed_texts(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Return L2-normalized 384-dim embeddings for a list of `texts`."""
+    texts = request.get("texts", [])
+    if not isinstance(texts, list) or not all(isinstance(t, str) for t in texts):
+        raise HTTPException(status_code=400, detail="texts must be a list of strings")
+    if len(texts) > 64:
+        raise HTTPException(status_code=400, detail="batch size capped at 64")
+    h = get_handlers()
+    mat = h.embedder.embed_batch(texts)
+    return {
+        "success": True,
+        "model": getattr(h.embedder, "model_name", "fallback-hash"),
+        "dim": int(mat.shape[1]) if mat.ndim == 2 else 0,
+        "count": int(mat.shape[0]) if mat.ndim == 2 else 0,
+        "embeddings": [row.tolist() for row in mat],
+    }
+
 
 # ============================================================================
 # MAIN
