@@ -1,0 +1,114 @@
+{
+  "report_version": "level3-synthesis-after-real-fce.v1",
+  "branch": "research/level-3-natural-omega",
+  "as_of_commit_sha": "5bd9f1f",
+  "origin_main_sha": "15a7c47",
+  "main_operational_classification": "Level 2 of 4 (Morphogenetic Advisory Memory)",
+  "advisory_only": true,
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "thresholds_unchanged_in_research_branch": true,
+  "level_3_declared": false,
+  "natural_omega_proven": false,
+  "reference_field_created": false,
+  "production_loop_test_run": false,
+  "claim_thresholds_are_wrong": false,
+  "section_1_demonstrated": [
+    "Z_active semantics works: every cycle's z_active is reduced by applying a SummaryEvent while z_total is preserved; conservation invariant holds on both 500-row replays with audit_flags=[].",
+    "Summaries preserve Z_total and reduce Z_active: A 105 summaries -> z_active 34.75/151.40; B 130 summaries -> z_active 22.30/144.40; archived buffer rows remain recoverable.",
+    "PotentialOmega surrogate signals reproduce across A and B: 49+76 signals all advisory_only=True; common buckets include trust_hierarchy::factual, macp_pipeline::factual, security_boundary::security_boundary, unsafe_memory::security_boundary, general::factual.",
+    "Surrogate temporal rule passes on every candidate bucket: commit 11 verdict ISOLATED_RULE_OBSERVED_NO_OMEGA_CREATED across all 6 (bucket x transcript) pairs.",
+    "Real FCE math does NOT coagulate: commit 12 verdict REAL_FCE_NO_COAGULATION across all 6 pairs; no OmegaRecord, no OmegaRegistry write, no ReferenceField, no agent.check_coagulation call."
+  ],
+  "section_2_real_result": {
+    "all_candidate_buckets_verdict_A": "REAL_FCE_NO_COAGULATION",
+    "all_candidate_buckets_verdict_B": "REAL_FCE_NO_COAGULATION",
+    "max_real_S_t_observed_A": 0.1383,
+    "max_real_S_t_observed_B": 0.1380,
+    "approx_max_S_t_range": "0.13-0.14",
+    "longest_run_above_theta": 0,
+    "theta_s_used": 0.28,
+    "tau_coag_used": 12,
+    "thresholds_unchanged": true,
+    "fce_m_vendor_mutation": "none",
+    "production_config_mutation": "none",
+    "agent_check_coagulation_calls": 0,
+    "omega_registry_register_calls": 0,
+    "omega_record_instances_created": 0,
+    "reference_field_instances_created": 0,
+    "agent_omega_final_state": 0,
+    "final_verdict_commit_12": "REAL_FCE_NO_COAGULATION"
+  },
+  "section_3_technical_cause_probable": {
+    "real_FCE_formula": "S_t = AR * kappa * I_t * B_t",
+    "form": "multiplicative product of four [0, 1]-bounded factors",
+    "adapter_input_kind": "deterministic SHA-256 hash of cycle_id, scaled by z_active",
+    "anchor_input_kind": "0.5 * s_t_surrogate + 0.5 * b_t_surrogate",
+    "missing_property_of_hash_vectors": "no semantic alignment with agent's internal direction Phi_s",
+    "consequence_for_I_t": "assimilation fidelity stays small because E (Phi_s-projected excitation) is small relative to delta_X",
+    "consequence_for_S_t": "product collapses to ~0.13 max, ~0.01 mean despite high surrogate s_t",
+    "why_surrogate_diverges_from_real": "surrogate is arithmetic mean of three near-1 quantities; real is product of four where one factor (I_t) is near 0.1 due to absent semantic alignment",
+    "interpretation": "divergence is most plausibly an artifact of the missing semantic encoder, not a property of the data",
+    "no_LLM_no_embedding_imports_in_adapter": true
+  },
+  "section_4_cannot_be_claimed": [
+    "No Level 3 declaration on main.",
+    "No natural Omega; no OmegaRecord exists.",
+    "No ReferenceField creation occurred.",
+    "No production-loop proof; no production conversational input was driven through FceOmegaObserver.step on this branch.",
+    "No claim that operator-locked thresholds theta_s=0.28 / tau_coag=12 are wrong; the real-FCE failure to coagulate says inputs lack semantic fidelity, not that thresholds are mis-set."
+  ],
+  "section_5_what_comes_next": {
+    "next_experiment_name": "Semantic Vector Observation Adapter",
+    "goal": "test whether semantic alignment raises I_t enough for real FCE S_t to approach theta_s under the unchanged production temporal rule",
+    "constraints_carried_over_from_commit_12": [
+      "no OmegaRegistry.register",
+      "no OmegaRecord creation",
+      "no ReferenceField creation",
+      "no is_omega_anchor identifier",
+      "no agent.check_coagulation call (use local audit rule)",
+      "no FCE-M vendor mutation",
+      "no production config mutation",
+      "no Level 3 declaration on main",
+      "no tag, no GitHub Release"
+    ],
+    "new_constraints_specific_to_semantic_adapter": [
+      "field vectors must come from a real semantic encoder (production embedding pipeline read-only, or an equivalent encoder loaded only in the research process with the divergence from production marked)",
+      "vectors must be derived from actual transcript turn texts, not from cycle metadata",
+      "the temporal rule remains the local audit re-implementation; production check_coagulation untouched"
+    ],
+    "branching_decision_if_semantic_adapter_also_NO_COAGULATION": "research line concludes surrogate-vs-real gap is fundamental to FCE-M product form on these workloads; alternative adapter design or new transcripts required",
+    "branching_decision_if_semantic_adapter_OBSERVED_NO_OMEGA_CREATED": "operator's prerogative to design a separate production-loop test; out of scope for current research branch"
+  },
+  "section_6_l3_gate_status_after_commit_12": {
+    "L3-G1": {"status": "PASS", "notes": "Conservation invariant + z_active < z_total on both runs."},
+    "L3-G2": {"status": "PARTIAL", "notes": "Within-run b_t recovery observed at surrogate and real-FCE levels; real-FCE did not recover above threshold."},
+    "L3-G3": {"status": "PASS", "notes": "Every summary preserves non-empty source_event_ids."},
+    "L3-G4": {"status": "PASS", "notes": "Buffer marks archived, never deletes; raw events recoverable."},
+    "L3-G5": {"status": "PASS", "notes": "125 surrogate signals (49 A + 76 B) all advisory_only=True."},
+    "L3-G6": {"status": "PASS", "notes": "No check_coagulation call from research code (AST-verified). Vacuously satisfied."},
+    "L3-G7": {"status": "NOT_TESTED_YET", "notes": "ReferenceField path intentionally not exercised."},
+    "L3-G8": {"status": "NOT_TESTED_YET", "notes": "No Omega to contest post-coagulation."},
+    "L3-G9": {"status": "NOT_TESTED_YET", "notes": "D/E/F/M/N benchmarks belong on main; research branch zero-diff for production paths."},
+    "L3-G10": {"status": "PARTIAL / BLOCKED_BY_REAL_FCE_NO_COAGULATION", "notes": "A and B replay with comparable surrogate distributions and pass the surrogate rule; real-FCE rule does NOT pass on either; without a real-FCE coagulation event the second-run reproducibility criterion cannot be evaluated. Unblocking requires the Semantic Vector Observation Adapter."}
+  },
+  "section_7_final_conclusion": {
+    "headline": "Positive research infrastructure; Level 3 not reached; next bottleneck is semantic assimilation fidelity I_t.",
+    "commits_summary": [
+      "commits 2-7: deterministic projection / metabolism / summary / detector / harness pipeline; 143 tests pass",
+      "commits 8-9: two 500-row hand-authored transcripts",
+      "commit 10: formal A/B comparison + L3 gate audit",
+      "commit 11: surrogate-level controlled coagulation observation (verdict ISOLATED_RULE_OBSERVED_NO_OMEGA_CREATED)",
+      "commit 12: isolated real-FCE-M observation adapter (verdict REAL_FCE_NO_COAGULATION)"
+    ],
+    "tests_passing_on_research_branch": 227,
+    "production_zero_touch_verified": true,
+    "thresholds_unchanged": true,
+    "key_finding": "surrogate would-coagulate vs real-FCE no-coagulation gap; surrogate is feasibility geometry, not production rule pass; real FCE product form is more conservative on hash-derived field vectors",
+    "next_bottleneck": "I_t (assimilation fidelity) under semantic alignment",
+    "next_experiment": "Semantic Vector Observation Adapter",
+    "level_3_declared": false,
+    "natural_omega_proven": false,
+    "main_remains_level_2_of_4": true
+  }
+}
