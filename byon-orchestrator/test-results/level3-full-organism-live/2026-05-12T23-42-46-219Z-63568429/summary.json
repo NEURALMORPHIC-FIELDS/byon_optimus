@@ -1,0 +1,239 @@
+{
+  "schema_version": "level3-full-organism-runner.v1",
+  "branch": "research/level3-full-organism-runtime",
+  "run_id": "2026-05-12T23-42-46-219Z-63568429",
+  "generated_at": "2026-05-12T23:45:52.611Z",
+  "dry_run": false,
+  "model_id": "claude-sonnet-4-6",
+  "memory_url": "http://localhost:8000",
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": true
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 20673.681658029556
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": false,
+      "embedder": null,
+      "stats": {
+        "success": true,
+        "num_contexts": 1061,
+        "by_type": {
+          "code": 0,
+          "conversation": 881,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 2.3369827270507812,
+        "uptime_seconds": 20673.69746351242
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 815,
+          "events_since_consolidate": 0,
+          "dedup": {
+            "events_seen": 1040,
+            "coherent_repeats_skipped": 15,
+            "first_writes": 1025
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "ready": true
+  },
+  "scenarios_run": 0,
+  "total_turns": 0,
+  "total_claude_calls": 0,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_estimated_cost_usd": 0,
+  "mean_claude_latency_ms": null,
+  "max_observed_s_t": null,
+  "mean_observed_s_t": null,
+  "longest_run_above_theta": 0,
+  "omega_total_initial": 0,
+  "omega_total_final": 0,
+  "omega_total_delta": 0,
+  "reference_field_total_initial": 0,
+  "reference_field_total_final": 0,
+  "reference_field_total_delta": 0,
+  "relation_events_emitted": 101,
+  "relation_types_seen": [
+    "constrains",
+    "stabilizes",
+    "protects",
+    "contradicts",
+    "routes_to"
+  ],
+  "relational_field_summary": {
+    "n_events": 101,
+    "relation_type_counts": {
+      "constrains": 27,
+      "stabilizes": 27,
+      "protects": 10,
+      "contradicts": 10,
+      "routes_to": 27
+    },
+    "center_field_states": [
+      {
+        "center_id": "byon::auditor_signature::security_boundary",
+        "active_relations": 10,
+        "supporting_relations": 10,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "SYSTEM_CANONICAL": 10
+        },
+        "relation_tension": 0,
+        "field_coherence": 1,
+        "field_resonance": 0.16666666666666666,
+        "field_stability": 1,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::contextual_pathway::factual",
+        "active_relations": 27,
+        "supporting_relations": 0,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "SYSTEM_CANONICAL": 27
+        },
+        "relation_tension": 0,
+        "field_coherence": 0.5,
+        "field_resonance": 0,
+        "field_stability": 0.7,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::macp_pipeline::factual",
+        "active_relations": 27,
+        "supporting_relations": 0,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "VERIFIED_PROJECT_FACT": 27
+        },
+        "relation_tension": 0,
+        "field_coherence": 0.5,
+        "field_resonance": 0,
+        "field_stability": 0.7,
+        "source_turn_ids": [
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-000",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-001",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-002",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-003",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-004",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-005",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-006",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-007",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-008",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-009",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-010",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-011",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-012",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-013",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-014",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-015",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-016",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-017",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-018",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-019",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-020",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-021",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-022",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-023",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-024",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-025",
+          "2026-05-12T23-42-46-219Z-63568429:scenario-2-adversarial:turn-026"
+        ],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::release_state::project_state",
+        "active_relations": 27,
+        "supporting_relations": 27,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "VERIFIED_PROJECT_FACT": 27
+        },
+        "relation_tension": 0,
+        "field_coherence": 1,
+        "field_resonance": 0.16666666666666666,
+        "field_stability": 1,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::unsafe_memory::security_boundary",
+        "active_relations": 10,
+        "supporting_relations": 0,
+        "contesting_relations": 10,
+        "trust_tier_distribution": {
+          "DISPUTED_OR_UNSAFE": 10
+        },
+        "relation_tension": 1,
+        "field_coherence": 0,
+        "field_resonance": 0,
+        "field_stability": 0,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario_id": "scenario-2-adversarial",
+      "title": null,
+      "purpose": null,
+      "turns_run": 0,
+      "error": "memory-service HTTP 429: {\"success\":false,\"error\":\"Rate limit exceeded. Please try again later.\",\"retry_after\":60}"
+    }
+  ],
+  "final_verdict": "INCONCLUSIVE_NEEDS_LONGER_RUN",
+  "allowed_verdicts": [
+    "FULL_ORGANISM_LEVEL2_CONFIRMED",
+    "FULL_ORGANISM_LEVEL3_NOT_OBSERVED",
+    "FULL_ORGANISM_NEAR_THRESHOLD",
+    "OMEGA_OBSERVED_BY_CHECK_COAGULATION_NO_MANUAL_WRITE",
+    "INCONCLUSIVE_NEEDS_LONGER_RUN",
+    "CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST"
+  ],
+  "forbidden_verdicts": [
+    "LEVEL_3_REACHED",
+    "OMEGA_CREATED_MANUALLY",
+    "SYNTHETIC_OMEGA",
+    "THRESHOLD_LOWERED",
+    "REFERENCEFIELD_CREATED_WITHOUT_OMEGA"
+  ],
+  "level_3_declared": false,
+  "natural_omega_proven": false
+}
