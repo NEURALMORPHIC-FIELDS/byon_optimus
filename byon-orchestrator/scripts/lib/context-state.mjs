@@ -172,6 +172,12 @@ function freshState(threadId, thresholds) {
         _candidate_task_mode: null,
         _last_seen: Date.now(),
         _adversarial_reopen_until_turn: 0,
+        // v0.6.9.1: sticky high-water mark for the phase machine. Used by
+        // Gate 27 to distinguish "drift failure" from "stabilization not
+        // reached". Once a thread reaches "warm" it sets this; even after
+        // a drift reset it stays so a later "no drift fired" decision can
+        // be classified as a real failure rather than a never-warm case.
+        _highest_phase_reached: "cold",
     };
 }
 
@@ -203,6 +209,10 @@ export function resetContext(threadId, reason = "manual") {
     };
     const fresh = freshState(threadId, { ...DEFAULT_THRESHOLDS, ...thresholds });
     fresh.turn_count = s.turn_count;        // preserve cumulative turn counter
+    // v0.6.9.1: high-water mark is preserved across drift resets so Gate 27
+    // can tell whether this thread EVER reached WARM (the drift reset
+    // itself goes cold, but the historical fact stays).
+    fresh._highest_phase_reached = s._highest_phase_reached || s.phase;
     fresh._reset_reason = reason;
     THREAD_STATE.set(threadId, fresh);
     return fresh;
@@ -452,6 +462,8 @@ export function applyStabilizationRule(state, classification, opts = {}) {
     }
 
     if (state.phase === "stabilizing") {
+        // v0.6.9.1: high-water mark
+        if (state._highest_phase_reached === "cold") state._highest_phase_reached = "stabilizing";
         const sameCandidate = state._candidate_domain === candidateDomain;
         if (!sameCandidate) {
             state._candidate_domain = candidateDomain;
@@ -470,6 +482,7 @@ export function applyStabilizationRule(state, classification, opts = {}) {
             state.topic_center = averageVectors(state._recent_query_embeddings.slice(-3));
             state.topic_center_set_at_turn = state.turn_count;
             state.turn_count_since_stabilization = 0;
+            state._highest_phase_reached = "warm";   // v0.6.9.1: high-water mark
         }
         return state.phase;
     }
@@ -492,14 +505,26 @@ const EXPLICIT_TOPIC_SWITCH_RX =
 export function checkDrift(state, userText, classification, opts = {}) {
     const T = { ...DEFAULT_THRESHOLDS, ...opts };
 
+    // v0.6.9.1: adversarial pattern triggers a reopen / drift event from ANY
+    // phase (cold, stabilizing, or warm). The planner downstream forces
+    // full COLD on `_adversarial_reopen_until_turn`, but the drift event
+    // itself must still be emitted as telemetry so Gate 26 can observe it.
+    if (detectAdversarialPattern(userText)) {
+        return { triggered: true, trigger: "adversarial_pattern", hardness: "hard" };
+    }
+    // v0.6.9.1: the task-mode classifier may flag an `adversarial-test` turn
+    // even when the named pattern dictionary misses (covers more flexible
+    // phrasings). Treat that as a drift event too, so the telemetry is
+    // never silent on a clearly adversarial input.
+    if (classifyTaskMode(userText) === "adversarial-test") {
+        return { triggered: true, trigger: "adversarial_pattern", hardness: "hard" };
+    }
+
     if (state.phase !== "warm") {
         return { triggered: false, trigger: null, hardness: null };
     }
 
     // ---- Hard triggers (always fire) ----
-    if (detectAdversarialPattern(userText)) {
-        return { triggered: true, trigger: "adversarial_pattern", hardness: "hard" };
-    }
     if (EXPLICIT_TOPIC_SWITCH_RX.test(userText)) {
         return { triggered: true, trigger: "explicit_user_correction", hardness: "hard" };
     }
@@ -630,13 +655,29 @@ export function planMemoryRoutes(state, opts = {}) {
             scope: "thread",
             domain: domainFilter,
             jurisdiction: state.subdomain || null,
+            // v0.6.9.1: tighter intra-tier caps in WARM. Operator-set per
+            // v0.6.9.1 §4. SYSTEM_CANONICAL and DISPUTED_OR_UNSAFE remain
+            // always-on with their full counts (defense in depth); the
+            // narrowed tiers cap to {3, 3, 2, 2} so the dynamic suffix
+            // actually shrinks rather than just dropping tier headers.
             max_hits_per_tier: {
-                SYSTEM_CANONICAL: 4,
-                VERIFIED_PROJECT_FACT: 4,
-                DOMAIN_VERIFIED: 4,
-                USER_PREFERENCE: 3,
+                SYSTEM_CANONICAL: 8,
+                VERIFIED_PROJECT_FACT: 3,
+                DOMAIN_VERIFIED: 3,
+                USER_PREFERENCE: 2,
                 EXTRACTED_USER_CLAIM: 2,
-                DISPUTED_OR_UNSAFE: 4,
+                DISPUTED_OR_UNSAFE: 8,
+            },
+            // v0.6.9.1: compaction directives the dynamic-suffix builder
+            // honours. Conversation excerpts only appear if directly
+            // relevant; ACTIVE RESPONSE CONSTRAINTS uses its short form
+            // when no compliance violation was detected recently.
+            warm_compaction: {
+                conversation_excerpts: "directly_relevant_only",
+                active_constraints: "compact_unless_violation",
+                fce_summary: "deltas_only",
+                system_canonical: "compact",
+                disputed_unsafe: "compact_unless_relevant",
             },
         },
         render_blocks: renderBlocks,
@@ -790,33 +831,43 @@ export async function updateContext({ threadId, userText, turn, memCall, thresho
     }
 
     let drift = { triggered: false, trigger: null, hardness: null };
-    if (state.phase === "warm") {
-        drift = checkDrift(state, userText, classification, T);
-        if (drift.triggered) {
-            state.drift_triggered_at_turn = state.turn_count;
-            const hardness = drift.hardness;
-            const trigger = drift.trigger;
-            resetContext(threadId, `drift:${trigger}`);
-            const fresh = THREAD_STATE.get(threadId);
-            fresh.turn_count = state.turn_count;
-            fresh.drift_triggered_at_turn = state.turn_count;
-            if (trigger === "adversarial_pattern") {
-                fresh._adversarial_reopen_until_turn = state.turn_count + T.adversarial_reopen_min_turns;
-            }
-            const plan = planMemoryRoutes(fresh, { force_full_cold: true });
-            return {
-                state: fresh,
-                classification,
-                drift: { ...drift, prev_domain: state.domain, prev_subdomain: state.subdomain },
-                plan,
-                telemetry: buildTelemetry(fresh, classification, plan, drift),
-            };
-        }
 
+    // v0.6.9.1: drift check runs FIRST, regardless of phase. checkDrift
+    // returns adversarial_pattern hits even from COLD/STABILIZING so the
+    // telemetry surface (Gate 26) never goes silent on a clearly adversarial
+    // turn. Other drift triggers (jurisdiction mismatch, domain change,
+    // explicit topic switch) still only fire from WARM.
+    drift = checkDrift(state, userText, classification, T);
+    if (drift.triggered) {
+        state.drift_triggered_at_turn = state.turn_count;
+        const trigger = drift.trigger;
+        const prevDomain = state.domain;
+        const prevSubdomain = state.subdomain;
+        const prevPhase = state.phase;
+        resetContext(threadId, `drift:${trigger}`);
+        const fresh = THREAD_STATE.get(threadId);
+        fresh.turn_count = state.turn_count;
+        fresh.drift_triggered_at_turn = state.turn_count;
+        if (trigger === "adversarial_pattern") {
+            fresh._adversarial_reopen_until_turn = state.turn_count + T.adversarial_reopen_min_turns;
+        }
+        const plan = planMemoryRoutes(fresh, { force_full_cold: true });
+        return {
+            state: fresh,
+            classification,
+            drift: { ...drift, prev_domain: prevDomain, prev_subdomain: prevSubdomain, prev_phase: prevPhase },
+            plan,
+            telemetry: buildTelemetry(fresh, classification, plan, drift),
+        };
+    }
+
+    if (state.phase === "warm") {
         if (state.turn_count_since_stabilization > 0
             && state.turn_count_since_stabilization % T.warm_sanity_check_every_n_turns === 0
             && classification.domain_id !== state.domain
             && classification.confidence >= T.drift_confidence_min) {
+            const prevDomain = state.domain;
+            const prevSubdomain = state.subdomain;
             resetContext(threadId, "sanity_check_failed");
             const fresh = THREAD_STATE.get(threadId);
             fresh.turn_count = state.turn_count;
@@ -824,7 +875,7 @@ export async function updateContext({ threadId, userText, turn, memCall, thresho
             return {
                 state: fresh,
                 classification,
-                drift: { triggered: true, trigger: "sanity_check_failed", hardness: "soft" },
+                drift: { triggered: true, trigger: "sanity_check_failed", hardness: "soft", prev_domain: prevDomain, prev_subdomain: prevSubdomain },
                 plan,
                 telemetry: buildTelemetry(fresh, classification, plan, { trigger: "sanity_check_failed" }),
             };
@@ -878,6 +929,14 @@ function buildTelemetry(state, classification, plan, drift) {
         drift_triggered_at_turn: state.drift_triggered_at_turn,
         drift_trigger: drift?.trigger || null,
         drift_hardness: drift?.hardness || null,
+        // v0.6.9.1: explicit "never reached WARM" marker. Gate 27 reads
+        // this to distinguish a true drift failure (WARM reached, drift
+        // didn't fire on a topic switch) from stabilization_not_reached
+        // (the conversation never accumulated enough confidence — drift
+        // cannot fire from a state that doesn't exist).
+        stabilization_not_reached:
+            state.phase !== "warm" && (state._highest_phase_reached !== "warm"),
+        highest_phase_reached: state._highest_phase_reached || state.phase,
         turn_count: state.turn_count,
         turn_count_since_stabilization: state.turn_count_since_stabilization,
         fce_mode: plan.fce_mode,

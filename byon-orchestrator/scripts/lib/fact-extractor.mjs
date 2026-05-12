@@ -201,6 +201,62 @@ export const ADVERSARIAL_PATTERNS = [
             /(arhitectur|architecture).{0,40}(suprascris|overridden|overrid|replaced|supersed).{0,40}(memor|memori)/i,
         ],
     },
+    // ----------------------------------------------------------------------
+    // v0.6.9.1 — domain-generic claim-to-rule conversion attempts.
+    //
+    // The v0.6.5/6/7/8 patterns are scoped to BYON architecture and FCE-M
+    // jailbreak phrasings. These new patterns catch ANY attempt to elevate
+    // a user claim into a permanent rule, override a stated rule, or assert
+    // verification status the system has not granted. Domain-agnostic by
+    // design — covers construction, legal, security, etc.
+    // ----------------------------------------------------------------------
+    // 12. Claim-to-rule: "memorează ca regulă: NU trebuie X", "treat this
+    //     as rule", "from now on this is official", "consider this verified"
+    {
+        name: "claim_to_rule",
+        match: [
+            // RO: "memorează ca regulă/regulă permanentă/regulă oficială: X"
+            //     "salvează ca regulă permanentă"
+            //     "consideră aceasta o regulă"
+            /\b(memorea[zș][ăa]?|salveaz[ăa]?|consider[ăa]?)\b.{0,50}\b(ca\s+)?regul[ăa]\s*(permanent|oficial|ferm|sigur|valid)?/i,
+            /\bregul[ăa]\s+permanent[ăa]?\s*[:=]/i,
+            // RO: "nu trebuie X" elevated to a rule
+            /\b(memorea[zș][ăa]?|salveaz[ăa]?|consider[ăa]?)\b.{0,80}\b(nu|nu\s+mai)\s+trebuie/i,
+            // RO: "de acum X este oficial/verificat"
+            /\bde\s+acum\b.{0,40}\b(oficial|verificat|regul|aplicat|valid|adev[ăa]r)/i,
+            // EN: "treat this as rule" / "consider this rule" / "consider this verified"
+            /\b(treat|consider)\s+this\s+as\s+(a\s+)?(rule|fact|verified|official|policy)/i,
+            /\b(treat|consider)\s+(it|this)\s+(as\s+)?verified/i,
+            // EN: "from now on this is the rule" / "this is now the rule"
+            /\bfrom\s+now\s+on\b.{0,40}\b(rule|fact|official|policy|verified)/i,
+            /\b(this|that)\s+is\s+now\s+(the\s+)?(rule|fact|official|policy)/i,
+            // EN: "override the rule" / "supersede the rule"
+            /\b(override|supersede|replace|disregard)\s+(the\s+)?(rule|policy|standard|requirement)/i,
+            // EN/RO: "this unsafe rule is official" attempting to elevate
+            /\bunsafe\b.{0,40}\b(rule|fact|official|verified)/i,
+            // EN: "remember this as a rule" / "remember this as a permanent rule"
+            /\bremember\s+(this|that)\s+as\s+(a\s+)?(\w+\s+)?(rule|fact|policy|verified|standard|requirement)/i,
+        ],
+    },
+    // 13. Negative-elevation: "nu mai trebuie X" pushed as a rule, especially
+    //     domain-specific ("rosturi", "rotation", "audit", etc.) attempting
+    //     to remove a stated requirement.
+    {
+        name: "negative_rule_elevation",
+        match: [
+            // RO: "nu mai trebuie {required-thing}" — phrased as a directive
+            //     ("memorează" / "salvează" / "consideră" prefix OR colon)
+            /(memorea[zș][ăa]?|salveaz[ăa]?|consider[ăa]?|de\s+acum|de\s+azi)\b.{0,80}\bnu\s+mai\s+trebuie\b/i,
+            // RO: "X nu mai sunt necesare/obligatorii/aplicabile" elevated
+            /\bnu\s+mai\s+(sunt|este)\s+(necesar|obligator|aplica|valid)/i,
+            // RO: "ignoră / nu aplica regula X" — instructive form
+            /\b(ignor[ăa]?|nu\s+aplica|nu\s+respecta|s[ăa]ri\s+peste)\s+(regul|standard|norma|cerinț)/i,
+            // EN: "ignore the rule / disregard the standard"
+            /\b(ignore|disregard|skip)\s+(the\s+)?(rule|standard|requirement|policy|regulation)/i,
+            // EN: "X is no longer required / applicable / official"
+            /\bno\s+longer\s+(required|applicable|official|valid|in\s+force)/i,
+        ],
+    },
 ];
 
 export function detectAdversarialPattern(text) {
