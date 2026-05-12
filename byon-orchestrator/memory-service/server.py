@@ -494,6 +494,24 @@ async def handle_request(request: Dict[str, Any]):
     elif action == "verified_fact_list":
         return await verified_fact_list(request)
 
+    # ------------------------------------------------------------------
+    # v0.6.8: Operator-Verified Domain Knowledge (channel-gated)
+    # ------------------------------------------------------------------
+    elif action == "domain_fact_add":
+        return await domain_fact_add(request)
+
+    elif action == "domain_fact_revoke":
+        return await domain_fact_revoke(request)
+
+    elif action == "domain_fact_list":
+        return await domain_fact_list(request)
+
+    elif action == "domain_fact_review":
+        return await domain_fact_review(request)
+
+    elif action == "domain_fact_search":
+        return await domain_fact_search(request)
+
     else:
         raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
 
@@ -958,6 +976,373 @@ async def verified_fact_list(request: Dict[str, Any]) -> Dict[str, Any]:
 
     out.sort(key=lambda e: e.get("created_at") or 0, reverse=True)
     return {"success": True, "count": len(out), "facts": out}
+
+
+# ----------------------------------------------------------------------
+# v0.6.8: Operator-Verified Domain Knowledge
+#
+# A new trust tier, DOMAIN_VERIFIED, sits between VERIFIED_PROJECT_FACT
+# and USER_PREFERENCE in the trust hierarchy declared in fact-extractor.mjs.
+# It carries externally-verified domain knowledge: legislation, technical
+# standards, regulations, official docs.
+#
+# Required metadata for every domain fact (server validates):
+#   domain, jurisdiction, subject, predicate, object,
+#   source (one of source_name / source_url / source_path),
+#   retrieved_at, effective_from, review_after, citation
+#
+# Channel gate: writes only from "operator-cli" or "domain-ingestion-tool".
+# Chat / WhatsApp / ab-bench / conversation channels are rejected with 403.
+#
+# Expiry: when review_after has passed, recall (via inferTrustFromHit) demotes
+# the fact to DISPUTED_OR_UNSAFE so it surfaces under [6] with a stale marker,
+# not under [3] VERIFIED DOMAIN KNOWLEDGE.
+# ----------------------------------------------------------------------
+
+DOMAIN_WRITE_CHANNELS = {"operator-cli", "domain-ingestion-tool"}
+
+DOMAIN_FACT_REQUIRED_FIELDS = (
+    "domain", "jurisdiction",
+    "subject", "predicate", "object",
+    "retrieved_at", "effective_from", "review_after",
+    "citation",
+)
+
+DOMAIN_FACT_KINDS = {
+    "domain_fact", "legal_rule", "technical_standard",
+    "regulatory_constraint", "official_document", "internal_policy",
+    "safety_procedure", "industry_standard",
+}
+
+
+def _ensure_domain_write_channel(request: Dict[str, Any]) -> None:
+    data = request.get("data", {}) or {}
+    channel = data.get("channel") or request.get("channel")
+    if channel not in DOMAIN_WRITE_CHANNELS:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"domain_fact_* writes require channel in {sorted(DOMAIN_WRITE_CHANNELS)}. "
+                f"Got channel={channel!r}. "
+                "There is no conversational path to DOMAIN_VERIFIED."
+            ),
+        )
+
+
+def _validate_domain_fact_payload(data: Dict[str, Any]) -> None:
+    missing = []
+    for field in DOMAIN_FACT_REQUIRED_FIELDS:
+        val = data.get(field)
+        if not isinstance(val, str) or not val.strip():
+            missing.append(field)
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"domain_fact_add missing required fields: {missing}",
+        )
+    # at least one source pointer is required
+    source_pointers = [data.get("source_name"), data.get("source_url"), data.get("source_path")]
+    if not any(isinstance(p, str) and p.strip() for p in source_pointers):
+        raise HTTPException(
+            status_code=400,
+            detail="domain_fact_add requires at least one of: source_name, source_url, source_path",
+        )
+    # kind must be in the allow-list
+    kind = data.get("kind", "domain_fact")
+    if kind not in DOMAIN_FACT_KINDS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"domain_fact_add 'kind' must be one of {sorted(DOMAIN_FACT_KINDS)}, got {kind!r}",
+        )
+    # ISO-8601 sanity check on the three date fields
+    import re as _re
+    iso_re = _re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+\-]\d{2}:?\d{2})?)?$")
+    for date_field in ("retrieved_at", "effective_from", "review_after"):
+        v = data.get(date_field, "")
+        # "unknown" is allowed for effective_from per roadmap spec
+        if date_field == "effective_from" and v.strip().lower() == "unknown":
+            continue
+        if not iso_re.match(v):
+            raise HTTPException(
+                status_code=400,
+                detail=f"domain_fact_add field {date_field!r} must be ISO-8601 (YYYY-MM-DD[ T...]); got {v!r}",
+            )
+
+
+async def domain_fact_add(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a DOMAIN_VERIFIED fact. Channel-gated.
+
+    See module docstring for the required metadata. The store path piggy-backs
+    on the existing store_fact handler; the rich domain metadata is recorded
+    in a side-car structure on content_cache[ctx_id] so list/review can read
+    it back.
+    """
+    _ensure_domain_write_channel(request)
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+    _validate_domain_fact_payload(data)
+
+    subject = data["subject"].strip()
+    predicate = data["predicate"].strip()
+    obj = data["object"].strip()
+    kind = data.get("kind", "domain_fact").strip()
+    domain = data["domain"].strip()
+    jurisdiction = data["jurisdiction"].strip()
+    operator = (data.get("operator") or data.get("ingested_by") or "operator").strip()
+
+    fact_text = f"{subject} {predicate.replace('_', ' ')} {obj}"
+    channel = data.get("channel") or "operator-cli"
+
+    tags = [
+        kind,
+        subject.replace(" ", "_"),
+        f"trust:DOMAIN_VERIFIED",
+        f"scope:{(data.get('scope') or 'global').strip()}",
+        f"domain:{domain}",
+        f"jurisdiction:{jurisdiction}",
+        f"ingested_by:{operator}",
+        f"source_type:{(data.get('source_type') or 'unspecified').strip()}",
+    ]
+
+    ctx_id = h.store_fact(
+        fact=fact_text,
+        source=f"domain-ingest:{kind}:{operator}",
+        tags=tags,
+        thread_id=None,  # GLOBAL — domain facts are project-wide
+        channel=channel,
+        trust="DOMAIN_VERIFIED",
+        disputed=False,
+        disputed_pattern=None,
+    )
+
+    # store rich domain metadata alongside content_cache so list/review can recover it
+    domain_meta = {
+        "kind": kind,
+        "domain": domain,
+        "jurisdiction": jurisdiction,
+        "subject": subject,
+        "predicate": predicate,
+        "object": obj,
+        "source_name": data.get("source_name") or None,
+        "source_url": data.get("source_url") or None,
+        "source_path": data.get("source_path") or None,
+        "source_type": data.get("source_type") or "unspecified",
+        "retrieved_at": data["retrieved_at"],
+        "effective_from": data["effective_from"],
+        "review_after": data["review_after"],
+        "version": data.get("version") or None,
+        "citation": data["citation"],
+        "ingested_by": operator,
+        "scope": data.get("scope") or "global",
+        "supersedes": data.get("supersedes") or [],
+        "created_at": time.time(),
+        "revoked": False,
+    }
+    # also propagate the most-used fields into the metadata blob so
+    # inferTrustFromHit / formatFactsForPrompt can render them inline
+    md = h.content_cache[ctx_id].get("metadata", {})
+    md["jurisdiction"] = jurisdiction
+    md["source_name"] = data.get("source_name")
+    md["source_url"] = data.get("source_url")
+    md["source_path"] = data.get("source_path")
+    md["retrieved_at"] = data["retrieved_at"]
+    md["effective_from"] = data["effective_from"]
+    md["review_after"] = data["review_after"]
+    md["version"] = data.get("version")
+    md["citation"] = data["citation"]
+    md["domain"] = domain
+    md["kind"] = kind
+    h.content_cache[ctx_id]["metadata"] = md
+    h.content_cache[ctx_id]["domain_metadata"] = domain_meta
+    h._save_content_cache()
+
+    return {
+        "success": True,
+        "ctx_id": ctx_id,
+        "fact": fact_text,
+        "trust": "DOMAIN_VERIFIED",
+        "domain": domain,
+        "jurisdiction": jurisdiction,
+        "kind": kind,
+        "citation": data["citation"],
+        "retrieved_at": data["retrieved_at"],
+        "effective_from": data["effective_from"],
+        "review_after": data["review_after"],
+    }
+
+
+async def domain_fact_revoke(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Revoke a DOMAIN_VERIFIED fact. Channel-gated. Demotes to DISPUTED_OR_UNSAFE."""
+    _ensure_domain_write_channel(request)
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+    ctx_id = data.get("ctx_id")
+    reason = (data.get("reason") or "").strip()
+    operator = (data.get("operator") or "").strip()
+    if ctx_id is None or not reason or not operator:
+        raise HTTPException(status_code=400, detail="domain_fact_revoke requires ctx_id, reason, operator")
+    entry = h.content_cache.get(ctx_id)
+    if not entry:
+        raise HTTPException(status_code=404, detail=f"ctx_id {ctx_id} not found")
+    md = entry.get("metadata", {})
+    if md.get("trust") != "DOMAIN_VERIFIED":
+        raise HTTPException(status_code=400, detail=f"ctx_id {ctx_id} is not DOMAIN_VERIFIED (trust={md.get('trust')!r})")
+    # demote to disputed
+    md["disputed"] = True
+    md["disputed_pattern"] = "operator_revoked"
+    md["trust"] = "DISPUTED_OR_UNSAFE"
+    tags = list(md.get("tags") or [])
+    for marker in ("__revoked__", "__disputed__", "trust:DISPUTED_OR_UNSAFE"):
+        if marker not in tags:
+            tags.append(marker)
+    md["tags"] = tags
+    dm = entry.setdefault("domain_metadata", {})
+    dm["revoked"] = True
+    dm["revoked_at"] = time.time()
+    dm["revoked_reason"] = reason
+    dm["revoked_by"] = operator
+    h._save_content_cache()
+    return {"success": True, "ctx_id": ctx_id, "revoked": True, "revoked_by": operator, "revoked_reason": reason}
+
+
+def _is_domain_entry(entry: Dict[str, Any]) -> bool:
+    md = entry.get("metadata", {}) or {}
+    return md.get("trust") == "DOMAIN_VERIFIED" or "domain_metadata" in entry
+
+
+async def domain_fact_list(request: Dict[str, Any]) -> Dict[str, Any]:
+    """List domain facts. Read-only; no channel gate (but only domain facts surface).
+
+    Filters: jurisdiction, domain, kind, scope, include_revoked, include_expired.
+    """
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+    filters = {
+        "jurisdiction": data.get("jurisdiction"),
+        "domain": data.get("domain"),
+        "kind": data.get("kind"),
+        "scope": data.get("scope"),
+    }
+    include_revoked = bool(data.get("include_revoked"))
+    include_expired = bool(data.get("include_expired"))
+
+    out = []
+    for ctx_id, entry in h.content_cache.items():
+        if not _is_domain_entry(entry):
+            continue
+        dm = entry.get("domain_metadata", {}) or {}
+        md = entry.get("metadata", {}) or {}
+        # revoked filter
+        if dm.get("revoked") and not include_revoked:
+            continue
+        # expired filter
+        review_after = dm.get("review_after") or md.get("review_after")
+        is_expired = False
+        if review_after:
+            try:
+                from datetime import datetime as _dt
+                is_expired = _dt.fromisoformat(review_after.replace("Z", "+00:00")).timestamp() < time.time()
+            except Exception:
+                is_expired = False
+        if is_expired and not include_expired:
+            continue
+        # field filters
+        for k, v in filters.items():
+            if v and dm.get(k) != v:
+                break
+        else:
+            out.append({
+                "ctx_id": ctx_id,
+                "fact": entry.get("content", ""),
+                "domain": dm.get("domain"),
+                "jurisdiction": dm.get("jurisdiction"),
+                "kind": dm.get("kind"),
+                "source_name": dm.get("source_name"),
+                "source_url": dm.get("source_url"),
+                "source_path": dm.get("source_path"),
+                "source_type": dm.get("source_type"),
+                "retrieved_at": dm.get("retrieved_at"),
+                "effective_from": dm.get("effective_from"),
+                "review_after": dm.get("review_after"),
+                "version": dm.get("version"),
+                "citation": dm.get("citation"),
+                "ingested_by": dm.get("ingested_by"),
+                "scope": dm.get("scope"),
+                "revoked": dm.get("revoked", False),
+                "expired": is_expired,
+            })
+    out.sort(key=lambda e: (e.get("retrieved_at") or "", e.get("ctx_id")), reverse=True)
+    return {"success": True, "count": len(out), "facts": out}
+
+
+async def domain_fact_review(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Surface domain facts past their review_after date (audit helper)."""
+    h = get_handlers()
+    out = []
+    now = time.time()
+    for ctx_id, entry in h.content_cache.items():
+        if not _is_domain_entry(entry):
+            continue
+        dm = entry.get("domain_metadata", {}) or {}
+        if dm.get("revoked"):
+            continue
+        review_after = dm.get("review_after")
+        if not review_after:
+            continue
+        try:
+            from datetime import datetime as _dt
+            review_ts = _dt.fromisoformat(review_after.replace("Z", "+00:00")).timestamp()
+        except Exception:
+            continue
+        if review_ts < now:
+            out.append({
+                "ctx_id": ctx_id,
+                "fact": entry.get("content", ""),
+                "domain": dm.get("domain"),
+                "jurisdiction": dm.get("jurisdiction"),
+                "review_after": review_after,
+                "days_overdue": int((now - review_ts) / 86400),
+            })
+    return {"success": True, "count": len(out), "facts": out}
+
+
+async def domain_fact_search(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Domain-only semantic search. Filters by jurisdiction + domain when provided."""
+    h = get_handlers()
+    data = request.get("data", {}) or {}
+    query = data.get("query", "")
+    top_k = int(data.get("top_k", 10))
+    jurisdiction = data.get("jurisdiction")
+    domain = data.get("domain")
+
+    # Run a fact-only search at scope=global, then filter for domain entries.
+    raw = h.search_fact(query=query, top_k=top_k * 3, threshold=0.0, thread_id=None, scope="global")
+    out = []
+    for item in raw:
+        ctx_id = item["ctx_id"]
+        entry = h.content_cache.get(ctx_id, {})
+        if not _is_domain_entry(entry):
+            continue
+        dm = entry.get("domain_metadata", {}) or {}
+        if jurisdiction and dm.get("jurisdiction") != jurisdiction:
+            continue
+        if domain and dm.get("domain") != domain:
+            continue
+        out.append({
+            "ctx_id": ctx_id,
+            "similarity": item["similarity"],
+            "fact": entry.get("content", ""),
+            "domain": dm.get("domain"),
+            "jurisdiction": dm.get("jurisdiction"),
+            "citation": dm.get("citation"),
+            "source_name": dm.get("source_name") or dm.get("source_url"),
+            "retrieved_at": dm.get("retrieved_at"),
+            "review_after": dm.get("review_after"),
+            "revoked": dm.get("revoked", False),
+        })
+        if len(out) >= top_k:
+            break
+    return {"success": True, "count": len(out), "results": out}
 
 
 async def get_stats() -> Dict[str, Any]:
