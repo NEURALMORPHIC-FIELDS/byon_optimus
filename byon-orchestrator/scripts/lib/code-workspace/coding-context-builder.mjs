@@ -21,10 +21,14 @@
 import { FORBIDDEN_DUPLICATE_PUBLIC_APIS } from "./architecture-map.mjs";
 
 const DEFAULT_OPTS = {
-    max_exact_files: 25,
-    max_bytes_per_file: 6000,
+    max_exact_files: 40,           // PR #9: was 25; coding bench needs more
+    max_bytes_per_file: 10000,     // PR #9: was 6000; allow fuller exact files
     include_tests: true,
     max_recent_patches: 5,
+    // PR #9: priority hints; the orchestrator passes these per phase.
+    priority_paths: [],            // files touched in last patch / known failing files
+    priority_symbols: [],          // symbol names mentioned in the phase task
+    is_repair_pass: false,         // when true, the prompt is reshaped for fixing, not adding
 };
 
 export class CodingContextBuilder {
@@ -56,9 +60,24 @@ export class CodingContextBuilder {
     build({ phase_id, phase_title, phase_prompt, builder_opts = {} }) {
         const opts = { ...DEFAULT_OPTS, ...builder_opts };
 
-        const exactFiles = this.fileStore
-            ? this.fileStore.relevantFiles({ maxFiles: opts.max_exact_files, includeTests: opts.include_tests })
-            : [];
+        // PR #9 hardening: file-selection strategy is no longer just role-based.
+        // Priority order:
+        //   1. files touched in last patch (workspace state: last_modified_phase)
+        //   2. files containing failing tests (TestFailureMemory.lastFailure.failing_file)
+        //   3. files defining symbols mentioned in the phase task / prompt
+        //   4. tests covering structural requirements (test_related && hits keyword)
+        //   5. remaining source files
+        //   6. remaining tests
+        //   7. CLI / config
+        //   8. docs (lowest)
+        // The selection trace goes into telemetry.
+        const exactFiles = this._selectExactFiles({
+            maxFiles: opts.max_exact_files,
+            includeTests: opts.include_tests,
+            priorityPaths: opts.priority_paths || [],
+            prioritySymbols: opts.priority_symbols || [],
+            lastFailure: this.failures ? this.failures.lastFailure() : null,
+        });
 
         const symbols = this.symbolIndex ? this.symbolIndex.snapshot() : { totals: { files: 0, names: 0 }, by_kind: {}, duplicates: [] };
         const reqs = this.requirements ? this.requirements.snapshot() : null;
@@ -67,10 +86,26 @@ export class CodingContextBuilder {
         const archSnap = this.architecture ? this.architecture.snapshot() : null;
 
         const parts = [];
-        parts.push(`### CODING TASK — Phase ${phase_id}: ${phase_title}`);
-        parts.push("");
-        parts.push(phase_prompt);
-        parts.push("");
+        if (opts.is_repair_pass) {
+            // PR #9: repair-pass takes priority. The whole prompt is reframed
+            // around fixing the existing failure BEFORE doing anything else.
+            parts.push(`### REPAIR PASS — Phase ${phase_id}: ${phase_title}`);
+            parts.push("");
+            parts.push("**A previous phase left failing tests or guard violations.**");
+            parts.push("**Your single task this turn is to FIX THE EXISTING FAILURE.**");
+            parts.push("**Do NOT add new features. Do NOT refactor. Do NOT introduce new files unless they are regression tests for the specific fix.**");
+            parts.push("");
+            parts.push("The failure (verbatim) is at the bottom of this prompt under 'LAST TEST FAILURE'. The full prior workspace is included above. Read the failing test, read the file it tests, make the smallest correct change, ship a regression test.");
+            parts.push("");
+            parts.push("Original phase context (for reference only — repair takes priority):");
+            parts.push(phase_prompt);
+            parts.push("");
+        } else {
+            parts.push(`### CODING TASK — Phase ${phase_id}: ${phase_title}`);
+            parts.push("");
+            parts.push(phase_prompt);
+            parts.push("");
+        }
 
         parts.push("### ANTI-DUPLICATION WARNING (BYON workspace memory)");
         parts.push("");
@@ -187,12 +222,18 @@ export class CodingContextBuilder {
         const telemetry = {
             phase_id,
             phase_title,
+            is_repair_pass: !!opts.is_repair_pass,
             exact_files_count: exactFiles.length,
             exact_files_paths: exactFiles.map(f => f.file_path),
+            exact_files_with_reason: exactFiles.map(f => ({ path: f.file_path, reason: f._selectionReason })),
             exact_files_bytes_total: exactFiles.reduce((s, f) => s + Math.min(f.full_content.length, opts.max_bytes_per_file), 0),
+            file_budget: { max_files: opts.max_exact_files, max_bytes_per_file: opts.max_bytes_per_file },
+            priority_paths_used: opts.priority_paths || [],
+            priority_symbols_used: opts.priority_symbols || [],
             symbol_index: { unique_names: symbols.totals.names, duplicates_count: symbols.duplicates.length },
             requirements_included: reqs ? reqs.requirements.length : 0,
             requirements_structural_included: reqs ? reqs.requirements.filter(r => r.structural).length : 0,
+            requirements_violated_included: reqs ? reqs.requirements.filter(r => r.status === "violated").length : 0,
             recent_patches_included: patches.length,
             last_failure_included: !!lastFailure,
             architecture_forbidden_dups_detected: archSnap?.forbidden_duplicate_public_apis?.length || 0,
@@ -201,6 +242,61 @@ export class CodingContextBuilder {
             context_bytes: text.length,
         };
         return { text, telemetry };
+    }
+
+    /**
+     * Priority-based exact-file selection (PR #9 hardening).
+     * Each file gets a score; lowest wins. Returns up to maxFiles entries.
+     * The selection rationale travels into telemetry via `_selectionReason`.
+     */
+    _selectExactFiles({ maxFiles, includeTests, priorityPaths, prioritySymbols, lastFailure }) {
+        if (!this.fileStore) return [];
+        const existing = this.fileStore.listExisting();
+        const failingFile = lastFailure?.failing_file || null;
+        const priorityPathSet = new Set(priorityPaths);
+
+        // Find files that DEFINE any of the priority symbols (via symbol index).
+        const symbolFiles = new Set();
+        if (this.symbolIndex && prioritySymbols.length) {
+            for (const sym of prioritySymbols) {
+                for (const loc of (this.symbolIndex.locations?.(sym) || [])) {
+                    symbolFiles.add(loc.file);
+                }
+            }
+        }
+
+        function score(e) {
+            // Lower = higher priority.
+            if (priorityPathSet.has(e.file_path)) return 0;
+            if (failingFile && e.file_path === failingFile) return 1;
+            if (symbolFiles.has(e.file_path)) return 2;
+            if (e.role === "source" && !e.test_related) return 3;
+            if (e.role === "test") return 4;
+            if (e.role === "config") return 5;
+            if (e.role === "example") return 6;
+            if (e.role === "doc") return 7;
+            return 9;
+        }
+
+        const sorted = [...existing].sort((a, b) => {
+            const sa = score(a), sb = score(b);
+            if (sa !== sb) return sa - sb;
+            return a.file_path.localeCompare(b.file_path);
+        });
+
+        const out = [];
+        for (const e of sorted) {
+            if (!includeTests && e.test_related) continue;
+            // Attach selection reason for telemetry transparency.
+            let reason;
+            if (priorityPathSet.has(e.file_path)) reason = "touched_in_last_patch_or_phase_relevant";
+            else if (failingFile && e.file_path === failingFile) reason = "contains_failing_test";
+            else if (symbolFiles.has(e.file_path)) reason = "defines_priority_symbol";
+            else reason = e.role;
+            out.push({ ...e, _selectionReason: reason });
+            if (out.length >= maxFiles) break;
+        }
+        return out;
     }
 
     /**

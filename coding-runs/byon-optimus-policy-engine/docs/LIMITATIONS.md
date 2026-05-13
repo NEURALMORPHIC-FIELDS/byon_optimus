@@ -1,70 +1,89 @@
 # Limitations
 
+This document describes what the engine does **not** do.  Understanding these
+boundaries is essential before using this project in a real deployment context.
+
 ## No Real Execution
 
-All step execution is **simulated**. When the engine marks a step `success`,
-no actual process is spawned, no file is written, no deployment occurs, and
-no network call is made. The engine is a policy-enforcement and audit framework,
-not a task runner.
+All step execution is **simulated**.  `PolicyEngine.run()` records audit entries
+and returns status strings.  It does not:
 
-## No Persistent Audit Log by Default
+- Run shell commands or subprocesses
+- Deploy code to any environment
+- Call any network endpoint
+- Write to any filesystem path (beyond the audit log, which is in-memory)
+- Interact with CI/CD systems, Kubernetes, cloud providers, or any external service
 
-`AuditLog` stores entries in memory for the duration of a single `engine.run()`
-call. When the process exits, the log is lost. A `jsonl_path` constructor
-argument enables append-to-file persistence, but this is not wired up in the
-CLI (`--audit-file` is noted as a future feature in `cmd_audit`).
+The `action` field on a step is stored and audited but never interpreted or
+executed.
 
-## No Parallel Execution
+## In-Memory Audit Log Only
 
-Steps are executed strictly in topological order, one at a time. There is no
-concurrency, no thread pool, and no async support. Steps that could run in
-parallel (no shared dependencies) are serialised.
+`AuditLog` stores entries in a Python list for the lifetime of the process.
+It is **not** persisted to disk, a database, or any external store.  When the
+process exits, the audit log is lost.
+
+The log is append-only within a single process run, but there is no
+cryptographic signing, no write-ahead log, and no protection against a caller
+who holds a reference to the `AuditLog` object replacing it.
+`REQ_AUDIT_APPEND_ONLY` is partially satisfied (in-process immutability) but
+not fully satisfied (no durable persistence).
+
+## No Real Rollback
+
+`RollbackManager.rollback()` appends audit entries in reverse step order.  It
+does not perform any real undo operation (no database transactions, no file
+restores, no API calls).
 
 ## Single Condition Operator
 
-The only supported condition operator is `equals`. There is no `not_equals`,
-`in`, `gt`, `lt`, or boolean composition (`and`/`or`). Unknown operators raise
-`ConditionError` at runtime.
+The `condition` block supports only the `equals` operator.  There is no support
+for:
 
-## In-Memory Permission Model Only
+- `not_equals`, `greater_than`, `less_than`, `in`, `not_in`
+- Boolean combinators (`and`, `or`, `not`)
+- Regular expression matching
+- Dynamic variable resolution beyond a flat `context` dict
 
-`PermissionModel` is constructed in memory at startup from the built-in default
-gates. There is no integration with an external IAM system, LDAP, OAuth, or
-policy-as-code store (e.g. OPA). Adding custom gates requires Python API calls
-before invoking the engine.
+An unknown operator evaluates conservatively to `False` (step is skipped).
 
-## No Cryptographic Audit Integrity
+## No Parallel Execution
 
-`AuditLog` entries are not signed or hashed. An in-process attacker with access
-to the `AuditLog` object could manipulate `_entries` via Python name mangling.
-See `docs/SECURITY.md` for the threat model boundary.
+Steps are executed strictly in topological order, one at a time.  There is no
+support for running independent branches of the DAG concurrently.
 
-## No Rollback of Real Side Effects
+## No Step Retry or Timeout
 
-`RollbackManager.rollback()` records `ROLLBACK` audit entries and clears the
-internal completed-steps list. Because execution is simulated, there are no
-real side effects to undo. In a real system, rollback handlers would need to be
-registered per step.
+There is no retry logic, timeout, or backoff for failed steps.  A step either
+succeeds or fails in a single pass.
 
-## No Retry Logic
+## No Dynamic Workflow Modification
 
-A denied or failed step is not retried. There is no backoff, no retry count,
-and no partial-failure recovery. A denied step immediately blocks all transitive
-dependents.
+The workflow definition is fixed at load time.  Steps cannot add, remove, or
+modify other steps at runtime.  There is no support for dynamic fan-out or
+matrix builds.
 
-## YAML Only via PyYAML
+## No Secret Management
 
-JSON is supported natively. YAML requires `PyYAML>=6.0`. If PyYAML is not
-installed, YAML files raise `LoadError`. There is no support for TOML, HCL,
-or other formats.
+The engine has no concept of secrets, credentials, or environment variable
+injection.  The `params` dict on a step is stored as plain data and is never
+encrypted or redacted in the audit log.
 
-## No Schema Versioning
+## No Multi-Tenancy or Authentication
 
-Workflow files have no `version` field. There is no migration path between
-schema versions and no backwards-compatibility guarantee across releases.
+`PermissionModel` accepts a `role` string at construction time.  There is no
+authentication layer — the engine trusts the role it is given.  In a real
+deployment, the caller must authenticate the role before constructing
+`PermissionModel`.
 
-## Single-Process Only
+## No Persistent Gate Registry
 
-The engine has no distributed coordination, no locking, and no shared state
-between processes. Running two instances against the same workflow file
-simultaneously produces two independent, uncoordinated executions.
+`BUILTIN_GATES` is a module-level constant.  There is no database-backed gate
+registry, no UI for managing gates, and no hot-reload of gate definitions.
+Adding a new gate requires a code change and redeployment.
+
+## Python Version
+
+Requires Python 3.9 or later.  The `tomllib` module used in
+`test_regression_pyproject.py` is stdlib only from Python 3.11; a regex
+fallback is provided for 3.9/3.10.

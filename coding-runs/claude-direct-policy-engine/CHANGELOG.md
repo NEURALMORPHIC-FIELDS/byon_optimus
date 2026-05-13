@@ -1,52 +1,50 @@
 # Changelog
 
-All notable changes are recorded here, organised by phase.
+All notable changes to `policy-gated-workflow-engine` are recorded here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Phase 6: Developer Handoff
+## [Unreleased]
 
 ### Added
-- `docs/ARCHITECTURE.md` — module map, data-flow diagram (ASCII), extension
-  points, layer responsibilities.
-- `docs/SECURITY.md` — threat model, trusted-vs-untrusted input table, full
-  audit paragraph explaining how `policy_gate: bypass_all` is prevented.
-- `docs/LIMITATIONS.md` — explicit list of what the engine does NOT do.
-- `docs/EXAMPLES.md` — three worked examples with step-by-step expected output.
-- `README.md` refreshed: "Run all tests" command at the top, docs table,
-  exit-code table, role/gate table, full project layout.
-- `CHANGELOG.md` consolidated from per-phase prose into this single file.
+- `docs/ARCHITECTURE.md` — module inventory, data-flow diagrams, key design
+  decisions, invariant enforcement map.
+- `docs/SECURITY.md` — threat model, trusted-vs-untrusted input table,
+  step-by-step explanation of how `bypass_all` in YAML is prevented,
+  production gate and audit log security properties.
+- `docs/LIMITATIONS.md` — 12 explicit limitations (no real execution, no
+  persistence, no parallelism, etc.).
+- `docs/EXAMPLES.md` — 6 worked examples with full CLI output.
+- `examples/conditional_pipeline.yaml` — runnable environment-aware pipeline.
+- `CHANGELOG.md` (this file).
+- Refreshed `README.md` with single-command test instructions and links to all
+  docs.
 
 ### Changed
-- No functional code changes in this phase.  The docs were written to match
-  the code exactly; where a docstring was absent or misleading it was updated
-  to match observable behaviour.
+- No public API changes in this phase.
 
 ---
 
-## [0.4.0] — Phase 5: Bug Fix — skipped-blocks-dependents
+## [0.2.1] — Phase 4: Skip-propagation bug fix
 
 ### Fixed
+- **Critical**: A SKIPPED step (condition evaluated to False) was incorrectly
+  causing downstream dependent steps to be BLOCKED or FAILED.
 
-**`skipped-blocks-dependents`** — SKIPPED step incorrectly blocked dependents.
+  **Root cause**: The engine relied on a single `failed_ids` set to track all
+  non-successful steps.  When a step was skipped, it was not added to
+  `failed_ids`, which was correct — but the structural guarantee was implicit
+  and fragile.  Specifically, the Planner's `bad_ids` set and the engine's
+  blocking check both needed to be verified to never include skipped steps.
 
-**Severity:** High — incorrect workflow execution results.
+  **Fix**: Introduced an explicit `skipped_ids: Set[str]` in both
+  `WorkflowEngine.run()` and `Planner.build()`.  The blocking check now
+  reads:
 
-**Symptoms**
-
-A step whose `condition` evaluates to `False` is marked `SKIPPED`.  Any step
-that listed the skipped step in `depends_on` was then marked `FAILED` /
-`BLOCKED` instead of running normally.
-
-Example:
-
-```yaml
-steps:
-  - id: optional-scan
-    action: scan
-    condition:
-      equals: { var: environment, value: production }
-  - id: build
-    action: build
-    depends_on: [optional-scan]   # was BLOCKED in staging — now SUCCESS
+  ```python
+  blocking = [
+      dep for dep in step.depends_on
+      if dep in failed_ids
+      and dep not in skipped_ids   # belt-and-suspenders invariant assertion
+  ]

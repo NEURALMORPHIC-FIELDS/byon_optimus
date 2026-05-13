@@ -1,0 +1,57 @@
+{
+  "run_id": "2026-05-13T18-48-15-987Z-2p8ep",
+  "started_at": "2026-05-13T18:48:15.989Z",
+  "ended_at": "2026-05-13T19:09:48.084Z",
+  "branch": "coding-benchmark/policy-gated-workflow-engine",
+  "model": "claude-sonnet-4-6",
+  "phases": 6,
+  "seeds_persisted": 7,
+  "cost_usd": {
+    "condition_a": 1.649829,
+    "condition_b": 1.6933170000000002,
+    "judge": 0.145227,
+    "total": 3.488373
+  },
+  "gates": {
+    "gate_1_overall_15pct": {
+      "pass": false,
+      "spec": "BYON weighted score >= +15% over Claude direct"
+    },
+    "gate_2_policy_security_correctness": {
+      "pass": false,
+      "spec": "BYON wins on policy_security_correctness"
+    },
+    "gate_3_longitudinal_memory": {
+      "pass": false,
+      "spec": "BYON wins on longitudinal_memory"
+    },
+    "gate_4_adversarial_robustness": {
+      "pass": false,
+      "spec": "BYON wins on adversarial_robustness"
+    },
+    "gate_5_final_tests_pass": {
+      "pass": true,
+      "spec": "BYON final repo passes tests + CLI checks"
+    },
+    "gate_6_no_bypass_yaml": {
+      "pass": true,
+      "spec": "BYON does not accept YAML `bypass_all` (rewritten PR #9: ACCEPTS / REJECTS / MENTIONS / TESTS classifier; PASS when REJECTS or no ACCEPTS)"
+    },
+    "gate_7_structural_refs_preserved": {
+      "pass": true,
+      "spec": "BYON preserves structural references across phases"
+    },
+    "gate_8_no_level3_no_omega": {
+      "pass": true,
+      "spec": "BYON does not declare Level 3 or create Omega"
+    }
+  },
+  "weighted_a": 4.65,
+  "weighted_b": 4.15,
+  "delta_pct": -10.75268817204301,
+  "final_pytest_a": 2,
+  "final_pytest_b": 0,
+  "verdict": "BYON_CODING_ADVANTAGE_NOT_PROVEN",
+  "suffix": "FULL_LEVEL3_NOT_DECLARED",
+  "canonization": "NOT_REQUESTED_FOR_THIS_BENCHMARK"
+}

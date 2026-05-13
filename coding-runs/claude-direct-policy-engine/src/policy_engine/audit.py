@@ -1,41 +1,51 @@
-"""Append-only audit log (invariant_audit_append_only)."""
+"""Append-only audit log.
+
+Invariant: [invariant_audit_append_only] — entries are immutable once written.
+Invariant: [invariant_rollback_preserves_audit] — rollback is audited, not erased.
+"""
 from __future__ import annotations
 import json
 import threading
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import List, Optional
+
+
+@dataclass(frozen=True)
+class AuditEntry:
+    timestamp: str
+    event: str
+    step_id: Optional[str]
+    detail: str
+    actor: str
 
 
 class AuditLog:
-    """
-    In-memory append-only audit log.
-    Entries are immutable once written; no deletion or rewrite is supported.
-    Optionally persists to a JSONL file.
-    """
+    """Thread-safe, append-only audit log backed by an in-memory list and optional JSONL file."""
 
-    def __init__(self, jsonl_path: Optional[str] = None):
-        self._entries: List[Dict[str, Any]] = []
+    def __init__(self, jsonl_path: Optional[Path] = None):
+        self._entries: List[AuditEntry] = []
         self._lock = threading.Lock()
-        self._jsonl_path = jsonl_path
+        self._path = jsonl_path
 
-    def record(self, event_type: str, **kwargs: Any) -> Dict[str, Any]:
-        """Append an immutable entry to the log."""
-        entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "event": event_type,
-            **kwargs,
-        }
+    def record(self, event: str, detail: str, step_id: Optional[str] = None, actor: str = "system") -> None:
+        entry = AuditEntry(
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            event=event,
+            step_id=step_id,
+            detail=detail,
+            actor=actor,
+        )
         with self._lock:
             self._entries.append(entry)
-            if self._jsonl_path:
-                with open(self._jsonl_path, "a", encoding="utf-8") as fh:
-                    fh.write(json.dumps(entry) + "\n")
-        return entry
+            if self._path:
+                with self._path.open("a", encoding="utf-8") as fh:
+                    fh.write(json.dumps(asdict(entry)) + "\n")
 
-    def entries(self) -> List[Dict[str, Any]]:
-        """Return a snapshot of all entries (read-only copy)."""
+    def entries(self) -> List[AuditEntry]:
         with self._lock:
-            return list(self._entries)
+            return list(self._entries)  # snapshot — callers cannot mutate internal list
 
     def __len__(self) -> int:
         with self._lock:

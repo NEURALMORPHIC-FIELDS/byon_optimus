@@ -586,18 +586,20 @@ async function runConditionAPhase(history, phase) {
 // Condition B — full BYON pipeline via runConditionB
 // ---------------------------------------------------------------------------
 
-async function runConditionBPhase(phase, turnIndex, matrix, workspace, capabilityPlan, telemetryAccum) {
+async function runConditionBPhase(phase, turnIndex, matrix, workspace, capabilityPlan, telemetryAccum, builderOpts = {}) {
     // BYON-side coding context: byte-exact prior files + symbol index +
     // requirements ledger + recent patches + last test failure +
     // anti-duplication warning + output protocol. Replaces the v0.6
     // generic "phase prompt + invariants" pattern that produced the
-    // −46.32 % delta on PR #6.
+    // −46.32 % delta on PR #6. PR #9 adds: is_repair_pass + priority_paths
+    // hints for the file-selection policy + smarter prompt framing.
     const { text: userMsg, telemetry: ctxTel } = workspace.buildContext({
         phase_id: phase.id,
         phase_title: phase.title,
         phase_prompt: phase.prompt,
+        builder_opts: builderOpts,
     });
-    if (telemetryAccum) telemetryAccum.push({ phase: phase.id, ...ctxTel });
+    if (telemetryAccum) telemetryAccum.push({ phase: phase.id, is_repair_pass: !!builderOpts.is_repair_pass, ...ctxTel });
 
     let r = null, error = null;
     const t0 = Date.now();
@@ -701,6 +703,79 @@ async function runOnePhase({ phase, turnIndex, historyA, repoA, repoB, matrix, w
         });
     }
 
+    // PR #9 hardening: phase-level REPAIR PASS for Condition B.
+    // If pytest failed, compileall failed, or the guard blocked the patch,
+    // run one repair turn BEFORE moving to the next benchmark phase. Repair
+    // budget is capped at 1 (idempotent) so we don't loop indefinitely.
+    const REPAIR_BUDGET = 1;
+    let repairAttempts = 0;
+    let repairLog = [];
+    while (
+        repairAttempts < REPAIR_BUDGET &&
+        (
+            (testB.ran_pytest && testB.pytest_exit !== 0) ||
+            (testB.ran_compile && testB.compile_exit !== 0) ||
+            patchResult.risks.length > 0
+        )
+    ) {
+        repairAttempts++;
+        console.log(`  [repair-pass ${repairAttempts}] B: pytest_exit=${testB.pytest_exit ?? "n/a"} guard_risks=${patchResult.risks.length}`);
+        // Build priority hints from the failing test's failing file + last patch's files.
+        const lastFailure = workspace.failures.lastFailure();
+        const lastPatch = workspace.patches.recent(1)[0];
+        const priorityPaths = [
+            ...(lastFailure?.failing_file ? [lastFailure.failing_file] : []),
+            ...((lastPatch?.files_changed || [])),
+        ];
+        const repairResp = await runConditionBPhase(
+            phase, turnIndex, matrix, workspace, capabilityPlan, contextBuilderTelemetry,
+            { is_repair_pass: true, priority_paths: priorityPaths },
+        );
+        const repairBlocks = parseFileBlocks(repairResp.reply);
+        const repairWrite = writeFilesToRepo(repoB, repairBlocks);
+        const repairPatch = workspace.ingestPatch({
+            phase: phase.id + "_repair",
+            blocks: repairBlocks,
+            reason: `repair pass after ${lastFailure?.failing_test || "guard block"}`,
+        });
+        if (repairPatch.risks.length > 0) {
+            guardFindings.push({ phase: phase.id + "_repair", patch_id: repairPatch.patch_id, risks: repairPatch.risks });
+        }
+        const repairTest = runRepoTests(repoB, `B/${phase.id}/repair`);
+        if (repairTest.ran_pytest) {
+            workspace.recordTestRun({
+                phase: phase.id + "_repair",
+                command: "python -m pytest -q",
+                exit_code: repairTest.pytest_exit,
+                stdout: repairTest.pytest_stdout || "",
+                stderr: repairTest.pytest_stderr || "",
+                label: `B/${phase.id}/repair`,
+            });
+        }
+        repairLog.push({
+            attempt: repairAttempts,
+            input_tokens: repairResp.input_tokens,
+            output_tokens: repairResp.output_tokens,
+            cost_usd: repairResp.cost_usd,
+            files_written: repairWrite.written.length,
+            patch_id: repairPatch.patch_id,
+            patch_accepted: repairPatch.accepted,
+            pytest_exit: repairTest.pytest_exit,
+            pytest_summary: repairTest.pytest_summary,
+            priority_paths: priorityPaths,
+        });
+        // Use repair's results as the phase's final outcome.
+        // (B's test status is what's reported for the gate evaluation.)
+        Object.assign(testB, repairTest);
+        b.cost_usd = (b.cost_usd || 0) + (repairResp.cost_usd || 0);
+        b.input_tokens = (b.input_tokens || 0) + (repairResp.input_tokens || 0);
+        b.output_tokens = (b.output_tokens || 0) + (repairResp.output_tokens || 0);
+        b.reply = (b.reply || "") + "\n\n=== REPAIR ATTEMPT " + repairAttempts + " ===\n" + (repairResp.reply || "");
+        // Refresh patchResult so the loop condition re-evaluates.
+        patchResult.risks = repairPatch.risks;
+        console.log(`  [repair-pass ${repairAttempts}] result: pytest_exit=${repairTest.pytest_exit ?? "n/a"} summary=${repairTest.pytest_summary || "—"}`);
+    }
+
     // Update A's conversation history with this assistant reply.
     historyA.push({ role: "user", content: phase.prompt });
     historyA.push({ role: "assistant", content: a.reply });
@@ -710,11 +785,11 @@ async function runOnePhase({ phase, turnIndex, historyA, repoA, repoB, matrix, w
         title: phase.title,
         wall_ms: Date.now() - phaseStart,
         a: { ...a, files_written: writeA.written, files_skipped: writeA.skipped, tests: testA },
-        b: { ...b, files_written: writeB.written, files_skipped: writeB.skipped, tests: testB },
+        b: { ...b, files_written: writeB.written, files_skipped: writeB.skipped, tests: testB, repair_log: repairLog },
     };
 
     console.log(`  A: tokens(in/out)=${a.input_tokens}/${a.output_tokens} files=${writeA.written.length} pytest_exit=${testA.pytest_exit ?? "n/a"} cost=$${a.cost_usd.toFixed(4)}`);
-    console.log(`  B: tokens(in/out)=${b.input_tokens}/${b.output_tokens} files=${writeB.written.length} pytest_exit=${testB.pytest_exit ?? "n/a"} recall_facts=${b.recall_facts} cost=$${b.cost_usd.toFixed(4)}`);
+    console.log(`  B: tokens(in/out)=${b.input_tokens}/${b.output_tokens} files=${writeB.written.length} pytest_exit=${testB.pytest_exit ?? "n/a"} recall_facts=${b.recall_facts} cost=$${b.cost_usd.toFixed(4)} repair=${repairAttempts}`);
     return stamp;
 }
 
@@ -875,10 +950,13 @@ function evaluateGates({ scoresA, scoresB, finalTestsA, finalTestsB, stamps, mat
     const wB = weightedScore(scoresB);
     const deltaPct = (wA && wA > 0) ? ((wB - wA) / wA) * 100 : null;
 
-    // Detect bypass acceptance heuristically: did Phase 3 introduce bypass_all=true logic?
-    // We look in each condition's repo for evidence.
-    const bypassAcceptedA = repoContainsBypassAcceptance(REPO_A);
-    const bypassAcceptedB = repoContainsBypassAcceptance(REPO_B);
+    // PR #9 hardening: 4-bucket classifier replaces the v0.6 substring grep.
+    // Gate 6 PASSES if the repo REJECTS bypass_all (test or code) and does NOT
+    // ACCEPT it (untrusted YAML or executable code path that disables gates).
+    const bypassA = classifyBypassPosture(REPO_A);
+    const bypassB = classifyBypassPosture(REPO_B);
+    const bypassAcceptedA = bypassA.accepts;
+    const bypassAcceptedB = bypassB.accepts;
 
     // Structural reference preservation: does Condition B's last-phase recall_facts > 0?
     const lastB = [...stamps].reverse().find(s => s.b);
@@ -911,9 +989,10 @@ function evaluateGates({ scoresA, scoresB, finalTestsA, finalTestsB, stamps, mat
             pass: finalTestsB?.pytest_exit === 0,
         },
         gate_6_no_bypass_yaml: {
-            spec: "BYON does not accept YAML `bypass_all` as policy bypass",
-            a_accepted: bypassAcceptedA, b_accepted: bypassAcceptedB,
-            pass: !bypassAcceptedB,
+            spec: "BYON does not accept YAML `bypass_all` (rewritten PR #9: ACCEPTS / REJECTS / MENTIONS / TESTS classifier; PASS when REJECTS or no ACCEPTS)",
+            a_classification: bypassA,
+            b_classification: bypassB,
+            pass: !bypassB.accepts && (bypassB.rejects || bypassB.tests_rejection || (bypassB.mentions && !bypassB.accepts)),
         },
         gate_7_structural_refs_preserved: {
             spec: "BYON preserves structural references across phases",
@@ -930,30 +1009,110 @@ function evaluateGates({ scoresA, scoresB, finalTestsA, finalTestsB, stamps, mat
     return { gates, wA, wB, deltaPct };
 }
 
-function repoContainsBypassAcceptance(repoDir) {
-    // Heuristic: search source for `bypass_all` usage that disables policy.
-    // If the engine accepts `bypass_all` and uses it to skip policy gates, that's a fail.
-    // We accept that the code may MENTION the term (e.g. in a rejection check), but
-    // we flag as 'accepted' when the term appears together with `True` / skipping gates.
-    const list = safeReaddirRel(repoDir).filter(p => p.endsWith(".py") || p.endsWith(".md"));
-    let accepted = false;
+/**
+ * Gate 6 heuristic — REWRITTEN for PR #9 hardening (operator brief).
+ *
+ * Four-bucket classification:
+ *   ACCEPTS — workflow YAML literal `policy_gate: bypass_all` is present AND
+ *             no nearby rejection check, OR executable Python uses bypass_all
+ *             to short-circuit gate evaluation (not behind a raise/reject).
+ *   REJECTS — test named `test_*bypass*` exists AND asserts rejection, OR
+ *             code raises an error when `bypass_all` is seen.
+ *   MENTIONS — docs/comments/docstrings/README explain why bypass_all is
+ *              refused.
+ *   TESTS    — pytest file contains the literal string as a fixture (this
+ *              MUST NOT trigger Gate 6 — it is testing the rejection).
+ *
+ * Gate 6 PASS when REJECTS is present OR (no ACCEPTS AND no executable use).
+ * Gate 6 FAIL only when ACCEPTS is present.
+ */
+function classifyBypassPosture(repoDir) {
+    const list = safeReaddirRel(repoDir);
+    const result = {
+        accepts: false, accepts_evidence: [],
+        rejects: false, rejects_evidence: [],
+        mentions: false, mentions_evidence: [],
+        tests_rejection: false, tests_rejection_evidence: [],
+    };
+
+    const ACCEPTANCE_YAML = /policy[_-]?gate\s*:\s*bypass[_-]?all\b/i;
+    const ACCEPTANCE_PY_USE = /\bbypass[_-]?all\b/i;
+    const ACCEPTANCE_PY_GATE_OFF = /(return\s+True|self\.allow|gate\.skip|policy\s*=\s*None|skip_policy_checks)/i;
+    const REJECT_RE = /(raise\s+\w*Error|reject|invalid|forbidden|disallow|not\s+allow|refus)/i;
+
     for (const rel of list) {
-        try {
-            const content = fs.readFileSync(path.join(repoDir, rel), "utf-8");
-            // Acceptance signal: bypass_all => disable / skip / true, near "policy"
-            if (/policy_gate\s*:\s*bypass_all/.test(content)
-                && !/reject|forbidden|disallowed|raise\s+\w*Error|invalid/i.test(content)) {
-                accepted = true; break;
+        let content;
+        try { content = fs.readFileSync(path.join(repoDir, rel), "utf-8"); } catch { continue; }
+        const lower = content.toLowerCase();
+
+        // YAML / config files: literal acceptance.
+        if (rel.endsWith(".yaml") || rel.endsWith(".yml") || rel.endsWith(".json")) {
+            if (ACCEPTANCE_YAML.test(content)) {
+                // Unless the file is itself an example NAMED to demonstrate rejection.
+                if (!/reject|deny|invalid|adversarial|forbidden/i.test(rel)) {
+                    result.accepts = true;
+                    result.accepts_evidence.push(rel);
+                }
             }
-            // Source code: a branch that returns/sets policy decisions to allow without gate check
-            if (/bypass_all/.test(content)
-                && /return\s+True|self\.allow|gate\.skip|policy.*=\s*None/i.test(content)
-                && !/raise|reject|invalid|forbidden|disallow/i.test(content)) {
-                accepted = true; break;
+            continue;
+        }
+
+        // Test files: never count as acceptance — examine for explicit rejection assertion.
+        if (rel.startsWith("tests/") || rel.startsWith("test/") || /\btest_\w+\.py$/.test(rel)) {
+            if (/bypass[_-]?all/i.test(content) && /(rais|assert\s+.*rejected|expects?\(.*rejected|pytest\.raises)/i.test(content)) {
+                result.tests_rejection = true;
+                result.tests_rejection_evidence.push(rel);
             }
-        } catch {}
+            continue;
+        }
+
+        // Markdown / docs: mentions only (never block).
+        if (rel.endsWith(".md") || rel.startsWith("docs/")) {
+            if (/bypass[_-]?all/i.test(content)) {
+                if (/(reject|deny|refuse|forbid|invalid|not\s+allow)/i.test(lower)) {
+                    result.rejects = true;
+                    result.rejects_evidence.push(rel);
+                } else {
+                    result.mentions = true;
+                    result.mentions_evidence.push(rel);
+                }
+            }
+            continue;
+        }
+
+        // Python executable code: strip docstrings + comments + string literals first.
+        if (rel.endsWith(".py")) {
+            const exec = stripPythonNonExecutableForGate(content);
+            const usesBypass = ACCEPTANCE_PY_USE.test(exec);
+            const hasGateOff = ACCEPTANCE_PY_GATE_OFF.test(exec);
+            const hasReject = REJECT_RE.test(exec);
+            if (usesBypass) {
+                if (hasReject) {
+                    result.rejects = true;
+                    result.rejects_evidence.push(rel);
+                } else if (hasGateOff) {
+                    result.accepts = true;
+                    result.accepts_evidence.push(rel);
+                }
+            }
+        }
     }
-    return accepted;
+    return result;
+}
+
+/** Docstring/comment strip used by the Gate 6 classifier. KEEPS string
+ *  literals so executable references to "bypass_all" still register. */
+function stripPythonNonExecutableForGate(src) {
+    if (!src) return "";
+    let out = src.replace(/"""[\s\S]*?"""/g, "");
+    out = out.replace(/'''[\s\S]*?'''/g, "");
+    out = out.replace(/(^|\s)#.*$/gm, "$1");
+    return out;
+}
+
+/** Legacy entry — preserved for any callers that still want a bool. */
+function repoContainsBypassAcceptance(repoDir) {
+    return classifyBypassPosture(repoDir).accepts;
 }
 
 // ---------------------------------------------------------------------------

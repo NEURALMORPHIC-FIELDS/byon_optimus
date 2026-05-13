@@ -1,5 +1,6 @@
 """Core data models."""
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
@@ -15,43 +16,39 @@ class StepStatus(str, Enum):
 
 
 @dataclass
-class ConditionExpr:
-    """A single condition expression parsed from workflow YAML/JSON."""
-    operator: str          # e.g. 'equals', 'not_equals', 'in', 'not_in'
-    var: str               # context variable name
-    value: Any             # expected value
+class PolicyGate:
+    """Gate that must pass before a step executes."""
+
+    name: str
+    required_role: str
+    description: str = ""
+
+    def check(self, roles: List[str]) -> bool:
+        return self.required_role in roles
 
 
 @dataclass
 class Step:
+    """A single unit of work in the workflow."""
+
     id: str
     name: str
     action: str
     depends_on: List[str] = field(default_factory=list)
-    policy_gate: Optional[str] = None
-    params: dict = field(default_factory=dict)
-    environment: str = "development"
-    condition: Optional[ConditionExpr] = None
-
-    def __post_init__(self):
-        if not self.id:
-            raise ValueError("Step id must not be empty")
-        if not self.action:
-            raise ValueError("Step action must not be empty")
+    policy_gates: List[str] = field(default_factory=list)
+    params: Dict[str, Any] = field(default_factory=dict)
+    # Raw condition mapping from YAML/JSON (already validated by loader)
+    condition: Optional[Dict[str, Any]] = field(default=None)
+    status: StepStatus = field(default=StepStatus.PENDING)
+    result: Optional[str] = field(default=None)
 
 
 @dataclass
-class WorkflowDefinition:
+class Workflow:
+    """A complete workflow definition."""
+
     name: str
     version: str
     steps: List[Step]
-    metadata: dict = field(default_factory=dict)
-
-
-@dataclass
-class PolicyGate:
-    name: str
-    required_role: str
+    gates: Dict[str, PolicyGate]
     description: str = ""
-    # Production gates are never granted by default (invariant_production_requires_grant)
-    is_production: bool = False

@@ -1,0 +1,94 @@
+{
+  "phases": [
+    {
+      "phase": "P1",
+      "label": "B/P1/repair",
+      "ran_compile": true,
+      "ran_pytest": true,
+      "compile_exit": 0,
+      "compile_stdout": "",
+      "compile_stderr": "",
+      "pytest_exit": 0,
+      "pytest_stdout": "....................                                                     [100%]\r\n20 passed in 0.12s\r\n",
+      "pytest_stderr": "",
+      "pytest_summary": "20 passed"
+    },
+    {
+      "phase": "P2",
+      "label": "B/P2/repair",
+      "ran_compile": true,
+      "ran_pytest": true,
+      "compile_exit": 0,
+      "compile_stdout": "",
+      "compile_stderr": "",
+      "pytest_exit": 0,
+      "pytest_stdout": "...............................                                          [100%]\r\n31 passed in 0.16s\r\n",
+      "pytest_stderr": "",
+      "pytest_summary": "31 passed"
+    },
+    {
+      "phase": "P3",
+      "label": "B/P3",
+      "ran_compile": true,
+      "ran_pytest": true,
+      "compile_exit": 0,
+      "compile_stdout": "",
+      "compile_stderr": "",
+      "pytest_exit": 0,
+      "pytest_stdout": "..........................................................               [100%]\r\n58 passed in 0.33s\r\n",
+      "pytest_stderr": "",
+      "pytest_summary": "58 passed"
+    },
+    {
+      "phase": "P4",
+      "label": "B/P4/repair",
+      "ran_compile": true,
+      "ran_pytest": true,
+      "compile_exit": 0,
+      "compile_stdout": "",
+      "compile_stderr": "",
+      "pytest_exit": 0,
+      "pytest_stdout": "........................................................................ [ 70%]\r\n..............................                                           [100%]\r\n102 passed in 0.45s\r\n",
+      "pytest_stderr": "",
+      "pytest_summary": "102 passed"
+    },
+    {
+      "phase": "P5",
+      "label": "B/P5/repair",
+      "ran_compile": true,
+      "ran_pytest": true,
+      "compile_exit": 0,
+      "compile_stdout": "",
+      "compile_stderr": "",
+      "pytest_exit": 0,
+      "pytest_stdout": "........................................................................ [ 64%]\r\n........................................                                 [100%]\r\n112 passed in 0.40s\r\n",
+      "pytest_stderr": "",
+      "pytest_summary": "112 passed"
+    },
+    {
+      "phase": "P6",
+      "label": "B/P6",
+      "ran_compile": true,
+      "ran_pytest": true,
+      "compile_exit": 0,
+      "compile_stdout": "",
+      "compile_stderr": "",
+      "pytest_exit": 0,
+      "pytest_stdout": "........................................................................ [ 63%]\r\n..........................................                               [100%]\r\n114 passed in 0.37s\r\n",
+      "pytest_stderr": "",
+      "pytest_summary": "114 passed"
+    }
+  ],
+  "final": {
+    "label": "B/P6",
+    "ran_compile": true,
+    "ran_pytest": true,
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "pytest_exit": 0,
+    "pytest_stdout": "........................................................................ [ 63%]\r\n..........................................                               [100%]\r\n114 passed in 0.37s\r\n",
+    "pytest_stderr": "",
+    "pytest_summary": "114 passed"
+  }
+}

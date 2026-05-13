@@ -128,7 +128,16 @@ export class WorkspaceDiffGuard {
                 }
             } else if (lang === "python") {
                 // Code that USES bypass_all without rejecting it => acceptance.
-                if (BYPASS_CODE_USE.test(b.content) && !BYPASS_REJECT_HINTS.test(b.content)) {
+                // PR #9 hardening: strip docstrings/comments/string-literals so
+                // a docstring like "REQ_NO_POLICY_BYPASS: refuse bypass_all" no
+                // longer trips the executable-code path. Test files (whose
+                // ENTIRE purpose is to ASSERT rejection of bypass_all) are
+                // exempt — they always contain the substring as a test fixture.
+                if (b.path.startsWith("tests/") || b.path.startsWith("test/")) continue;
+                // For bypass-detection, KEEP string literals — `"bypass_all"`
+                // is legitimately the term being matched against.
+                const exec = stripPythonNonExecutable(b.content, { stripStringLiterals: false });
+                if (BYPASS_CODE_USE.test(exec) && !BYPASS_REJECT_HINTS.test(exec)) {
                     risks.push({
                         type: GUARD_RISK.BYPASS_ALL_ACCEPTED,
                         message: `python file ${b.path} references bypass_all without rejection`,
@@ -160,12 +169,18 @@ export class WorkspaceDiffGuard {
         }
 
         // 5. Audit append-only invariant.
+        //    PR #9 hardening: distinguish executable Python from docstrings /
+        //    string literals / comments. The PR #8 benchmark showed false
+        //    positives in P1/P3/P4 because the guard matched literal text
+        //    inside class/function docstrings explaining the invariant. We
+        //    now strip docstrings + comments before pattern-matching.
         for (const b of blocks) {
             const lang = inferLang(b.path);
             if (lang !== "python") continue;
             if (!/audit/i.test(b.path) && !/audit/i.test(b.content)) continue;
+            const exec = stripPythonNonExecutable(b.content);
             for (const re of APPEND_ONLY_NEGATIVES) {
-                if (re.test(b.content)) {
+                if (re.test(exec)) {
                     risks.push({
                         type: GUARD_RISK.AUDIT_APPEND_BROKEN,
                         message: `audit append-only invariant looks broken in ${b.path} (pattern: ${re})`,
@@ -175,7 +190,7 @@ export class WorkspaceDiffGuard {
                 }
             }
             for (const re of ROLLBACK_ERASES) {
-                if (re.test(b.content)) {
+                if (re.test(exec)) {
                     risks.push({
                         type: GUARD_RISK.ROLLBACK_ERASES_AUDIT,
                         message: `rollback path in ${b.path} appears to erase audit history`,
@@ -195,6 +210,42 @@ export class WorkspaceDiffGuard {
 
         return { risks, ok: risks.length === 0 };
     }
+}
+
+/**
+ * Strip Python docstrings ("""..."""  /  '''...'''), comments (# ...), and
+ * regular string literals before checking for executable patterns. Used by
+ * the audit/rollback guard to avoid flagging docstring text that EXPLAINS
+ * the invariant (false-positive cause in PR #8 P1/P3/P4).
+ *
+ * Best-effort regex pass — not a full Python parser. Conservative: when
+ * unsure, we leave the line in (keeps the check strict on executable code,
+ * not on prose).
+ */
+/**
+ * @param {string} src
+ * @param {Object} [opts]
+ * @param {boolean} [opts.stripStringLiterals=true]
+ *   When false, single/double-quoted string literals are preserved. Used by
+ *   the bypass_all detector — the term legitimately appears as a string
+ *   literal in valid executable code (`if x == "bypass_all": raise ...`).
+ *   When true (default), all literals collapse to empty quotes — used by
+ *   the audit append-only check.
+ */
+export function stripPythonNonExecutable(src, opts = {}) {
+    if (!src || typeof src !== "string") return "";
+    const stripStrings = opts.stripStringLiterals !== false;
+    // 1. Triple-quoted strings (greedy across newlines) — ALWAYS stripped.
+    let out = src.replace(/"""[\s\S]*?"""/g, "");
+    out = out.replace(/'''[\s\S]*?'''/g, "");
+    // 2. Single-quoted / double-quoted string literals on a line.
+    if (stripStrings) {
+        out = out.replace(/("(?:\\.|[^"\\\n])*")/g, '""');
+        out = out.replace(/('(?:\\.|[^'\\\n])*')/g, "''");
+    }
+    // 3. Line comments — ALWAYS stripped.
+    out = out.replace(/(^|\s)#.*$/gm, "$1");
+    return out;
 }
 
 function inferLang(p) {

@@ -1,113 +1,92 @@
-"""CLI entry point. Subcommands: validate, run, audit, explain, plan.
+"""CLI entry point: workflow validate|run|audit|explain|plan.
 
-REQ_NO_POLICY_BYPASS: the only operator-controlled policy fast-path is
-``--policy-mode=permissive`` (or ``POLICY_MODE=permissive`` env var).
-It is disabled by default, always audited, and cannot be set from within
-an untrusted workflow file.
+--policy-mode is an OPERATOR-controlled flag.  It is never read from workflow
+YAML/JSON (REQ_CONFIG_UNTRUSTED, REQ_NO_POLICY_BYPASS).
 """
 from __future__ import annotations
 import argparse
 import json
-import os
 import sys
 
-from policy_engine.loader import load_workflow, LoadError
-from policy_engine.planner import build_plan, PlanError, PlanRenderer
-from policy_engine.engine import PolicyEngine
-from policy_engine.audit import AuditLog
-from policy_engine.permissions import PermissionModel
-from policy_engine.policy_mode import PolicyMode, get_policy_mode_from_env
+from .audit import AuditLog
+from .loader import LoadError, load_workflow
+from .permissions import PermissionModel
+from .planner import PlanError, PlanRenderer, PlanValidator, build_plan
+from .engine import PolicyEngine
 
-
-def _resolve_policy_mode(args: argparse.Namespace) -> PolicyMode:
-    """Resolve policy mode from CLI flag, then env var, then default (ENFORCE).
-
-    Precedence: --policy-mode flag > POLICY_MODE env var > ENFORCE (default).
-    The workflow file itself cannot influence this value (REQ_NO_POLICY_BYPASS).
-    """
-    cli_value = getattr(args, "policy_mode", None)
-    if cli_value is not None:
-        cli_value = cli_value.strip().lower()
-        if cli_value == PolicyMode.PERMISSIVE.value:
-            return PolicyMode.PERMISSIVE
-        if cli_value == PolicyMode.ENFORCE.value:
-            return PolicyMode.ENFORCE
-        # Unknown value — default to ENFORCE (fail-safe).
-        print(
-            f"WARNING: unknown --policy-mode value {cli_value!r}; "
-            f"defaulting to 'enforce'.",
-            file=sys.stderr,
-        )
-        return PolicyMode.ENFORCE
-    return get_policy_mode_from_env()
+_GLOBAL_AUDIT = AuditLog()
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
     try:
         wf = load_workflow(args.file)
-        build_plan(wf)
-        print(f"OK: workflow {wf.name!r} is valid ({len(wf.steps)} steps)")
+        PlanValidator().validate(wf)
+        print(f"OK: '{wf.name}' — {len(wf.steps)} steps, DAG valid.")
         return 0
     except (LoadError, PlanError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
+        _GLOBAL_AUDIT.append("validation_error", detail=str(exc))
         return 1
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    policy_mode = getattr(args, "policy_mode", "enforced")
+    if policy_mode not in ("enforced", "permissive"):
+        print(
+            f"ERROR: invalid --policy-mode '{policy_mode}'. "
+            "Must be 'enforced' or 'permissive'.",
+            file=sys.stderr,
+        )
+        return 1
+
+    if policy_mode == "permissive":
+        # Audit the operator's decision to use permissive mode BEFORE running.
+        _GLOBAL_AUDIT.append(
+            "operator_permissive_mode_activated",
+            detail=(
+                "OPERATOR explicitly activated permissive policy mode via CLI. "
+                "All gate overrides will be recorded."
+            ),
+        )
+        print(
+            "WARNING: --policy-mode=permissive is active. "
+            "All policy gate decisions will be OVERRIDDEN and audited.",
+            file=sys.stderr,
+        )
+
     try:
         wf = load_workflow(args.file)
         plan = build_plan(wf)
     except (LoadError, PlanError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
+        _GLOBAL_AUDIT.append("load_error", detail=str(exc))
         return 1
 
     role = getattr(args, "role", "developer")
-    policy_mode = _resolve_policy_mode(args)
-
-    if policy_mode is PolicyMode.PERMISSIVE:
-        print(
-            "WARNING: policy-mode=permissive is active. "
-            "Gate failures will be OVERRIDDEN and recorded in the audit log. "
-            "Do NOT use this in production.",
-            file=sys.stderr,
-        )
-
-    pm = PermissionModel.default()
-    audit = AuditLog()
+    perms = PermissionModel(role=role)
     engine = PolicyEngine(
-        permission_model=pm,
-        audit=audit,
-        role=role,
+        permissions=perms,
+        audit=_GLOBAL_AUDIT,
         policy_mode=policy_mode,
     )
     results = engine.run(plan)
-
-    print(f"Workflow: {wf.name}")
-    for step_name, status in results.items():
-        print(f"  {step_name}: {status}")
-
-    if policy_mode is PolicyMode.PERMISSIVE:
-        overridden = [e for e in audit.entries if e.event == "OVERRIDDEN"]
-        if overridden:
-            print(
-                f"\nAUDIT: {len(overridden)} gate(s) were OVERRIDDEN "
-                f"(permissive mode). These events are permanently recorded.",
-                file=sys.stderr,
-            )
-
-    return 0 if all(v == "success" for v in results.values()) else 1
+    for step, status in results.items():
+        icon = "✓" if status == "success" else "✗"
+        print(f"  {icon} {step}: {status}")
+    return 0 if all(s == "success" for s in results.values()) else 1
 
 
-def cmd_audit(args: argparse.Namespace) -> int:
-    print(
-        "Audit log is in-memory per run. "
-        "Use --audit-file with 'run' to persist (future feature)."
-    )
+def cmd_audit(_args: argparse.Namespace) -> int:
+    entries = _GLOBAL_AUDIT.entries
+    if not entries:
+        print("Audit log is empty.")
+        return 0
+    for e in entries:
+        print(f"[{e.event}] step={e.step} {e.detail}")
     return 0
 
 
 def cmd_explain(args: argparse.Namespace) -> int:
-    """Explain subcommand: kept for backwards compatibility; delegates to cmd_plan."""
     try:
         wf = load_workflow(args.file)
         plan = build_plan(wf)
@@ -119,73 +98,82 @@ def cmd_explain(args: argparse.Namespace) -> int:
 
 
 def cmd_plan(args: argparse.Namespace) -> int:
-    """Print the execution plan (human-readable + machine-readable dict).
+    """Print the execution plan WITHOUT executing anything.
 
-    Does NOT execute the workflow. REQ_TESTS_NOT_OPTIONAL: covered in test_plan.py.
+    Uses --role to predict gate outcomes.  Output format is controlled by
+    --format (text [default] or json).
+
+    This command NEVER executes steps, modifies state, or writes audit entries
+    for the workflow itself.  It is a pure read/predict operation.
     """
+    role = getattr(args, "role", "developer")
+    fmt = getattr(args, "format", "text")
+
     try:
         wf = load_workflow(args.file)
-        plan = build_plan(wf)
+        perms = PermissionModel(role=role)
+        plan = build_plan(wf, permissions=perms)
     except (LoadError, PlanError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
 
     renderer = PlanRenderer()
-
-    # Human-readable section
-    print(renderer.render(plan))
-
-    # Machine-readable section
-    print("\n--- machine-readable ---")
-    print(json.dumps(renderer.render_dict(plan), indent=2))
-
+    if fmt == "json":
+        output = json.dumps(renderer.render_dict(plan), indent=2)
+        print(output)
+    else:
+        print(renderer.render(plan))
     return 0
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="workflow",
-        description="Policy-gated workflow engine",
-    )
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(prog="workflow")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_val = sub.add_parser("validate", help="Validate a workflow file")
+    p_val = sub.add_parser("validate", help="Validate workflow file")
     p_val.add_argument("file")
 
-    p_run = sub.add_parser("run", help="Run a workflow")
+    p_run = sub.add_parser("run", help="Run workflow (simulated)")
     p_run.add_argument("file")
-    p_run.add_argument("--role", default="developer", help="Caller role for policy gates")
+    p_run.add_argument("--role", default="developer", help="Caller role")
     p_run.add_argument(
         "--policy-mode",
         dest="policy_mode",
-        default=None,
-        choices=["enforce", "permissive"],
+        default="enforced",
+        choices=["enforced", "permissive"],
         help=(
-            "Operator-controlled policy mode. "
-            "'enforce' (default): all gates enforced normally. "
-            "'permissive': gate failures are OVERRIDDEN and audited — "
-            "for operator-controlled test environments only. "
-            "Cannot be set from within a workflow file (REQ_NO_POLICY_BYPASS)."
+            "OPERATOR ONLY. 'permissive' overrides gate denials and records every "
+            "override in the audit log. NEVER set this from workflow YAML/JSON. "
+            "Default: enforced."
         ),
     )
 
-    sub.add_parser("audit", help="Show audit log (in-memory note)")
+    sub.add_parser("audit", help="Print audit log")
 
-    p_exp = sub.add_parser("explain", help="Explain execution plan (alias for plan)")
+    p_exp = sub.add_parser("explain", help="Explain execution plan")
     p_exp.add_argument("file")
 
     p_plan = sub.add_parser(
         "plan",
-        help="Print execution plan (human-readable + machine-readable dict). Does NOT execute.",
+        help=(
+            "Print the execution plan (with predicted gate outcomes) "
+            "WITHOUT executing anything."
+        ),
     )
     p_plan.add_argument("file")
+    p_plan.add_argument(
+        "--role",
+        default="developer",
+        help="Role used to predict gate outcomes (default: developer)",
+    )
+    p_plan.add_argument(
+        "--format",
+        dest="format",
+        default="text",
+        choices=["text", "json"],
+        help="Output format: 'text' (default) or 'json'",
+    )
 
-    return parser
-
-
-def main(argv: list[str] | None = None) -> int:
-    """Entry point. Returns exit code (int). Does NOT call sys.exit() itself."""
-    parser = build_parser()
     args = parser.parse_args(argv)
     dispatch = {
         "validate": cmd_validate,
@@ -194,9 +182,8 @@ def main(argv: list[str] | None = None) -> int:
         "explain": cmd_explain,
         "plan": cmd_plan,
     }
-    return dispatch[args.command](args)
+    sys.exit(dispatch[args.command](args))
 
 
-def _cli_entry() -> None:
-    """Setuptools console_scripts entry point — calls sys.exit with return code."""
-    sys.exit(main())
+if __name__ == "__main__":
+    main()

@@ -1,24 +1,26 @@
 # Examples
 
-## Example 1: Simple Dev Build
+## Example 1: Basic Three-Step Pipeline (developer role)
 
-A two-step workflow that builds and tests in a `dev` environment.
-Both steps require the `dev-gate`, satisfied by the `developer` role.
+This example shows a build → test → deploy pipeline where the developer role
+has permission to pass `dev-gate`.
 
-**File: `examples/simple_build.yaml`**
+### Workflow file: `examples/basic_pipeline.yaml`
 
 ```yaml
-name: simple-build
+name: basic-pipeline
 steps:
   - name: build
-    action: build_image
+    action: compile
     environment: dev
-    policy_gates: [dev-gate]
-    params:
-      image: myapp:latest
 
-  - name: unit-tests
-    action: run_tests
-    environment: dev
+  - name: test
+    action: pytest
     depends_on: [build]
+    environment: dev
+
+  - name: deploy
+    action: ship
+    depends_on: [test]
     policy_gates: [dev-gate]
+    environment: dev
