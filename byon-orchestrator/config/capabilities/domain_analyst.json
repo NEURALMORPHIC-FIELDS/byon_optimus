@@ -1,0 +1,47 @@
+{
+  "id": "domain_analyst",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Norms, standards, regulations, citations. Jurisdiction-aware DOMAIN_VERIFIED reasoning. Distinct from legal_analyst (which adds case-law / contractual analysis).",
+  "domains": ["standards", "norms", "regulation", "citation", "compliance"],
+  "intents": ["cite", "verify-source", "check-jurisdiction", "compare-norms"],
+  "roles": ["domain_analyst", "compliance_analyst", "standards_engineer", "policy_analyst"],
+  "activation_keywords": [
+    "GDPR", "ISO", "IEC", "EN", "ANSI", "RFC", "NIST",
+    "directive", "regulation", "norm", "standard",
+    "jurisdiction", "citation", "reference",
+    "ANSPDCP", "DPA", "EU", "California", "USA",
+    "compliance", "audit", "certification"
+  ],
+  "negative_keywords": [
+    "novel", "scene", "character",
+    "implement", "refactor", "diff"
+  ],
+  "required_modules": [
+    "domain_verified_facts",
+    "verified_project_fact",
+    "citation_validator",
+    "jurisdiction_resolver"
+  ],
+  "optional_modules": [
+    "structural_reference_memory"
+  ],
+  "memory_routes": [
+    "domain_verified_fact",
+    "verified_project_fact"
+  ],
+  "context_builder": "domain_citation_context_builder",
+  "output_contract": "citation_with_jurisdiction_and_source",
+  "guards": [
+    "no_citation_fraud",
+    "no_jurisdiction_transplant",
+    "no_invented_source"
+  ],
+  "module_status": {
+    "citation_validator": "planned",
+    "jurisdiction_resolver": "planned",
+    "domain_citation_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}

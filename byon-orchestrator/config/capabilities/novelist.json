@@ -1,0 +1,53 @@
+{
+  "id": "novelist",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Long-form fiction: canon memory, character continuity, scene state, plot graph. v0.6 capability bench K showed Claude direct WINS on creative work when structural constraints over-fire. Novelist capability is the proper containment for fiction so trust/structure don't dampen creative latitude.",
+  "domains": ["fiction", "creative_writing", "narrative", "screenplay"],
+  "intents": ["write-scene", "develop-character", "outline-plot", "edit-prose", "draft-chapter"],
+  "roles": ["novelist", "screenwriter", "creative_writer", "editor"],
+  "activation_keywords": [
+    "novel", "novella", "story", "fiction", "scene", "chapter",
+    "character", "protagonist", "antagonist", "dialogue",
+    "plot", "subplot", "arc", "canon", "world",
+    "setting", "atmosphere", "mood",
+    "screenplay", "script", "voice", "narrator", "POV",
+    "metaphor", "imagery"
+  ],
+  "negative_keywords": [
+    "implement", "refactor", "patch", "diff",
+    "GDPR", "jurisdiction", "policy_gate",
+    "CVE", "exploit"
+  ],
+  "required_modules": [
+    "canon_memory",
+    "character_state_index",
+    "scene_state_memory",
+    "plot_graph"
+  ],
+  "optional_modules": [
+    "voice_consistency_checker",
+    "structural_reference_memory"
+  ],
+  "memory_routes": [
+    "canon_memory",
+    "conversation_memory",
+    "user_preference"
+  ],
+  "context_builder": "narrative_context_builder",
+  "output_contract": "prose_paragraph_or_scene",
+  "guards": [
+    "no_canon_contradiction",
+    "no_character_substitution"
+  ],
+  "module_status": {
+    "canon_memory": "planned",
+    "character_state_index": "planned",
+    "scene_state_memory": "planned",
+    "plot_graph": "planned",
+    "voice_consistency_checker": "planned",
+    "narrative_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}

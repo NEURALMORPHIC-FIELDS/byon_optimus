@@ -1,0 +1,52 @@
+{
+  "id": "pharmacology_safety_analyst",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Drug-safety questions: interactions, contraindications, pharmacokinetics — at a safety-FIRST analytical level. NEVER a clinical-decision-maker; always 'consult licensed clinician' boundary.",
+  "domains": ["pharmacology", "drug_safety", "clinical_pharm"],
+  "intents": ["check-interaction", "summarize-contraindication", "explain-pharmacokinetics"],
+  "roles": ["pharmacology_safety_analyst", "clinical_pharmacist", "drug_safety_officer"],
+  "activation_keywords": [
+    "drug", "medication", "tablet", "capsule", "infusion",
+    "dosage", "dose", "mg", "mcg",
+    "contraindication", "indication", "side effect", "adverse",
+    "interaction", "DDI",
+    "pharmacokinetics", "PK", "PD", "half-life", "CYP", "P450",
+    "ICD-10", "ICD-11",
+    "warning label", "FDA", "EMA", "ANMDM"
+  ],
+  "negative_keywords": [
+    "implement", "refactor", "diff",
+    "scene", "novel", "character",
+    "GDPR", "policy_gate"
+  ],
+  "required_modules": [
+    "drug_database",
+    "interaction_table",
+    "domain_verified_facts",
+    "safety_guard_clinical"
+  ],
+  "optional_modules": [
+    "jurisdiction_resolver"
+  ],
+  "memory_routes": [
+    "domain_verified_fact",
+    "verified_project_fact"
+  ],
+  "context_builder": "clinical_safety_context_builder",
+  "output_contract": "ranked_safety_findings_with_clinician_disclaimer",
+  "guards": [
+    "no_clinical_decision",
+    "no_personalised_dosage_recommendation",
+    "no_substitute_for_clinician",
+    "no_jurisdiction_transplant"
+  ],
+  "module_status": {
+    "drug_database": "planned",
+    "interaction_table": "planned",
+    "safety_guard_clinical": "planned",
+    "clinical_safety_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}

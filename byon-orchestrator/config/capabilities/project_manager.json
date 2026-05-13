@@ -1,0 +1,51 @@
+{
+  "id": "project_manager",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Coordination across phases, releases, stakeholders, deadlines. Tracks deliverables, risks, dependencies — not implementation details.",
+  "domains": ["planning", "release", "schedule", "risk", "stakeholders"],
+  "intents": ["plan", "schedule", "prioritize", "triage", "track", "summarize-status", "raise-risk"],
+  "roles": ["project_manager", "program_manager", "release_manager", "lead"],
+  "activation_keywords": [
+    "plan", "roadmap", "milestone", "deadline", "schedule",
+    "release", "version", "tag", "ship", "launch",
+    "priority", "prioritize", "blocker", "risk", "ETA",
+    "sprint", "backlog", "ticket", "epic", "story",
+    "stakeholder", "team", "deliverable",
+    "what should I", "what next", "next step", "next phase", "next priority"
+  ],
+  "negative_keywords": [
+    "implement", "refactor", "patch", "diff",
+    "novel", "scene", "character",
+    "dosage", "contraindication"
+  ],
+  "required_modules": [
+    "verified_project_fact",
+    "release_state_memory",
+    "risk_register",
+    "deadline_tracker"
+  ],
+  "optional_modules": [
+    "structural_reference_memory",
+    "fce_advisory"
+  ],
+  "memory_routes": [
+    "verified_project_fact",
+    "release_state_memory",
+    "conversation_memory"
+  ],
+  "context_builder": "project_state_context_builder",
+  "output_contract": "actionable_bullet_list",
+  "guards": [
+    "no_silent_deadline_slip",
+    "no_unverified_status_claim"
+  ],
+  "module_status": {
+    "release_state_memory": "planned",
+    "risk_register": "planned",
+    "deadline_tracker": "planned",
+    "project_state_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}

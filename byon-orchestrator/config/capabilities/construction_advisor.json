@@ -1,0 +1,50 @@
+{
+  "id": "construction_advisor",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Civil / building works: codes, materials, structural feasibility, site-safety. Domain-locked to construction; refuses to give legally-binding engineering decisions.",
+  "domains": ["construction", "civil_engineering", "building", "site_safety"],
+  "intents": ["estimate-material", "check-code", "advise-method", "raise-site-risk"],
+  "roles": ["construction_advisor", "site_supervisor", "civil_engineer", "contractor"],
+  "activation_keywords": [
+    "concrete", "rebar", "beam", "column", "foundation", "slab",
+    "load-bearing", "structural", "shear",
+    "Eurocode", "EN 1990", "EN 1991", "EN 1992",
+    "site", "scaffold", "PPE",
+    "brick", "mortar", "drywall", "insulation",
+    "construction", "build", "renovation", "civil"
+  ],
+  "negative_keywords": [
+    "novel", "scene",
+    "implement", "refactor",
+    "ICD-10", "dosage"
+  ],
+  "required_modules": [
+    "construction_code_index",
+    "material_property_table",
+    "domain_verified_facts"
+  ],
+  "optional_modules": [
+    "site_safety_advisor",
+    "jurisdiction_resolver"
+  ],
+  "memory_routes": [
+    "domain_verified_fact",
+    "verified_project_fact"
+  ],
+  "context_builder": "construction_context_builder",
+  "output_contract": "cited_engineering_advice_with_disclaimer",
+  "guards": [
+    "no_binding_engineering_decision",
+    "no_safety_corner_cut",
+    "no_jurisdiction_transplant"
+  ],
+  "module_status": {
+    "construction_code_index": "planned",
+    "material_property_table": "planned",
+    "site_safety_advisor": "planned",
+    "construction_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}
