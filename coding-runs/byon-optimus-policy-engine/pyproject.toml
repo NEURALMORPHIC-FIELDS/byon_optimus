@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "policy-gated-workflow-engine"
+version = "0.1.0"
+description = "Policy-gated workflow engine with audit log and rollback"
+requires-python = ">=3.9"
+dependencies = ["PyYAML>=6.0"]
+
+[project.scripts]
+workflow = "policy_engine.cli:_cli_entry"
+
+[tool.setuptools.packages.find]
+where = ["src"]

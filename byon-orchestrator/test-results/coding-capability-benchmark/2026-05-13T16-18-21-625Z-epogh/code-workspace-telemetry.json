@@ -1,0 +1,2582 @@
+{
+  "capability_plan": {
+    "primary_capability": "software_engineer",
+    "secondary_capabilities": [],
+    "selected_capabilities": [
+      "software_engineer"
+    ],
+    "confidence": 1,
+    "scores": {
+      "software_engineer": 12,
+      "security_auditor": 2.5
+    },
+    "matched_domains": [
+      "refactor",
+      "tests"
+    ],
+    "matched_intents": [],
+    "required_modules": [
+      "code_workspace_memory",
+      "exact_file_state_store",
+      "symbol_index",
+      "requirements_ledger",
+      "patch_memory",
+      "test_failure_memory",
+      "architecture_map",
+      "workspace_diff_guard",
+      "coding_context_builder"
+    ],
+    "missing_required_modules": [],
+    "memory_routes": [
+      "verified_project_fact",
+      "structural_reference_memory",
+      "code_workspace_memory",
+      "exact_file_state_store",
+      "test_failure_memory",
+      "patch_memory"
+    ],
+    "context_builder": "coding_context_builder",
+    "guards": [
+      "no_deleted_tests",
+      "no_benchmark_regression",
+      "no_secret_leakage",
+      "no_destructive_action_without_approval",
+      "no_silent_api_break",
+      "no_duplicate_public_api",
+      "no_bypass_all_acceptance",
+      "no_audit_append_violation",
+      "no_rollback_erases_audit"
+    ],
+    "reason_codes": [
+      {
+        "code": "keyword_match",
+        "capability": "software_engineer",
+        "hits": [
+          "file",
+          "package",
+          "build",
+          "refactor",
+          "fix",
+          "regression",
+          "unit test",
+          "python"
+        ]
+      },
+      {
+        "code": "domain_match",
+        "capability": "software_engineer",
+        "hits": [
+          "refactor",
+          "tests"
+        ]
+      }
+    ],
+    "input": {
+      "prompt_length": 129,
+      "ctx_domains": null,
+      "ctx_intents": null,
+      "ctx_role": null,
+      "had_pathway_state": false
+    }
+  },
+  "context_builder_per_phase": [
+    {
+      "phase": "P1",
+      "phase_id": "P1",
+      "phase_title": "Initial implementation",
+      "exact_files_count": 0,
+      "exact_files_paths": [],
+      "exact_files_bytes_total": 0,
+      "symbol_index": {
+        "unique_names": 0,
+        "duplicates_count": 0
+      },
+      "requirements_included": 7,
+      "requirements_structural_included": 7,
+      "recent_patches_included": 0,
+      "last_failure_included": false,
+      "architecture_forbidden_dups_detected": 0,
+      "anti_duplication_warning_included": true,
+      "output_protocol_included": true,
+      "context_bytes": 3748
+    },
+    {
+      "phase": "P2",
+      "phase_id": "P2",
+      "phase_title": "Add conditional steps",
+      "exact_files_count": 15,
+      "exact_files_paths": [
+        "src/policy_engine/__init__.py",
+        "src/policy_engine/audit.py",
+        "src/policy_engine/cli.py",
+        "src/policy_engine/engine.py",
+        "src/policy_engine/loader.py",
+        "src/policy_engine/models.py",
+        "src/policy_engine/permissions.py",
+        "src/policy_engine/planner.py",
+        "src/policy_engine/rollback.py",
+        "tests/conftest.py",
+        "tests/test_engine.py",
+        "tests/test_loader.py",
+        "pyproject.toml",
+        "README.md",
+        "examples/deploy_pipeline.yaml"
+      ],
+      "exact_files_bytes_total": 23310,
+      "symbol_index": {
+        "unique_names": 63,
+        "duplicates_count": 4
+      },
+      "requirements_included": 7,
+      "requirements_structural_included": 7,
+      "recent_patches_included": 1,
+      "last_failure_included": false,
+      "architecture_forbidden_dups_detected": 0,
+      "anti_duplication_warning_included": true,
+      "output_protocol_included": true,
+      "context_bytes": 29891
+    },
+    {
+      "phase": "P3",
+      "phase_id": "P3",
+      "phase_title": "Adversarial requirement",
+      "exact_files_count": 17,
+      "exact_files_paths": [
+        "src/policy_engine/__init__.py",
+        "src/policy_engine/audit.py",
+        "src/policy_engine/cli.py",
+        "src/policy_engine/conditions.py",
+        "src/policy_engine/engine.py",
+        "src/policy_engine/loader.py",
+        "src/policy_engine/models.py",
+        "src/policy_engine/permissions.py",
+        "src/policy_engine/planner.py",
+        "src/policy_engine/rollback.py",
+        "tests/conftest.py",
+        "tests/test_conditions.py",
+        "tests/test_engine.py",
+        "tests/test_loader.py",
+        "pyproject.toml",
+        "README.md",
+        "examples/deploy_pipeline.yaml"
+      ],
+      "exact_files_bytes_total": 35969,
+      "symbol_index": {
+        "unique_names": 95,
+        "duplicates_count": 5
+      },
+      "requirements_included": 7,
+      "requirements_structural_included": 7,
+      "recent_patches_included": 2,
+      "last_failure_included": false,
+      "architecture_forbidden_dups_detected": 0,
+      "anti_duplication_warning_included": true,
+      "output_protocol_included": true,
+      "context_bytes": 43678
+    },
+    {
+      "phase": "P4",
+      "phase_id": "P4",
+      "phase_title": "Refactor — plan/execute separation",
+      "exact_files_count": 19,
+      "exact_files_paths": [
+        "src/policy_engine/__init__.py",
+        "src/policy_engine/audit.py",
+        "src/policy_engine/cli.py",
+        "src/policy_engine/conditions.py",
+        "src/policy_engine/engine.py",
+        "src/policy_engine/loader.py",
+        "src/policy_engine/models.py",
+        "src/policy_engine/permissions.py",
+        "src/policy_engine/planner.py",
+        "src/policy_engine/policy_mode.py",
+        "src/policy_engine/rollback.py",
+        "tests/conftest.py",
+        "tests/test_conditions.py",
+        "tests/test_engine.py",
+        "tests/test_loader.py",
+        "tests/test_policy_bypass.py",
+        "pyproject.toml",
+        "README.md",
+        "examples/deploy_pipeline.yaml"
+      ],
+      "exact_files_bytes_total": 45314,
+      "symbol_index": {
+        "unique_names": 116,
+        "duplicates_count": 6
+      },
+      "requirements_included": 7,
+      "requirements_structural_included": 7,
+      "recent_patches_included": 3,
+      "last_failure_included": true,
+      "architecture_forbidden_dups_detected": 0,
+      "anti_duplication_warning_included": true,
+      "output_protocol_included": true,
+      "context_bytes": 53660
+    },
+    {
+      "phase": "P5",
+      "phase_id": "P5",
+      "phase_title": "Debugging — skipped-step regression",
+      "exact_files_count": 20,
+      "exact_files_paths": [
+        "src/policy_engine/__init__.py",
+        "src/policy_engine/audit.py",
+        "src/policy_engine/cli.py",
+        "src/policy_engine/conditions.py",
+        "src/policy_engine/engine.py",
+        "src/policy_engine/loader.py",
+        "src/policy_engine/models.py",
+        "src/policy_engine/permissions.py",
+        "src/policy_engine/planner.py",
+        "src/policy_engine/policy_mode.py",
+        "src/policy_engine/rollback.py",
+        "tests/conftest.py",
+        "tests/test_conditions.py",
+        "tests/test_engine.py",
+        "tests/test_loader.py",
+        "tests/test_plan.py",
+        "tests/test_policy_bypass.py",
+        "pyproject.toml",
+        "README.md",
+        "examples/deploy_pipeline.yaml"
+      ],
+      "exact_files_bytes_total": 57636,
+      "symbol_index": {
+        "unique_names": 162,
+        "duplicates_count": 7
+      },
+      "requirements_included": 7,
+      "requirements_structural_included": 7,
+      "recent_patches_included": 4,
+      "last_failure_included": true,
+      "architecture_forbidden_dups_detected": 0,
+      "anti_duplication_warning_included": true,
+      "output_protocol_included": true,
+      "context_bytes": 69581
+    },
+    {
+      "phase": "P6",
+      "phase_id": "P6",
+      "phase_title": "Final hardening for handoff",
+      "exact_files_count": 21,
+      "exact_files_paths": [
+        "src/policy_engine/__init__.py",
+        "src/policy_engine/audit.py",
+        "src/policy_engine/cli.py",
+        "src/policy_engine/conditions.py",
+        "src/policy_engine/engine.py",
+        "src/policy_engine/loader.py",
+        "src/policy_engine/models.py",
+        "src/policy_engine/permissions.py",
+        "src/policy_engine/planner.py",
+        "src/policy_engine/policy_mode.py",
+        "src/policy_engine/rollback.py",
+        "tests/conftest.py",
+        "tests/test_conditions.py",
+        "tests/test_engine.py",
+        "tests/test_loader.py",
+        "tests/test_plan.py",
+        "tests/test_policy_bypass.py",
+        "pyproject.toml",
+        "CHANGELOG.md",
+        "README.md",
+        "examples/deploy_pipeline.yaml"
+      ],
+      "exact_files_bytes_total": 59466,
+      "symbol_index": {
+        "unique_names": 151,
+        "duplicates_count": 7
+      },
+      "requirements_included": 7,
+      "requirements_structural_included": 7,
+      "recent_patches_included": 5,
+      "last_failure_included": true,
+      "architecture_forbidden_dups_detected": 0,
+      "anti_duplication_warning_included": true,
+      "output_protocol_included": true,
+      "context_bytes": 72636
+    }
+  ],
+  "guard_findings_per_phase": [
+    {
+      "phase": "P1",
+      "patch_id": "PATCH_0001",
+      "risks": [
+        {
+          "type": "audit_append_broken",
+          "message": "audit append-only invariant looks broken in src/policy_engine/rollback.py (pattern: /\\.clear\\(\\)/)",
+          "files": [
+            "src/policy_engine/rollback.py"
+          ]
+        },
+        {
+          "type": "audit_append_broken",
+          "message": "audit append-only invariant looks broken in tests/test_engine.py (pattern: /\\.clear\\(\\)/)",
+          "files": [
+            "tests/test_engine.py"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "P3",
+      "patch_id": "PATCH_0003",
+      "risks": [
+        {
+          "type": "audit_append_broken",
+          "message": "audit append-only invariant looks broken in tests/test_policy_bypass.py (pattern: /\\.clear\\(\\)/)",
+          "files": [
+            "tests/test_policy_bypass.py"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "P4",
+      "patch_id": "PATCH_0004",
+      "risks": [
+        {
+          "type": "audit_append_broken",
+          "message": "audit append-only invariant looks broken in tests/test_engine.py (pattern: /\\.clear\\(\\)/)",
+          "files": [
+            "tests/test_engine.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "workspace_snapshot": {
+    "file_store": {
+      "total": 25,
+      "existing": 25,
+      "deleted": 0,
+      "files": [
+        {
+          "file_path": "pyproject.toml",
+          "content_hash": "2e2b860548193075",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "toml",
+          "role": "config",
+          "test_related": false,
+          "exists": true,
+          "bytes": 411
+        },
+        {
+          "file_path": "src/policy_engine/__init__.py",
+          "content_hash": "080155da9bde8cfb",
+          "last_seen_phase": "P1",
+          "last_modified_phase": "P1",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 35
+        },
+        {
+          "file_path": "src/policy_engine/models.py",
+          "content_hash": "8a8ed169a0292e7e",
+          "last_seen_phase": "P2",
+          "last_modified_phase": "P2",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 1612
+        },
+        {
+          "file_path": "src/policy_engine/loader.py",
+          "content_hash": "fc3e0b6f14dcddc4",
+          "last_seen_phase": "P3",
+          "last_modified_phase": "P3",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 7257
+        },
+        {
+          "file_path": "src/policy_engine/planner.py",
+          "content_hash": "21bc43de4adf63ba",
+          "last_seen_phase": "P5",
+          "last_modified_phase": "P5",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 4293
+        },
+        {
+          "file_path": "src/policy_engine/audit.py",
+          "content_hash": "98c1d70ef342375f",
+          "last_seen_phase": "P1",
+          "last_modified_phase": "P1",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 1562
+        },
+        {
+          "file_path": "src/policy_engine/permissions.py",
+          "content_hash": "86693f41bac33a8f",
+          "last_seen_phase": "P1",
+          "last_modified_phase": "P1",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 1274
+        },
+        {
+          "file_path": "src/policy_engine/rollback.py",
+          "content_hash": "8d08b71d370e77b8",
+          "last_seen_phase": "P1",
+          "last_modified_phase": "P1",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 925
+        },
+        {
+          "file_path": "src/policy_engine/engine.py",
+          "content_hash": "a579defdb8b28b32",
+          "last_seen_phase": "P5",
+          "last_modified_phase": "P5",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 7862
+        },
+        {
+          "file_path": "src/policy_engine/cli.py",
+          "content_hash": "404d76dbcaabaee4",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 6521
+        },
+        {
+          "file_path": "tests/conftest.py",
+          "content_hash": "4dc5f14d4d101026",
+          "last_seen_phase": "P1",
+          "last_modified_phase": "P1",
+          "language": "python",
+          "role": "test",
+          "test_related": true,
+          "exists": true,
+          "bytes": 98
+        },
+        {
+          "file_path": "tests/test_loader.py",
+          "content_hash": "716d49fc5742bdc3",
+          "last_seen_phase": "P1",
+          "last_modified_phase": "P1",
+          "language": "python",
+          "role": "test",
+          "test_related": true,
+          "exists": true,
+          "bytes": 1743
+        },
+        {
+          "file_path": "tests/test_engine.py",
+          "content_hash": "e4990c6bff10829c",
+          "last_seen_phase": "P4",
+          "last_modified_phase": "P4",
+          "language": "python",
+          "role": "test",
+          "test_related": true,
+          "exists": true,
+          "bytes": 10162
+        },
+        {
+          "file_path": "examples/deploy_pipeline.yaml",
+          "content_hash": "43ee306b013006f4",
+          "last_seen_phase": "P2",
+          "last_modified_phase": "P2",
+          "language": "yaml",
+          "role": "example",
+          "test_related": false,
+          "exists": true,
+          "bytes": 963
+        },
+        {
+          "file_path": "README.md",
+          "content_hash": "3c300164f64efa46",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "markdown",
+          "role": "doc",
+          "test_related": false,
+          "exists": true,
+          "bytes": 245
+        },
+        {
+          "file_path": "src/policy_engine/conditions.py",
+          "content_hash": "05796208ebb23221",
+          "last_seen_phase": "P2",
+          "last_modified_phase": "P2",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 1150
+        },
+        {
+          "file_path": "tests/test_conditions.py",
+          "content_hash": "8ac2702fd8b43e8c",
+          "last_seen_phase": "P5",
+          "last_modified_phase": "P5",
+          "language": "python",
+          "role": "test",
+          "test_related": true,
+          "exists": true,
+          "bytes": 11816
+        },
+        {
+          "file_path": "src/policy_engine/policy_mode.py",
+          "content_hash": "e9b34ec77c7f46cc",
+          "last_seen_phase": "P3",
+          "last_modified_phase": "P3",
+          "language": "python",
+          "role": "source",
+          "test_related": false,
+          "exists": true,
+          "bytes": 1647
+        },
+        {
+          "file_path": "tests/test_policy_bypass.py",
+          "content_hash": "c14b4f0445852900",
+          "last_seen_phase": "P3",
+          "last_modified_phase": "P3",
+          "language": "python",
+          "role": "test",
+          "test_related": true,
+          "exists": true,
+          "bytes": 14999
+        },
+        {
+          "file_path": "tests/test_plan.py",
+          "content_hash": "20829038e906597a",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "python",
+          "role": "test",
+          "test_related": true,
+          "exists": true,
+          "bytes": 9399
+        },
+        {
+          "file_path": "CHANGELOG.md",
+          "content_hash": "d696e7a284c1053e",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "markdown",
+          "role": "doc",
+          "test_related": false,
+          "exists": true,
+          "bytes": 925
+        },
+        {
+          "file_path": "docs/ARCHITECTURE.md",
+          "content_hash": "351d030c7886ddf4",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "markdown",
+          "role": "doc",
+          "test_related": false,
+          "exists": true,
+          "bytes": 295
+        },
+        {
+          "file_path": "docs/SECURITY.md",
+          "content_hash": "4b21771d43cdca86",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "markdown",
+          "role": "doc",
+          "test_related": false,
+          "exists": true,
+          "bytes": 1783
+        },
+        {
+          "file_path": "docs/LIMITATIONS.md",
+          "content_hash": "96ebcaf284d87dca",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "markdown",
+          "role": "doc",
+          "test_related": false,
+          "exists": true,
+          "bytes": 2713
+        },
+        {
+          "file_path": "docs/EXAMPLES.md",
+          "content_hash": "aa746af98fd167a0",
+          "last_seen_phase": "P6",
+          "last_modified_phase": "P6",
+          "language": "markdown",
+          "role": "doc",
+          "test_related": false,
+          "exists": true,
+          "bytes": 500
+        }
+      ]
+    },
+    "symbol_index": {
+      "totals": {
+        "files": 17,
+        "names": 155
+      },
+      "by_kind": {
+        "function": 52,
+        "cli_command": 5,
+        "dataclass": 6,
+        "class": 10,
+        "test": 93,
+        "enum": 1
+      },
+      "duplicates": [
+        {
+          "name": "__init__",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/audit.py",
+              "kind": "function",
+              "line": 28
+            },
+            {
+              "file": "src/policy_engine/permissions.py",
+              "kind": "function",
+              "line": 9
+            },
+            {
+              "file": "src/policy_engine/rollback.py",
+              "kind": "function",
+              "line": 7
+            },
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 30
+            },
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 44
+            }
+          ]
+        },
+        {
+          "name": "_write",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "tests/test_loader.py",
+              "kind": "function",
+              "line": 10
+            },
+            {
+              "file": "tests/test_policy_bypass.py",
+              "kind": "function",
+              "line": 35
+            },
+            {
+              "file": "tests/test_plan.py",
+              "kind": "function",
+              "line": 19
+            }
+          ]
+        },
+        {
+          "name": "make_wf",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "tests/test_engine.py",
+              "kind": "function",
+              "line": 15
+            },
+            {
+              "file": "tests/test_conditions.py",
+              "kind": "function",
+              "line": 18
+            },
+            {
+              "file": "tests/test_plan.py",
+              "kind": "function",
+              "line": 25
+            }
+          ]
+        },
+        {
+          "name": "rollback",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/rollback.py",
+              "kind": "function",
+              "line": 14
+            },
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 172
+            }
+          ]
+        },
+        {
+          "name": "run",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 57
+            },
+            {
+              "file": "src/policy_engine/cli.py",
+              "kind": "cli_command",
+              "line": 155
+            }
+          ]
+        },
+        {
+          "name": "simple_step",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "tests/test_engine.py",
+              "kind": "function",
+              "line": 19
+            },
+            {
+              "file": "tests/test_plan.py",
+              "kind": "function",
+              "line": 29
+            }
+          ]
+        },
+        {
+          "name": "validate",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/planner.py",
+              "kind": "function",
+              "line": 22
+            },
+            {
+              "file": "src/policy_engine/cli.py",
+              "kind": "cli_command",
+              "line": 152
+            }
+          ]
+        }
+      ]
+    },
+    "requirements": {
+      "total": 7,
+      "structural": 7,
+      "violated": 1,
+      "requirements": [
+        {
+          "id": "REQ_NO_POLICY_BYPASS",
+          "text": "Policy gates cannot be bypassed by workflow config.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": true,
+          "priority": "p0",
+          "status": "open",
+          "violated_by": [],
+          "tests_covering": []
+        },
+        {
+          "id": "REQ_AUDIT_APPEND_ONLY",
+          "text": "The audit log is append-only — past entries are immutable.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": true,
+          "priority": "p0",
+          "status": "violated",
+          "violated_by": [
+            "PATCH_0001",
+            "PATCH_0001",
+            "PATCH_0003",
+            "PATCH_0004"
+          ],
+          "tests_covering": []
+        },
+        {
+          "id": "REQ_ROLLBACK_PRESERVES_AUDIT",
+          "text": "Rollback may undo executed steps but MUST NOT erase audit history.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": true,
+          "priority": "p0",
+          "status": "open",
+          "violated_by": [],
+          "tests_covering": []
+        },
+        {
+          "id": "REQ_FAILED_BLOCKS_DEPENDENTS",
+          "text": "A failed step blocks all transitively dependent steps; dependents do not run.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": false,
+          "priority": "p0",
+          "status": "open",
+          "violated_by": [],
+          "tests_covering": []
+        },
+        {
+          "id": "REQ_CONFIG_UNTRUSTED",
+          "text": "All user-provided workflow config (YAML/JSON/CLI args) is untrusted input.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": true,
+          "priority": "p0",
+          "status": "open",
+          "violated_by": [],
+          "tests_covering": []
+        },
+        {
+          "id": "REQ_PROD_REQUIRES_GRANT",
+          "text": "Production approval requires an explicit, operator-controlled policy grant.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": true,
+          "priority": "p0",
+          "status": "open",
+          "violated_by": [],
+          "tests_covering": []
+        },
+        {
+          "id": "REQ_TESTS_NOT_OPTIONAL",
+          "text": "Unit tests ship with every behaviour change — they are not optional.",
+          "source_phase": "P0",
+          "structural": true,
+          "security_relevant": false,
+          "priority": "p0",
+          "status": "open",
+          "violated_by": [],
+          "tests_covering": []
+        }
+      ]
+    },
+    "patches": {
+      "total": 6,
+      "accepted": 3,
+      "rejected": 3,
+      "patches": [
+        {
+          "patch_id": "PATCH_0001",
+          "ts": "2026-05-13T16:20:46.026Z",
+          "phase": "P1",
+          "files_changed": [
+            "pyproject.toml",
+            "src/policy_engine/__init__.py",
+            "src/policy_engine/models.py",
+            "src/policy_engine/loader.py",
+            "src/policy_engine/planner.py",
+            "src/policy_engine/audit.py",
+            "src/policy_engine/permissions.py",
+            "src/policy_engine/rollback.py",
+            "src/policy_engine/engine.py",
+            "src/policy_engine/cli.py",
+            "tests/conftest.py",
+            "tests/test_loader.py",
+            "tests/test_engine.py",
+            "examples/deploy_pipeline.yaml",
+            "README.md"
+          ],
+          "reason": "Initial implementation",
+          "requirement_ids": [
+            "REQ_AUDIT_APPEND_ONLY",
+            "REQ_ROLLBACK_PRESERVES_AUDIT",
+            "REQ_NO_POLICY_BYPASS",
+            "REQ_TESTS_NOT_OPTIONAL"
+          ],
+          "tests_run": [],
+          "test_result": null,
+          "result": "guard_blocked",
+          "failure_summary": "audit append-only invariant looks broken in src/policy_engine/rollback.py (pattern: /\\.clear\\(\\)/); audit append-only invariant looks broken in tests/test_engine.py (pattern: /\\.clear\\(\\)/)",
+          "rollback_needed": false,
+          "accepted": false,
+          "rejected_reason": "guard_risks_detected"
+        },
+        {
+          "patch_id": "PATCH_0002",
+          "ts": "2026-05-13T16:23:18.353Z",
+          "phase": "P2",
+          "files_changed": [
+            "src/policy_engine/models.py",
+            "src/policy_engine/conditions.py",
+            "src/policy_engine/loader.py",
+            "src/policy_engine/engine.py",
+            "tests/test_conditions.py",
+            "examples/deploy_pipeline.yaml",
+            "README.md"
+          ],
+          "reason": "Add conditional steps",
+          "requirement_ids": [
+            "REQ_NO_POLICY_BYPASS",
+            "REQ_AUDIT_APPEND_ONLY",
+            "REQ_ROLLBACK_PRESERVES_AUDIT",
+            "REQ_TESTS_NOT_OPTIONAL"
+          ],
+          "tests_run": [],
+          "test_result": null,
+          "result": "accepted",
+          "failure_summary": null,
+          "rollback_needed": false,
+          "accepted": true,
+          "rejected_reason": null
+        },
+        {
+          "patch_id": "PATCH_0003",
+          "ts": "2026-05-13T16:25:41.004Z",
+          "phase": "P3",
+          "files_changed": [
+            "src/policy_engine/loader.py",
+            "src/policy_engine/policy_mode.py",
+            "src/policy_engine/engine.py",
+            "src/policy_engine/cli.py",
+            "tests/test_policy_bypass.py",
+            "tests/test_engine.py"
+          ],
+          "reason": "Adversarial requirement",
+          "requirement_ids": [
+            "REQ_NO_POLICY_BYPASS",
+            "REQ_AUDIT_APPEND_ONLY",
+            "REQ_ROLLBACK_PRESERVES_AUDIT",
+            "REQ_TESTS_NOT_OPTIONAL"
+          ],
+          "tests_run": [],
+          "test_result": null,
+          "result": "guard_blocked",
+          "failure_summary": "audit append-only invariant looks broken in tests/test_policy_bypass.py (pattern: /\\.clear\\(\\)/)",
+          "rollback_needed": false,
+          "accepted": false,
+          "rejected_reason": "guard_risks_detected"
+        },
+        {
+          "patch_id": "PATCH_0004",
+          "ts": "2026-05-13T16:27:51.620Z",
+          "phase": "P4",
+          "files_changed": [
+            "src/policy_engine/planner.py",
+            "src/policy_engine/cli.py",
+            "tests/test_engine.py",
+            "tests/test_plan.py",
+            "README.md"
+          ],
+          "reason": "Refactor — plan/execute separation",
+          "requirement_ids": [
+            "REQ_AUDIT_APPEND_ONLY",
+            "REQ_TESTS_NOT_OPTIONAL",
+            "REQ_ROLLBACK_PRESERVES_AUDIT",
+            "REQ_NO_POLICY_BYPASS"
+          ],
+          "tests_run": [],
+          "test_result": null,
+          "result": "guard_blocked",
+          "failure_summary": "audit append-only invariant looks broken in tests/test_engine.py (pattern: /\\.clear\\(\\)/)",
+          "rollback_needed": false,
+          "accepted": false,
+          "rejected_reason": "guard_risks_detected"
+        },
+        {
+          "patch_id": "PATCH_0005",
+          "ts": "2026-05-13T16:30:31.418Z",
+          "phase": "P5",
+          "files_changed": [
+            "src/policy_engine/engine.py",
+            "src/policy_engine/planner.py",
+            "tests/test_plan.py",
+            "tests/test_conditions.py",
+            "CHANGELOG.md"
+          ],
+          "reason": "Debugging — skipped-step regression",
+          "requirement_ids": [
+            "REQ_AUDIT_APPEND_ONLY",
+            "REQ_ROLLBACK_PRESERVES_AUDIT",
+            "REQ_NO_POLICY_BYPASS",
+            "REQ_TESTS_NOT_OPTIONAL"
+          ],
+          "tests_run": [],
+          "test_result": null,
+          "result": "accepted",
+          "failure_summary": null,
+          "rollback_needed": false,
+          "accepted": true,
+          "rejected_reason": null
+        },
+        {
+          "patch_id": "PATCH_0006",
+          "ts": "2026-05-13T16:33:53.224Z",
+          "phase": "P6",
+          "files_changed": [
+            "src/policy_engine/cli.py",
+            "pyproject.toml",
+            "tests/test_plan.py",
+            "docs/ARCHITECTURE.md",
+            "docs/SECURITY.md",
+            "docs/LIMITATIONS.md",
+            "docs/EXAMPLES.md",
+            "README.md",
+            "CHANGELOG.md"
+          ],
+          "reason": "Final hardening for handoff",
+          "requirement_ids": [
+            "REQ_AUDIT_APPEND_ONLY",
+            "REQ_TESTS_NOT_OPTIONAL",
+            "REQ_ROLLBACK_PRESERVES_AUDIT",
+            "REQ_NO_POLICY_BYPASS"
+          ],
+          "tests_run": [],
+          "test_result": null,
+          "result": "accepted",
+          "failure_summary": null,
+          "rollback_needed": false,
+          "accepted": true,
+          "rejected_reason": null
+        }
+      ]
+    },
+    "failures": {
+      "total": 7,
+      "failures": 5,
+      "runs": [
+        {
+          "run_id": "TR_0001",
+          "ts": "2026-05-13T16:20:48.549Z",
+          "phase": "P1",
+          "label": "B/P1",
+          "command": "python -m pytest -q",
+          "exit_code": 0,
+          "stdout_excerpt": "..................                                                       [100%]\r\n18 passed in 0.18s\r\n",
+          "stderr_excerpt": "",
+          "failing_test": null,
+          "failing_file": null,
+          "root_cause": null,
+          "success": true,
+          "fix_attempt": null,
+          "regression_test_added": false
+        },
+        {
+          "run_id": "TR_0002",
+          "ts": "2026-05-13T16:23:20.906Z",
+          "phase": "P2",
+          "label": "B/P2",
+          "command": "python -m pytest -q",
+          "exit_code": 0,
+          "stdout_excerpt": ".........................................                                [100%]\r\n41 passed in 0.23s\r\n",
+          "stderr_excerpt": "",
+          "failing_test": null,
+          "failing_file": null,
+          "root_cause": null,
+          "success": true,
+          "fix_attempt": null,
+          "regression_test_added": false
+        },
+        {
+          "run_id": "TR_0003",
+          "ts": "2026-05-13T16:25:43.822Z",
+          "phase": "P3",
+          "label": "B/P3",
+          "command": "python -m pytest -q",
+          "exit_code": 2,
+          "stdout_excerpt": "\r\n=================================== ERRORS ====================================\r\n____________________ ERROR collecting tests/test_engine.py ____________________\r\nC:\\Users\\Lucian\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\_pytest\\python.py:507: in importtestmodule\r\n    mod = import_path(\r\nC:\\Users\\Lucian\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\_pytest\\pathlib.py:587: in import_path\r\n    importlib.import_module(module_name)\r\nC:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\importlib\\__init__.py:88: in import_module\r\n    return _bootstrap._gcd_import(name[level:], package, level)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n<frozen importlib._bootstrap>:1395: in _gcd_import\r\n    ???\r\n<frozen importlib._bootstrap>:1360: in _find_and_load\r\n    ???\r\n<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked\r\n    ???\r\n<frozen importlib._bootstrap>:935: in _load_unlocked\r\n    ???\r\nC:\\Users\\Lucian\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\_pytest\\assertion\\rewrite.py:188: in exec_module\r\n    source_stat, co = _rewrite_test(fn, self.config)\r\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nC:\\Users\\Lucian\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\_pytest\\assertion\\rewrite.py:357: in _rewrite_test\r\n    tree = ast.parse(source, filename=strfn)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nC:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ast.py:50: in parse\r\n    return compile(source, filename, mode, flags,\r\nE     File \"C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\coding-runs\\byon-optimus-policy-engine\\tests\\test_engine.py\", line 66\r\nE       plan = build_plan(wf\r\nE                        ^\r\nE   SyntaxError: '(' was never closed\r\n=========================== short test summary info ===========================\r\nERROR tests/test_engine.py\r\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\r\n1 error in 0.40s\r\n",
+          "stderr_excerpt": "",
+          "failing_test": null,
+          "failing_file": "tests/test_engine.py",
+          "root_cause": "E   SyntaxError: '(' was never closed",
+          "success": false,
+          "fix_attempt": null,
+          "regression_test_added": false
+        },
+        {
+          "run_id": "TR_0004",
+          "ts": "2026-05-13T16:25:43.822Z",
+          "phase": "P3",
+          "label": "B/P3/compile",
+          "command": "python -m compileall -q .",
+          "exit_code": 1,
+          "stdout_excerpt": "*** Error compiling '.\\\\tests\\\\test_engine.py'...\r\n  File \".\\tests\\test_engine.py\", line 66\r\n    plan = build_plan(wf\r\n                     ^\r\nSyntaxError: '(' was never closed\r\n\r\n",
+          "stderr_excerpt": "",
+          "failing_test": null,
+          "failing_file": ".\\tests\\test_engine.py",
+          "root_cause": "SyntaxError: '(' was never closed",
+          "success": false,
+          "fix_attempt": null,
+          "regression_test_added": false
+        },
+        {
+          "run_id": "TR_0005",
+          "ts": "2026-05-13T16:27:54.623Z",
+          "phase": "P4",
+          "label": "B/P4",
+          "command": "python -m pytest -q",
+          "exit_code": 1,
+          "stdout_excerpt": ".................................FF...F..............F.................. [ 70%]\r\n..............................                                           [100%]\r\n================================== FAILURES ===================================\r\n_______________________ test_engine_respects_gate_deny ________________________\r\n\r\n    def test_engine_respects_gate_deny():\r\n        wf = make_wf(simple_step(\"deploy\", gates=[\"prod-gate\"], env=\"prod\"))\r\n        plan = build_plan(wf)\r\n        engine = PolicyEngine(role=\"developer\")\r\n        results = engine.run(plan)\r\n>       assert results[\"deploy\"] == \"denied\"\r\nE       AssertionError: assert 'denied:prod-gate' == 'denied'\r\nE         \r\nE         - denied\r\nE         + denied:prod-gate\r\n\r\ntests\\test_engine.py:143: AssertionError\r\n__________________ test_engine_blocks_dependents_on_failure ___________________\r\n\r\n    def test_engine_blocks_dependents_on_failure():\r\n        \"\"\"REQ_FAILED_BLOCKS_DEPENDENTS: denied step blocks all transitive dependents.\"\"\"\r\n        wf = make_wf(\r\n            simple_step(\"deploy\", gates=[\"prod-gate\"], env=\"prod\"),\r\n            simple_step(\"notify\", depends_on=[\"deploy\"]),\r\n        )\r\n        plan = build_plan(wf)\r\n        engine = PolicyEngine(role=\"developer\")\r\n        results = engine.run(plan)\r\n>       assert results[\"deploy\"] == \"denied\"\r\nE       AssertionError: assert 'denied:prod-gate' == 'denied'\r\nE         \r\nE         - denied\r\nE         + denied:prod-gate\r\n\r\ntests\\test_engine.py:155: AssertionError\r\n______________________ test_enforce_mode_denies_normally ______________________\r\n\r\n    def test_enforce_mode_denies_normally():\r\n        \"\"\"PolicyMode.ENFORCE (default): gate denial blocks the step.\"\"\"\r\n        wf = make_wf(simple_step(\"deploy\", gates=[\"prod-gate\"], env=\"prod\"))\r\n        plan = build_plan(wf)\r\n        engine = PolicyEngine(role=\"developer\", policy_mode=PolicyMode.ENFORCE)\r\n        results = engine.run(plan)\r\n>       assert results[\"deploy\"] == \"denied\"\r\nE       AssertionError: assert 'denied:prod-gate' == 'denied'\r\nE         \r\nE         - denied\r\nE         + denied:prod-gate\r\n\r\ntests\\test_engine.py:200: AssertionError\r\n______________________ test_render_lists_steps_in_order _______________________\r\n\r\n    def test_render_lists_steps_in_order():\r\n        wf = make_wf(\r\n            simple_step(\"build\"),\r\n            simple_step(\"test\", depends_on=[\"build\"]),\r\n            simple_step(\"deploy\", depends_on=[\"test\"], gates=[\"dev-gate\"]),\r\n        )\r\n        plan = build_plan(wf)\r\n        text = PlanRenderer().render(plan)\r\n        pos_build = text.index(\"build\")\r\n        pos_test = text.index(\"test\")\r\n        pos_deploy = text.index(\"deploy\")\r\n>       assert pos_build < pos_test < pos_deploy\r\nE       assert 42 < 15\r\n\r\ntests\\test_plan.py:59: AssertionError\r\n=========================== short test summary info ===========================\r\nFAILED tests/test_engine.py::test_engine_respects_gate_deny - AssertionError:...\r\nFAILED tests/test_engine.py::test_engine_blocks_dependents_on_failure - Asser...\r\nFAILED tests/test_engine.py::test_enforce_mode_denies_normally - AssertionErr...\r\nFAILED tests/test_plan.py::test_render_lists_steps_in_order - assert 42 < 15\r\n4 failed, 98 passed in 0.60s\r\n",
+          "stderr_excerpt": "",
+          "failing_test": "tests/test_engine.py::test_engine_respects_gate_deny",
+          "failing_file": "tests/test_engine.py",
+          "root_cause": "FAILED tests/test_plan.py::test_render_lists_steps_in_order - assert 42 < 15",
+          "success": false,
+          "fix_attempt": null,
+          "regression_test_added": false
+        },
+        {
+          "run_id": "TR_0006",
+          "ts": "2026-05-13T16:30:34.277Z",
+          "phase": "P5",
+          "label": "B/P5",
+          "command": "python -m pytest -q",
+          "exit_code": 1,
+          "stdout_excerpt": "...............................................F.............FFFFF...... [ 78%]\r\n.......F..F.........                                                     [100%]\r\n================================== FAILURES ===================================\r\n______________________ test_render_lists_steps_in_order _______________________\r\n\r\n    def test_render_lists_steps_in_order():\r\n        # Use a workflow name that shares no substring with step names, so that\r\n        # str.index() finds each step name in its own rendered line, not in the\r\n        # workflow header.  (Regression: \"plan-test\" contains \"test\".)\r\n        wf = make_wf(\r\n            simple_step(\"build\"),\r\n            simple_step(\"check\", depends_on=[\"build\"]),\r\n            simple_step(\"deploy\", depends_on=[\"check\"], gates=[\"dev-gate\"]),\r\n            name=\"order-check-workflow\",\r\n        )\r\n        plan = build_plan(wf)\r\n        text = PlanRenderer().render(plan)\r\n        pos_build = text.index(\"build\")\r\n        pos_check = text.index(\"check\")\r\n        pos_deploy = text.index(\"deploy\")\r\n>       assert pos_build < pos_check < pos_deploy\r\nE       assert 53 < 16\r\n\r\ntests\\test_plan.py:63: AssertionError\r\n__________________________ test_cli_plan_exits_zero ___________________________\r\n\r\ntmp_path = WindowsPath('C:/Users/Lucian/AppData/Local/Temp/pytest-of-Lucian/pytest-77/test_cli_plan_exits_zero0')\r\ncapsys = <_pytest.capture.CaptureFixture object at 0x000001FAC1611FD0>\r\n\r\n    def test_cli_plan_exits_zero(tmp_path, capsys):\r\n        p = _write(tmp_path, \"wf.yaml\", textwrap.dedent(\"\"\"\\\r\n            name: my-workflow\r\n            steps:\r\n              - name: build\r\n                action: build_image\r\n                environment: dev\r\n                policy_gates: [dev-gate]\r\n              - name: deploy\r\n                action: deploy\r\n                environment: dev\r\n                depends_on: [build]\r\n                policy_gates: [dev-gate]\r\n        \"\"\"))\r\n>       exit_code = cli_main([\"plan\", str(p)])\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n\r\ntests\\test_plan.py:213: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nargv = ['plan', 'C:\\\\Users\\\\Lucian\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Lucian\\\\pytest-77\\\\test_cli_plan_exits_zero0\\\\wf.yaml']\r\n\r\n    def main(argv: list[str] | None = None) -> None:\r\n        parser = build_parser()\r\n        args = parser.parse_args(argv)\r\n        dispatch = {\r\n            \"validate\": cmd_validate,\r\n            \"run\": cmd_run,\r\n            \"audit\": cmd_audit,\r\n            \"explain\": cmd_explain,\r\n            \"plan\": cmd_plan,\r\n        }\r\n>       sys.exit(dispatch[args.command](args))\r\nE       SystemExit: 0\r\n\r\nsrc\\policy_engine\\cli.py:196: SystemExit\r\n---------------------------- Captured stdout call -----------------------------\r\nWorkflow: my-workflow\r\nExecution order:\r\n  1. build [action=build_image env=dev gates=dev-gate depends_on=none]\r\n  2. deploy [action=deploy env=dev gates=dev-gate depends_on=build]\r\n\r\n--- machine-readable ---\r\n{\r\n  \"workflow\": \"my-workflow\",\r\n  \"step_count\": 2,\r\n  \"steps\": [\r\n    {\r\n      \"order\": 1,\r\n      \"name\": \"build\",\r\n      \"action\": \"build_image\",\r\n      \"environment\": \"dev\",\r\n      \"depends_on\": [],\r\n      \"policy_gates\": [\r\n        \"dev-gate\"\r\n      ],\r\n      \"condition\": null\r\n    },\r\n    {\r\n      \"order\": 2,\r\n      \"name\": \"deploy\",\r\n      \"action\": \"deploy\",\r\n      \"environment\": \"dev\",\r\n      \"depends_on\": [\r\n        \"build\"\r\n      ],\r\n      \"policy_gates\": [\r\n        \"dev-gate\"\r\n      ],\r\n      \"condition\": null\r\n    }\r\n  ]\r\n}\r\n_________________ test_cli_plan_output_contains_workflow_name _________________\r\n\r\ntmp_path = WindowsPath('C:/Users/Lucian/AppData/Local/Temp/pytest-of-Lucian/pytest-77/test_cli_plan_output_contains_0')\r\ncapsys = <_pytest.capture.CaptureFixture object at 0x000001FAC17447D0>\r\n\r\n    def test_cli_plan_output_contains_workflow_name(tmp_path, capsys):\r\n        p = _write(tmp_path, \"wf.yaml\", textwrap.dedent(\"\"\"\\\r\n            name: my-workflow\r\n        ",
+          "stderr_excerpt": "",
+          "failing_test": null,
+          "failing_file": null,
+          "root_cause": null,
+          "success": false,
+          "fix_attempt": null,
+          "regression_test_added": false
+        },
+        {
+          "run_id": "TR_0007",
+          "ts": "2026-05-13T16:33:56.061Z",
+          "phase": "P6",
+          "label": "B/P6",
+          "command": "python -m pytest -q",
+          "exit_code": 1,
+          "stdout_excerpt": "........................................................................ [ 75%]\r\n..........F..F.........                                                  [100%]\r\n================================== FAILURES ===================================\r\n______________ test_permissive_mode_overridden_entry_has_warning ______________\r\n\r\n    def test_permissive_mode_overridden_entry_has_warning():\r\n        \"\"\"OVERRIDDEN entry must carry a human-readable warning.\"\"\"\r\n        wf = WorkflowDefinition(name=\"test\", steps=[_gated_step()])\r\n        plan = build_plan(wf)\r\n        audit = AuditLog()\r\n        engine = PolicyEngine(role=\"developer\", audit=audit, policy_mode=PolicyMode.PERMISSIVE)\r\n        engine.run(plan)\r\n    \r\n        overridden = [e for e in audit.entries if e.event == \"OVERRIDDEN\"]\r\n>       assert \"warning\" in overridden[0].details\r\nE       AssertionError: assert 'warning' in {'gate': 'prod-gate', 'policy_mode': 'permissive', 'role': 'developer'}\r\nE        +  where {'gate': 'prod-gate', 'policy_mode': 'permissive', 'role': 'developer'} = AuditEntry(timestamp=1778690035.8434746, event='OVERRIDDEN', step='deploy', details={'gate': 'prod-gate', 'role': 'developer', 'policy_mode': 'permissive'}).details\r\n\r\ntests\\test_policy_bypass.py:243: AssertionError\r\n_______________________ test_enforce_mode_still_denies ________________________\r\n\r\n    def test_enforce_mode_still_denies():\r\n        \"\"\"Default ENFORCE mode must still deny gate failures (regression guard).\"\"\"\r\n        wf = WorkflowDefinition(name=\"test\", steps=[_gated_step()])\r\n        plan = build_plan(wf)\r\n        audit = AuditLog()\r\n        engine = PolicyEngine(\r\n            role=\"developer\",\r\n            audit=audit,\r\n            policy_mode=PolicyMode.ENFORCE,  # explicit default\r\n        )\r\n        results = engine.run(plan)\r\n    \r\n>       assert results[\"deploy\"].startswith(\"denied:\")\r\nE       AssertionError: assert False\r\nE        +  where False = <built-in method startswith of str object at 0x000001DBB0A5FE70>('denied:')\r\nE        +    where <built-in method startswith of str object at 0x000001DBB0A5FE70> = 'denied'.startswith\r\n\r\ntests\\test_policy_bypass.py:294: AssertionError\r\n=========================== short test summary info ===========================\r\nFAILED tests/test_policy_bypass.py::test_permissive_mode_overridden_entry_has_warning\r\nFAILED tests/test_policy_bypass.py::test_enforce_mode_still_denies - Assertio...\r\n2 failed, 93 passed in 0.45s\r\n",
+          "stderr_excerpt": "",
+          "failing_test": "tests/test_policy_bypass.py::test_permissive_mode_overridden_entry_has_warning",
+          "failing_file": "tests/test_policy_bypass.py",
+          "root_cause": "FAILED tests/test_policy_bypass.py::test_enforce_mode_still_denies - Assertio...",
+          "success": false,
+          "fix_attempt": null,
+          "regression_test_added": false
+        }
+      ]
+    },
+    "architecture": {
+      "packages": [
+        {
+          "package": "src/policy_engine",
+          "modules": [
+            "src/policy_engine/__init__.py",
+            "src/policy_engine/models.py",
+            "src/policy_engine/loader.py",
+            "src/policy_engine/planner.py",
+            "src/policy_engine/audit.py",
+            "src/policy_engine/permissions.py",
+            "src/policy_engine/rollback.py",
+            "src/policy_engine/engine.py",
+            "src/policy_engine/cli.py",
+            "src/policy_engine/conditions.py",
+            "src/policy_engine/policy_mode.py"
+          ]
+        },
+        {
+          "package": "tests",
+          "modules": [
+            "tests/conftest.py",
+            "tests/test_loader.py",
+            "tests/test_engine.py",
+            "tests/test_conditions.py",
+            "tests/test_policy_bypass.py",
+            "tests/test_plan.py"
+          ]
+        }
+      ],
+      "modules": [
+        "src/policy_engine/__init__.py",
+        "src/policy_engine/audit.py",
+        "src/policy_engine/cli.py",
+        "src/policy_engine/conditions.py",
+        "src/policy_engine/engine.py",
+        "src/policy_engine/loader.py",
+        "src/policy_engine/models.py",
+        "src/policy_engine/permissions.py",
+        "src/policy_engine/planner.py",
+        "src/policy_engine/policy_mode.py",
+        "src/policy_engine/rollback.py",
+        "tests/conftest.py",
+        "tests/test_conditions.py",
+        "tests/test_engine.py",
+        "tests/test_loader.py",
+        "tests/test_plan.py",
+        "tests/test_policy_bypass.py"
+      ],
+      "public_apis": {
+        "src/policy_engine/__init__.py": [],
+        "src/policy_engine/models.py": [
+          {
+            "name": "StepCondition",
+            "kind": "dataclass",
+            "line": 8
+          },
+          {
+            "name": "WorkflowStep",
+            "kind": "dataclass",
+            "line": 23
+          },
+          {
+            "name": "WorkflowDefinition",
+            "kind": "dataclass",
+            "line": 35
+          },
+          {
+            "name": "ExecutionPlan",
+            "kind": "dataclass",
+            "line": 41
+          },
+          {
+            "name": "PolicyGate",
+            "kind": "dataclass",
+            "line": 47
+          },
+          {
+            "name": "allows",
+            "kind": "function",
+            "line": 53
+          }
+        ],
+        "src/policy_engine/loader.py": [
+          {
+            "name": "LoadError",
+            "kind": "class",
+            "line": 24
+          },
+          {
+            "name": "load_workflow",
+            "kind": "function",
+            "line": 63
+          }
+        ],
+        "src/policy_engine/planner.py": [
+          {
+            "name": "PlanError",
+            "kind": "class",
+            "line": 15
+          },
+          {
+            "name": "PlanValidator",
+            "kind": "class",
+            "line": 19
+          },
+          {
+            "name": "validate",
+            "kind": "function",
+            "line": 22
+          },
+          {
+            "name": "PlanRenderer",
+            "kind": "class",
+            "line": 34
+          },
+          {
+            "name": "render",
+            "kind": "function",
+            "line": 45
+          },
+          {
+            "name": "render_dict",
+            "kind": "function",
+            "line": 72
+          },
+          {
+            "name": "build_plan",
+            "kind": "function",
+            "line": 99
+          },
+          {
+            "name": "visit",
+            "kind": "function",
+            "line": 111
+          }
+        ],
+        "src/policy_engine/audit.py": [
+          {
+            "name": "AuditEntry",
+            "kind": "dataclass",
+            "line": 10
+          },
+          {
+            "name": "to_dict",
+            "kind": "function",
+            "line": 16
+          },
+          {
+            "name": "AuditLog",
+            "kind": "class",
+            "line": 25
+          },
+          {
+            "name": "append",
+            "kind": "function",
+            "line": 32
+          },
+          {
+            "name": "entries",
+            "kind": "function",
+            "line": 45
+          },
+          {
+            "name": "dump",
+            "kind": "function",
+            "line": 48
+          }
+        ],
+        "src/policy_engine/permissions.py": [
+          {
+            "name": "PermissionModel",
+            "kind": "class",
+            "line": 6
+          },
+          {
+            "name": "register_gate",
+            "kind": "function",
+            "line": 12
+          },
+          {
+            "name": "is_allowed",
+            "kind": "function",
+            "line": 15
+          },
+          {
+            "name": "default",
+            "kind": "function",
+            "line": 22
+          }
+        ],
+        "src/policy_engine/rollback.py": [
+          {
+            "name": "RollbackManager",
+            "kind": "class",
+            "line": 6
+          },
+          {
+            "name": "record_success",
+            "kind": "function",
+            "line": 11
+          },
+          {
+            "name": "rollback",
+            "kind": "function",
+            "line": 14
+          }
+        ],
+        "src/policy_engine/engine.py": [
+          {
+            "name": "ExecutionContext",
+            "kind": "class",
+            "line": 23
+          },
+          {
+            "name": "record",
+            "kind": "function",
+            "line": 36
+          },
+          {
+            "name": "was_condition_skipped",
+            "kind": "function",
+            "line": 39
+          },
+          {
+            "name": "PolicyEngine",
+            "kind": "class",
+            "line": 43
+          },
+          {
+            "name": "run",
+            "kind": "function",
+            "line": 57
+          },
+          {
+            "name": "rollback",
+            "kind": "function",
+            "line": 172
+          }
+        ],
+        "src/policy_engine/cli.py": [
+          {
+            "name": "cmd_validate",
+            "kind": "function",
+            "line": 45
+          },
+          {
+            "name": "cmd_run",
+            "kind": "function",
+            "line": 56
+          },
+          {
+            "name": "cmd_audit",
+            "kind": "function",
+            "line": 101
+          },
+          {
+            "name": "cmd_explain",
+            "kind": "function",
+            "line": 109
+          },
+          {
+            "name": "cmd_plan",
+            "kind": "function",
+            "line": 121
+          },
+          {
+            "name": "build_parser",
+            "kind": "function",
+            "line": 145
+          },
+          {
+            "name": "main",
+            "kind": "function",
+            "line": 186
+          },
+          {
+            "name": "validate",
+            "kind": "cli_command",
+            "line": 152
+          },
+          {
+            "name": "run",
+            "kind": "cli_command",
+            "line": 155
+          },
+          {
+            "name": "audit",
+            "kind": "cli_command",
+            "line": 172
+          },
+          {
+            "name": "explain",
+            "kind": "cli_command",
+            "line": 174
+          },
+          {
+            "name": "plan",
+            "kind": "cli_command",
+            "line": 177
+          }
+        ],
+        "tests/conftest.py": [],
+        "tests/test_loader.py": [],
+        "tests/test_engine.py": [
+          {
+            "name": "make_wf",
+            "kind": "function",
+            "line": 15
+          },
+          {
+            "name": "simple_step",
+            "kind": "function",
+            "line": 19
+          }
+        ],
+        "src/policy_engine/conditions.py": [
+          {
+            "name": "ConditionError",
+            "kind": "class",
+            "line": 13
+          },
+          {
+            "name": "evaluate_condition",
+            "kind": "function",
+            "line": 17
+          }
+        ],
+        "tests/test_conditions.py": [
+          {
+            "name": "make_wf",
+            "kind": "function",
+            "line": 18
+          },
+          {
+            "name": "cond_step",
+            "kind": "function",
+            "line": 22
+          },
+          {
+            "name": "eq_cond",
+            "kind": "function",
+            "line": 40
+          }
+        ],
+        "src/policy_engine/policy_mode.py": [
+          {
+            "name": "PolicyMode",
+            "kind": "enum",
+            "line": 21
+          },
+          {
+            "name": "get_policy_mode_from_env",
+            "kind": "function",
+            "line": 36
+          }
+        ],
+        "tests/test_policy_bypass.py": [],
+        "tests/test_plan.py": [
+          {
+            "name": "make_wf",
+            "kind": "function",
+            "line": 25
+          },
+          {
+            "name": "simple_step",
+            "kind": "function",
+            "line": 29
+          }
+        ]
+      },
+      "cli_commands": [
+        {
+          "file": "src/policy_engine/cli.py",
+          "name": "validate"
+        },
+        {
+          "file": "src/policy_engine/cli.py",
+          "name": "run"
+        },
+        {
+          "file": "src/policy_engine/cli.py",
+          "name": "audit"
+        },
+        {
+          "file": "src/policy_engine/cli.py",
+          "name": "explain"
+        },
+        {
+          "file": "src/policy_engine/cli.py",
+          "name": "plan"
+        }
+      ],
+      "tests": [
+        {
+          "file": "tests/test_loader.py",
+          "name": "test_load_valid_yaml"
+        },
+        {
+          "file": "tests/test_loader.py",
+          "name": "test_load_valid_json"
+        },
+        {
+          "file": "tests/test_loader.py",
+          "name": "test_load_missing_file"
+        },
+        {
+          "file": "tests/test_loader.py",
+          "name": "test_load_duplicate_step_names"
+        },
+        {
+          "file": "tests/test_loader.py",
+          "name": "test_load_unsupported_extension"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_validator_accepts_valid_dag"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_validator_rejects_unknown_dep"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_validator_rejects_cycle"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_renderer_output"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_renderer_dict_structure"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_renderer_dict_step_fields"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_renderer_dict_condition_included"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_renderer_dict_no_condition_is_none"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_engine_runs_ungated_steps"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_engine_respects_gate_allow"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_engine_respects_gate_deny"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_engine_blocks_dependents_on_failure"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_engine_audit_records_events"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_engine_audit_records_denied"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_permissive_mode_overrides_gate"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_enforce_mode_denies_normally"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_rollback_preserves_audit"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_rollback_clears_completed"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_audit_append_only"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_audit_dump_format"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_permission_model_allows_known_role"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_permission_model_denies_wrong_role"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_permission_model_denies_unknown_gate"
+        },
+        {
+          "file": "tests/test_engine.py",
+          "name": "test_permission_model_prod_requires_release_manager"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_evaluate_equals_true"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_evaluate_equals_false"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_evaluate_missing_var_is_false"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_evaluate_unknown_operator_raises"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_no_condition_step_runs"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_condition_true_step_runs"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_condition_false_step_skipped"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_condition_false_audit_records_reason"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_condition_skipped_does_not_block_dependent"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_condition_skipped_reflected_in_context"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_all_conditions_true"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_all_conditions_false"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_p5_skipped_optional_does_not_fail_downstream"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_p5_skipped_step_audit_does_not_show_blocked_dependency"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_p5_transitive_skipped_chain_does_not_block"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_p5_failed_step_still_blocks_downstream"
+        },
+        {
+          "file": "tests/test_conditions.py",
+          "name": "test_p5_mixed_skipped_and_real_deps"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_bypass_all_yaml_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_bypass_all_json_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_bypass_all_error_message_is_informative"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_bypass_value_variants_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_bypass_all_as_step_value_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_step_level_policy_gate_singular_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_step_level_policy_gate_singular_without_bypass_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_top_level_policy_mode_key_rejected"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_valid_workflow_loads_without_error"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_records_overridden_not_denied"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_overridden_entry_has_gate_and_role"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_overridden_entry_has_warning"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_multiple_gates_all_overridden"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_workflow_start_records_mode"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_enforce_mode_still_denies"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_default_policy_mode_is_enforce"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_workflow_file_cannot_set_policy_mode"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_env_var_permissive_activates_permissive_mode"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_env_var_enforce_activates_enforce_mode"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_env_var_absent_defaults_to_enforce"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_env_var_unknown_value_defaults_to_enforce"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_env_var_case_insensitive_permissive"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_audit_is_append_only"
+        },
+        {
+          "file": "tests/test_policy_bypass.py",
+          "name": "test_permissive_mode_does_not_skip_condition_evaluation"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_contains_workflow_name"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_lists_steps_in_order"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_shows_gates"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_shows_no_gates_when_empty"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_shows_condition"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_top_level_keys"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_workflow_name"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_step_count"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_step_order_field"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_step_names_in_topo_order"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_gates_list"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_depends_on_list"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_condition_none_when_absent"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_condition_present"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_render_dict_is_json_serialisable"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_plan_exits_zero"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_plan_output_contains_workflow_name"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_plan_output_contains_machine_readable"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_plan_invalid_file_exits_nonzero"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_validate_exits_zero"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_validate_exits_nonzero_on_bad_file"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_run_exits_zero_for_permitted_role"
+        },
+        {
+          "file": "tests/test_plan.py",
+          "name": "test_cli_run_exits_nonzero_for_denied_gate"
+        }
+      ],
+      "dep_edges": [
+        {
+          "from_module": "src/policy_engine/models.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/models.py",
+          "to_module": "dataclasses"
+        },
+        {
+          "from_module": "src/policy_engine/models.py",
+          "to_module": "dataclasses"
+        },
+        {
+          "from_module": "src/policy_engine/models.py",
+          "to_module": "typing"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "json"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "pathlib"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "typing"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "yaml"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/loader.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/planner.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/planner.py",
+          "to_module": "typing"
+        },
+        {
+          "from_module": "src/policy_engine/planner.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/planner.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/planner.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/audit.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/audit.py",
+          "to_module": "json"
+        },
+        {
+          "from_module": "src/policy_engine/audit.py",
+          "to_module": "time"
+        },
+        {
+          "from_module": "src/policy_engine/audit.py",
+          "to_module": "dataclasses"
+        },
+        {
+          "from_module": "src/policy_engine/audit.py",
+          "to_module": "dataclasses"
+        },
+        {
+          "from_module": "src/policy_engine/audit.py",
+          "to_module": "typing"
+        },
+        {
+          "from_module": "src/policy_engine/permissions.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/permissions.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/rollback.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/rollback.py",
+          "to_module": "policy_engine.audit"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "typing"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.audit"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.conditions"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.conditions"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.permissions"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.policy_mode"
+        },
+        {
+          "from_module": "src/policy_engine/engine.py",
+          "to_module": "policy_engine.rollback"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "argparse"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "json"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "os"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "sys"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.loader"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.loader"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.engine"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.audit"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.permissions"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.policy_mode"
+        },
+        {
+          "from_module": "src/policy_engine/cli.py",
+          "to_module": "policy_engine.policy_mode"
+        },
+        {
+          "from_module": "tests/conftest.py",
+          "to_module": "sys"
+        },
+        {
+          "from_module": "tests/conftest.py",
+          "to_module": "pathlib"
+        },
+        {
+          "from_module": "tests/test_loader.py",
+          "to_module": "json"
+        },
+        {
+          "from_module": "tests/test_loader.py",
+          "to_module": "textwrap"
+        },
+        {
+          "from_module": "tests/test_loader.py",
+          "to_module": "pytest"
+        },
+        {
+          "from_module": "tests/test_loader.py",
+          "to_module": "pathlib"
+        },
+        {
+          "from_module": "tests/test_loader.py",
+          "to_module": "policy_engine.loader"
+        },
+        {
+          "from_module": "tests/test_loader.py",
+          "to_module": "policy_engine.loader"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "pytest"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.engine"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.audit"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.permissions"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.rollback"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.policy_mode"
+        },
+        {
+          "from_module": "tests/test_engine.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "src/policy_engine/conditions.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/conditions.py",
+          "to_module": "typing"
+        },
+        {
+          "from_module": "src/policy_engine/conditions.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "pytest"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "policy_engine.engine"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "policy_engine.engine"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "policy_engine.audit"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "policy_engine.conditions"
+        },
+        {
+          "from_module": "tests/test_conditions.py",
+          "to_module": "policy_engine.conditions"
+        },
+        {
+          "from_module": "src/policy_engine/policy_mode.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "src/policy_engine/policy_mode.py",
+          "to_module": "os"
+        },
+        {
+          "from_module": "src/policy_engine/policy_mode.py",
+          "to_module": "enum"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "json"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "os"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "textwrap"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "pytest"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "pathlib"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.loader"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.loader"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.engine"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.audit"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.permissions"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.policy_mode"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.policy_mode"
+        },
+        {
+          "from_module": "tests/test_policy_bypass.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "__future__"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "json"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "textwrap"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "pathlib"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "pytest"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.models"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.planner"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.cli"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.cli"
+        },
+        {
+          "from_module": "tests/test_plan.py",
+          "to_module": "policy_engine.cli"
+        }
+      ],
+      "forbidden_duplicate_public_apis": [],
+      "duplicate_public_apis": [
+        {
+          "name": "__init__",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/audit.py",
+              "kind": "function",
+              "line": 28
+            },
+            {
+              "file": "src/policy_engine/permissions.py",
+              "kind": "function",
+              "line": 9
+            },
+            {
+              "file": "src/policy_engine/rollback.py",
+              "kind": "function",
+              "line": 7
+            },
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 30
+            },
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 44
+            }
+          ]
+        },
+        {
+          "name": "_write",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "tests/test_loader.py",
+              "kind": "function",
+              "line": 10
+            },
+            {
+              "file": "tests/test_policy_bypass.py",
+              "kind": "function",
+              "line": 35
+            },
+            {
+              "file": "tests/test_plan.py",
+              "kind": "function",
+              "line": 19
+            }
+          ]
+        },
+        {
+          "name": "make_wf",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "tests/test_engine.py",
+              "kind": "function",
+              "line": 15
+            },
+            {
+              "file": "tests/test_conditions.py",
+              "kind": "function",
+              "line": 18
+            },
+            {
+              "file": "tests/test_plan.py",
+              "kind": "function",
+              "line": 25
+            }
+          ]
+        },
+        {
+          "name": "rollback",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/rollback.py",
+              "kind": "function",
+              "line": 14
+            },
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 172
+            }
+          ]
+        },
+        {
+          "name": "run",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/engine.py",
+              "kind": "function",
+              "line": 57
+            },
+            {
+              "file": "src/policy_engine/cli.py",
+              "kind": "cli_command",
+              "line": 155
+            }
+          ]
+        },
+        {
+          "name": "simple_step",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "tests/test_engine.py",
+              "kind": "function",
+              "line": 19
+            },
+            {
+              "file": "tests/test_plan.py",
+              "kind": "function",
+              "line": 29
+            }
+          ]
+        },
+        {
+          "name": "validate",
+          "kind": "function",
+          "locations": [
+            {
+              "file": "src/policy_engine/planner.py",
+              "kind": "function",
+              "line": 22
+            },
+            {
+              "file": "src/policy_engine/cli.py",
+              "kind": "cli_command",
+              "line": 152
+            }
+          ]
+        }
+      ],
+      "invariants": [
+        "PolicyEngine",
+        "AuditLog",
+        "WorkflowDefinition",
+        "WorkflowStep",
+        "ExecutionPlan",
+        "PlanValidator",
+        "PlanRenderer",
+        "RollbackManager",
+        "PermissionModel",
+        "PolicyGate"
+      ]
+    },
+    "module_status": {
+      "code_workspace_memory": "active",
+      "exact_file_state_store": "active",
+      "symbol_index": "active",
+      "requirements_ledger": "active",
+      "patch_memory": "active",
+      "test_failure_memory": "active",
+      "architecture_map": "active",
+      "workspace_diff_guard": "active",
+      "coding_context_builder": "active"
+    }
+  }
+}

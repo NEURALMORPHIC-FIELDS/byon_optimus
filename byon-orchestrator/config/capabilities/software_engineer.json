@@ -1,8 +1,8 @@
 {
   "id": "software_engineer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "active",
-  "description": "Long-form software engineering across multi-file repos. Requires exact workspace memory, symbol awareness, and patch-level recall — none of which a similarity-based conversational memory provides. The v0.6 coding benchmark failed without this capability pack; see docs/CONTEXTUAL_CAPABILITY_ARCHIVE.md.",
+  "description": "Long-form software engineering across multi-file repos. Backed by the Code Workspace Memory layer (exact file state store, symbol index, requirements ledger, patch memory, test failure memory, architecture map, workspace diff guard, coding context builder). After the v0.6 coding benchmark exposed similarity-recall fragmentation, this capability now relies on byte-exact workspace memory, NOT semantic excerpts. Whether this layer actually beats Claude direct is measured by the coding benchmark rerun — do not assume success.",
   "domains": ["code", "software", "engineering", "refactor", "tests", "ci"],
   "intents": ["implement", "refactor", "fix", "debug", "review", "test", "build", "plan-implementation", "explain-code"],
   "roles": ["developer", "engineer", "tech_lead", "architect", "maintainer"],
@@ -58,20 +58,24 @@
     "no_benchmark_regression",
     "no_secret_leakage",
     "no_destructive_action_without_approval",
-    "no_silent_api_break"
+    "no_silent_api_break",
+    "no_duplicate_public_api",
+    "no_bypass_all_acceptance",
+    "no_audit_append_violation",
+    "no_rollback_erases_audit"
   ],
   "module_status": {
-    "code_workspace_memory": "planned",
-    "exact_file_state_store": "planned",
-    "symbol_index": "planned",
-    "requirements_ledger": "planned",
-    "patch_memory": "planned",
-    "test_failure_memory": "planned",
-    "architecture_map": "planned",
-    "workspace_diff_guard": "planned",
-    "coding_context_builder": "planned"
+    "code_workspace_memory": "active",
+    "exact_file_state_store": "active",
+    "symbol_index": "active",
+    "requirements_ledger": "active",
+    "patch_memory": "active",
+    "test_failure_memory": "active",
+    "architecture_map": "active",
+    "workspace_diff_guard": "active",
+    "coding_context_builder": "active"
   },
   "experience_log": true,
   "level3_claim": false,
-  "notes": "All required_modules are currently 'planned'. Until they exist, software_engineer capability activates but flags the gaps via router.missing_required_modules. Do NOT treat coding as solved."
+  "notes": "All 9 coding modules are now `active`. The capability router will no longer flag any required module as missing for software_engineer. Whether this layer reverses the v0.6 coding benchmark loss is measured empirically by the rerun under coding-capability-benchmark; this PR does NOT claim coding is solved by virtue of being implemented."
 }
