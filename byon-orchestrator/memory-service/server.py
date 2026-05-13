@@ -401,6 +401,32 @@ async def startup():
         "Memory backend mode: %s (FCE-M enabled=%s).", backend_mode, fcem.enabled
     )
 
+    # ------------------------------------------------------------------
+    # Level 3 full-organism experiment endpoints (read-only, env-gated).
+    #
+    # Hard isolation: the registration call below is a NO-OP when the env
+    # var `BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT` is not exactly "true".
+    # This is the only production-server line that knows about the
+    # experiment, and its only effect when OFF is to import the gating
+    # module and call a function that returns False without touching `app`.
+    # Tests verify: with flag OFF, no `/level3/...` route is registered.
+    # ------------------------------------------------------------------
+    try:
+        from level3_experimental_endpoints import register_level3_endpoints
+        _level3_registered = register_level3_endpoints(
+            app,
+            lambda: fcem,
+            lambda: handlers,
+        )
+        if _level3_registered:
+            logger.info(
+                "Level 3 full-organism experiment endpoints registered "
+                "(BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT=true)."
+            )
+    except Exception as _exc:  # pragma: no cover - registration is best-effort
+        logger.warning("Level 3 endpoint registration skipped: %s", _exc)
+
+
 @app.on_event("shutdown")
 async def shutdown():
     """Save all memory stores on shutdown"""

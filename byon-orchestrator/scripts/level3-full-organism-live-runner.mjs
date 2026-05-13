@@ -75,6 +75,10 @@ export const ALLOWED_VERDICTS = Object.freeze([
     "OMEGA_OBSERVED_BY_CHECK_COAGULATION_NO_MANUAL_WRITE",
     "INCONCLUSIVE_NEEDS_LONGER_RUN",
     "CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST",
+    // Added in commit 15:
+    "PARTIAL_FULL_ORGANISM_SMOKE_RUN",
+    "INCONCLUSIVE_EMBEDDINGS_NOT_CONFIRMED",
+    "INCONCLUSIVE_FCE_METRICS_NOT_EXPOSED",
 ]);
 
 const DEFAULT_MEMORY_URL = process.env.MEMORY_SERVICE_URL || "http://localhost:8000";
@@ -106,6 +110,7 @@ export function parseArgs(argv) {
         cleanupRun: null,
         estimateCost: false,
         reportCost: false,
+        turnDelayMs: 0,           // commit 15: --turn-delay-ms
         help: false,
     };
     for (let i = 0; i < argv.length; i++) {
@@ -118,10 +123,14 @@ export function parseArgs(argv) {
         else if (a === "--cleanup-run") args.cleanupRun = argv[++i];
         else if (a === "--estimate-cost") args.estimateCost = true;
         else if (a === "--report-cost") args.reportCost = true;
+        else if (a === "--turn-delay-ms") args.turnDelayMs = Number(argv[++i]);
         else if (a === "--help" || a === "-h") args.help = true;
     }
     if (!Number.isInteger(args.turns) || args.turns < 1) {
         args.turns = 30;
+    }
+    if (!Number.isFinite(args.turnDelayMs) || args.turnDelayMs < 0) {
+        args.turnDelayMs = 0;
     }
     return args;
 }
@@ -130,18 +139,114 @@ export function parseArgs(argv) {
 // Memory-service round-trip helper
 // ---------------------------------------------------------------------------
 
-export async function memPost(payload, { memoryUrl = DEFAULT_MEMORY_URL, timeoutMs = 30000 } = {}) {
-    const r = await fetch(memoryUrl + "/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!r.ok) {
-        const body = await r.text().catch(() => "");
-        throw new Error(`memory-service HTTP ${r.status}: ${body.slice(0, 200)}`);
+function _sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * POST to memory-service with rate-limit aware retry/backoff.
+ *
+ * On HTTP 429 the runner honors the `Retry-After` header (seconds) if
+ * present, otherwise applies exponential backoff: 1s, 2s, 4s, 8s
+ * (capped at 30s). Up to `maxRetries` attempts (default 5). The
+ * scenario is NOT marked failed until the policy is exhausted.
+ *
+ * On any other non-2xx, throws immediately — no retry.
+ */
+export async function memPost(
+    payload,
+    {
+        memoryUrl = DEFAULT_MEMORY_URL,
+        timeoutMs = 30000,
+        maxRetries = 5,
+        onRetry = null,
+    } = {},
+) {
+    let attempt = 0;
+    let lastError = null;
+    while (attempt <= maxRetries) {
+        try {
+            const r = await fetch(memoryUrl + "/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+                signal: AbortSignal.timeout(timeoutMs),
+            });
+            if (r.ok) {
+                return await r.json();
+            }
+            if (r.status === 429) {
+                let waitMs;
+                const retryAfter = r.headers.get("retry-after");
+                if (retryAfter) {
+                    const sec = Number(retryAfter);
+                    if (Number.isFinite(sec) && sec > 0) {
+                        waitMs = Math.min(sec * 1000, 60_000);
+                    }
+                }
+                if (waitMs === undefined) {
+                    // exp backoff: 1s, 2s, 4s, 8s, 16s, 30s cap
+                    waitMs = Math.min(30_000, Math.pow(2, attempt) * 1000);
+                }
+                if (onRetry) {
+                    try {
+                        onRetry({ attempt, waitMs, status: 429 });
+                    } catch {}
+                }
+                if (attempt < maxRetries) {
+                    await _sleep(waitMs);
+                    attempt += 1;
+                    continue;
+                }
+                const body = await r.text().catch(() => "");
+                throw new Error(
+                    `memory-service HTTP 429 after ${maxRetries + 1} attempts; body=${body.slice(0, 200)}`,
+                );
+            }
+            const body = await r.text().catch(() => "");
+            throw new Error(`memory-service HTTP ${r.status}: ${body.slice(0, 200)}`);
+        } catch (e) {
+            lastError = e;
+            if (!String(e.message || "").startsWith("memory-service HTTP")) {
+                // transport-level error (timeout, connection refused, etc.) —
+                // also subject to bounded retry.
+                if (attempt < maxRetries) {
+                    if (onRetry) {
+                        try {
+                            onRetry({ attempt, waitMs: 1000, status: "transport" });
+                        } catch {}
+                    }
+                    await _sleep(Math.min(30_000, Math.pow(2, attempt) * 1000));
+                    attempt += 1;
+                    continue;
+                }
+            }
+            throw e;
+        }
     }
-    return await r.json();
+    throw lastError || new Error("memPost: exhausted retries");
+}
+
+/**
+ * GET a JSON response from memory-service (used for the optional
+ * `/level3/...` endpoints that are env-gated on the server).
+ *
+ * Returns `{ ok: false, status }` instead of throwing on non-2xx so the
+ * runner can degrade gracefully when an endpoint is not registered.
+ */
+export async function memGet(pathFragment, { memoryUrl = DEFAULT_MEMORY_URL, timeoutMs = 10000 } = {}) {
+    try {
+        const r = await fetch(memoryUrl + pathFragment, {
+            method: "GET",
+            signal: AbortSignal.timeout(timeoutMs),
+        });
+        if (!r.ok) {
+            return { ok: false, status: r.status };
+        }
+        return await r.json();
+    } catch (e) {
+        return { ok: false, error: e.message };
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -162,28 +267,73 @@ export async function checkMemoryServiceLive(memoryUrl = DEFAULT_MEMORY_URL) {
 }
 
 export async function checkFaissAndEmbeddingsLive(memoryUrl = DEFAULT_MEMORY_URL) {
+    let faiss_live = false;
+    let stats = null;
     try {
-        const stats = await memPost({ action: "stats" }, { memoryUrl });
-        // ProductionEmbedder vs SimpleEmbedder discrimination via stats.
-        const embedderName = (stats && stats.embedder) || (stats && stats.stats && stats.stats.embedder) || null;
-        return {
-            faiss_live: !!stats,
-            embeddings_live: typeof embedderName === "string" && embedderName.length > 0,
-            embedder: embedderName,
-            stats,
-        };
+        stats = await memPost({ action: "stats" }, { memoryUrl, maxRetries: 0, timeoutMs: 3000 });
+        faiss_live = !!stats;
     } catch (e) {
         return { faiss_live: false, embeddings_live: false, reason: e.message };
     }
+    // commit 15: ask the env-gated /level3/embedder-info endpoint for an
+    // authoritative answer. If it returns 404 / 403 the experiment flag
+    // was not set on the server at startup; emit a clear "not confirmed".
+    const info = await memGet("/level3/embedder-info", { memoryUrl });
+    if (info && info.ok === true) {
+        return {
+            faiss_live,
+            embeddings_live: !!info.production_embeddings_live,
+            embedder_class: info.embedder_class || null,
+            embedder_name: info.embedder_name || null,
+            embedding_dim: info.embedding_dim || null,
+            backend: info.backend || null,
+            fallback_simple_embedder_active: !!info.fallback_simple_embedder_active,
+            stats,
+        };
+    }
+    return {
+        faiss_live,
+        embeddings_live: false,
+        embedder_class: null,
+        embedder_name: null,
+        embedding_dim: null,
+        backend: null,
+        fallback_simple_embedder_active: null,
+        embedder_endpoint_unavailable: true,
+        embedder_endpoint_status: info && info.status ? info.status : "unknown",
+        stats,
+    };
 }
 
 export async function checkFcemLive(memoryUrl = DEFAULT_MEMORY_URL) {
     try {
-        const state = await memPost({ action: "fce_state" }, { memoryUrl });
+        const state = await memPost({ action: "fce_state" }, { memoryUrl, maxRetries: 0, timeoutMs: 3000 });
         return { fce_live: !!(state && state.success), state };
     } catch (e) {
         return { fce_live: false, reason: e.message };
     }
+}
+
+/**
+ * Try the env-gated `/level3/fce-metrics` endpoint to capture detailed
+ * per-center metrics (kappa, alpha, Z_norm, B_t) plus the morphogenesis
+ * log tail (S_t, AR per event). Returns a structured response with a
+ * `fce_metrics_exposed` boolean.
+ *
+ * If the endpoint is not registered (flag was OFF at server start),
+ * returns `{ ok: false, fce_metrics_exposed: false }`. The runner uses
+ * the boolean to drive verdict selection.
+ */
+export async function fetchFceMetricsDetail(memoryUrl = DEFAULT_MEMORY_URL) {
+    const r = await memGet("/level3/fce-metrics", { memoryUrl });
+    if (r && r.ok === true) {
+        return r;
+    }
+    return {
+        ok: false,
+        fce_metrics_exposed: false,
+        reason: r && r.status ? `HTTP ${r.status}` : (r && r.error) || "unknown",
+    };
 }
 
 export function checkClaudeKey(env = process.env) {
@@ -380,13 +530,14 @@ export async function preflight({ requireClaude, env = process.env, memoryUrl = 
     const mem = await checkMemoryServiceLive(memoryUrl);
     const faiss = await checkFaissAndEmbeddingsLive(memoryUrl);
     const fcem = await checkFcemLive(memoryUrl);
+    const fceMetrics = await fetchFceMetricsDetail(memoryUrl);
     const ready =
         flag &&
         (!requireClaude || claude.present) &&
         mem.live &&
         faiss.faiss_live &&
         fcem.fce_live;
-    return { flag, claude, memory_service: mem, faiss, fcem, ready };
+    return { flag, claude, memory_service: mem, faiss, fcem, fce_metrics_detail: fceMetrics, ready };
 }
 
 // ---------------------------------------------------------------------------
@@ -500,6 +651,11 @@ async function runOneTurn({
     const omegaSnap = await memPost({ action: "fce_omega_registry" }, { memoryUrl }).catch(() => null);
     const refFieldSnap = await memPost({ action: "fce_reference_fields" }, { memoryUrl }).catch(() => null);
     const fceState = await memPost({ action: "fce_state" }, { memoryUrl }).catch(() => null);
+    // commit 15: also fetch the env-gated detailed FCE metrics endpoint
+    // when available (production server registered it). This is the
+    // surface that exposes per-center kappa/alpha/Z_norm/B_t and the
+    // morphogenesis log tail with S_t / AR.
+    const fceMetricsDetail = await fetchFceMetricsDetail(memoryUrl);
 
     const totalMs = Date.now() - t0;
     return {
@@ -534,6 +690,7 @@ async function runOneTurn({
         store_out_ctx_id: storeOut.ctx_id || null,
         assimilate_status: assimilateResp && assimilateResp.success ? "success" : "unknown",
         fce_state: fceState && fceState.state ? fceState.state : null,
+        fce_metrics_detail: fceMetricsDetail || null,
         snapshots: {
             omega_registry: omegaSnap && omegaSnap.omega_registry ? omegaSnap.omega_registry : null,
             reference_fields: refFieldSnap && refFieldSnap.reference_fields ? refFieldSnap.reference_fields : null,
@@ -556,6 +713,7 @@ async function runScenario({
     outputDir,
     artifactStreams,
     relRegistry,
+    turnDelayMs = 0,
 }) {
     const threadId = `level3_full_organism_${runId}__${scenario.id}`;
     const prompts = scenario.prompts.slice(0, turnsCap);
@@ -648,6 +806,11 @@ async function runScenario({
         relRegistry.recordCenterHints("byon::macp_pipeline::factual", {
             source_turn_ids: [turn.turn_id],
         });
+        // commit 15: optional inter-turn delay so the memory-service
+        // 100-req/60s rate limiter has headroom across long scenarios.
+        if (turnDelayMs && turnDelayMs > 0 && i < prompts.length - 1) {
+            await _sleep(turnDelayMs);
+        }
     }
     return {
         scenario_id: scenario.id,
@@ -686,25 +849,68 @@ async function openJsonlStream(filePath) {
 // Verdict computation
 // ---------------------------------------------------------------------------
 
-export function computeVerdict({ claudeLivePresent, scenarios, fceStatesObserved }) {
+export function computeVerdict({
+    claudeLivePresent,
+    scenarios,
+    fceStatesObserved,
+    productionEmbeddingsLive = null,
+    fceMetricsExposed = null,
+    requiredScenarioIds = ["scenario-1-byon-arch", "scenario-2-adversarial"],
+    maxObservedS = null,
+}) {
+    // 1. Hard prerequisite: live Claude.
     if (!claudeLivePresent) return "CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST";
-    // If any scenario produced new Omega via existing FCE-M path, that
-    // is the strongest *research observation* this runner is allowed to
-    // emit. It is NOT a Level 3 declaration.
+
+    // 2. Any required scenario with 0 completed turns -> SMOKE only.
+    //    (commit 15: Sc2 0/30 must no longer collapse into LEVEL2_CONFIRMED.)
+    const scenarioCompletion = new Map();
+    for (const s of scenarios) {
+        scenarioCompletion.set(s.scenario_id, {
+            turns_run: s.turns_run || (s.turns ? s.turns.length : 0),
+            error: s.error || null,
+        });
+    }
+    const anyRequiredZeroTurns = requiredScenarioIds.some((sid) => {
+        const sc = scenarioCompletion.get(sid);
+        return !sc || (sc.turns_run || 0) === 0;
+    });
+    if (anyRequiredZeroTurns) return "PARTIAL_FULL_ORGANISM_SMOKE_RUN";
+
+    // 3. Production embeddings must be confirmed live (commit 15).
+    if (productionEmbeddingsLive === false) {
+        return "INCONCLUSIVE_EMBEDDINGS_NOT_CONFIRMED";
+    }
+
+    // 4. FCE metrics must be exposed (commit 15). If endpoint says
+    //    "not exposed" or detection is null, emit the inconclusive
+    //    verdict rather than implying a healthy full evaluation.
+    if (fceMetricsExposed === false) {
+        return "INCONCLUSIVE_FCE_METRICS_NOT_EXPOSED";
+    }
+
+    // 5. Omega observed naturally by check_coagulation? That is the
+    //    strongest research observation; still NOT Level 3.
     const omegaSeen = scenarios.some((s) => (s.omega_delta || 0) > 0);
     if (omegaSeen) return "OMEGA_OBSERVED_BY_CHECK_COAGULATION_NO_MANUAL_WRITE";
-    // If we see S_t getting close to theta_s (>= 0.9 * theta_s in any
-    // captured fce state), we report near-threshold.
-    let maxObservedS = 0;
-    for (const fs of fceStatesObserved || []) {
-        if (fs && typeof fs.S_t === "number" && fs.S_t > maxObservedS) maxObservedS = fs.S_t;
-        if (fs && typeof fs.s_t === "number" && fs.s_t > maxObservedS) maxObservedS = fs.s_t;
+
+    // 6. Near-threshold: any captured S_t >= 0.9*theta_s.
+    let maxS = 0;
+    if (typeof maxObservedS === "number" && Number.isFinite(maxObservedS)) {
+        maxS = maxObservedS;
     }
-    if (maxObservedS >= 0.9 * THETA_S) return "FULL_ORGANISM_NEAR_THRESHOLD";
-    // If all scenarios ran to completion without aborts and produced
-    // healthy organism telemetry, we confirm Level 2.
+    for (const fs of fceStatesObserved || []) {
+        if (fs && typeof fs.S_t === "number" && fs.S_t > maxS) maxS = fs.S_t;
+        if (fs && typeof fs.s_t === "number" && fs.s_t > maxS) maxS = fs.s_t;
+        if (fs && typeof fs.max_S_t_in_log === "number" && fs.max_S_t_in_log > maxS) {
+            maxS = fs.max_S_t_in_log;
+        }
+    }
+    if (maxS >= 0.9 * THETA_S) return "FULL_ORGANISM_NEAR_THRESHOLD";
+
+    // 7. All scenarios completed without error -> Level 2 healthy.
     const allCompleted = scenarios.every((s) => !s.error);
     if (allCompleted) return "FULL_ORGANISM_LEVEL2_CONFIRMED";
+
     return "INCONCLUSIVE_NEEDS_LONGER_RUN";
 }
 
@@ -767,7 +973,11 @@ function renderMarkdown(summary) {
     lines.push(`- Mean latency ms (Claude): \`${fmt(summary.mean_claude_latency_ms, 1)}\``);
     lines.push(`- Max observed S_t: \`${summary.max_observed_s_t ?? "—"}\``);
     lines.push(`- Mean observed S_t: \`${summary.mean_observed_s_t ?? "—"}\``);
+    lines.push(`- Max observed AR: \`${summary.max_observed_ar ?? "—"}\``);
+    lines.push(`- Mean observed AR: \`${summary.mean_observed_ar ?? "—"}\``);
     lines.push(`- Longest run above threshold: \`${summary.longest_run_above_theta ?? 0}\``);
+    lines.push(`- Production embeddings live: **${summary.production_embeddings_live ?? "—"}** (class=\`${summary.embedder_class || "—"}\` name=\`${summary.embedder_name || "—"}\` dim=\`${summary.embedding_dim || "—"}\`)`);
+    lines.push(`- FCE metrics exposed: **${summary.fce_metrics_exposed ?? "—"}**`);
     lines.push(`- OmegaRegistry before/after: \`${summary.omega_total_initial ?? 0} -> ${summary.omega_total_final ?? 0}\` (delta=${summary.omega_total_delta ?? 0})`);
     lines.push(`- ReferenceField before/after: \`${summary.reference_field_total_initial ?? 0} -> ${summary.reference_field_total_final ?? 0}\` (delta=${summary.reference_field_total_delta ?? 0})`);
     lines.push(`- relation events emitted: ${summary.relation_events_emitted ?? 0}`);
@@ -1007,6 +1217,7 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
             outputDir,
             artifactStreams,
             relRegistry,
+            turnDelayMs: args.turnDelayMs,
         });
         scenarioResults.push(sr);
         for (const t of sr.turns || []) {
@@ -1021,6 +1232,7 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
         totalCost = 0,
         latencies = [],
         observedS = [],
+        observedAR = [],
         omegaInit = 0,
         omegaFinal = 0,
         refInit = 0,
@@ -1035,9 +1247,22 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
             totalOutTokens += t.output_tokens || 0;
             totalCost += t.estimated_cost_usd || 0;
             if (typeof t.claude_latency_ms === "number") latencies.push(t.claude_latency_ms);
-            // Try to extract S_t from fce_state (best-effort; FCE-M
-            // exposes per-center S_t under different keys depending on
-            // version, so we scan a few candidates).
+            // commit 15: extract S_t / AR from the /level3/fce-metrics
+            // detailed endpoint (per-turn capture) — these are real
+            // observer-derived numbers, not surrogate.
+            const fmd = t.fce_metrics_detail;
+            if (fmd && fmd.fce_metrics_exposed === true) {
+                if (typeof fmd.max_S_t_in_log === "number") observedS.push(fmd.max_S_t_in_log);
+                if (typeof fmd.max_AR_in_log === "number") observedAR.push(fmd.max_AR_in_log);
+                if (Array.isArray(fmd.morphogenesis_log_tail)) {
+                    for (const ev of fmd.morphogenesis_log_tail) {
+                        if (typeof ev.S_t === "number") observedS.push(ev.S_t);
+                        if (typeof ev.AR === "number") observedAR.push(ev.AR);
+                    }
+                }
+            }
+            // Fall back to fce_state (older FCE-M surface) if metrics
+            // detail not exposed.
             const fs = t.fce_state;
             if (fs && typeof fs === "object") {
                 if (typeof fs.S_t === "number") observedS.push(fs.S_t);
@@ -1058,6 +1283,8 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
     }
     const maxS = observedS.length ? Math.max(...observedS) : null;
     const meanS = observedS.length ? observedS.reduce((a, b) => a + b, 0) / observedS.length : null;
+    const maxAR = observedAR.length ? Math.max(...observedAR) : null;
+    const meanAR = observedAR.length ? observedAR.reduce((a, b) => a + b, 0) / observedAR.length : null;
     // Longest run above theta over the FLAT observed series (best-effort).
     let longest = 0;
     {
@@ -1069,10 +1296,44 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
             } else cur = 0;
         }
     }
+    // commit 15: enrich verdict computation with embedder + FCE metrics
+    // exposure flags and per-scenario completion. The FCE observer is
+    // typically NOT instantiated at preflight time (fresh memory-service
+    // process), but per-turn captures find it once events start. The
+    // verdict therefore considers the metric exposed if EITHER the
+    // preflight probe OR any per-turn capture returned true.
+    const productionEmbeddingsLive = pf.faiss && pf.faiss.embeddings_live === true;
+    const fceExposedAtPreflight =
+        pf.fce_metrics_detail && pf.fce_metrics_detail.fce_metrics_exposed === true;
+    let fceExposedDuringRun = false;
+    for (const sr of scenarioResults) {
+        if (!sr.turns) continue;
+        for (const t of sr.turns) {
+            if (
+                t.fce_metrics_detail &&
+                t.fce_metrics_detail.fce_metrics_exposed === true
+            ) {
+                fceExposedDuringRun = true;
+                break;
+            }
+        }
+        if (fceExposedDuringRun) break;
+    }
+    const fceMetricsExposed = fceExposedAtPreflight || fceExposedDuringRun;
+    const scenariosForVerdict = scenarioResults.map((s) => ({
+        scenario_id: s.scenario_id,
+        turns_run: s.turns ? s.turns.length : 0,
+        omega_delta: s.omega_delta,
+        error: s.error,
+    }));
     const verdict = computeVerdict({
         claudeLivePresent: pf.claude.present,
-        scenarios: scenarioResults,
+        scenarios: scenariosForVerdict,
         fceStatesObserved,
+        productionEmbeddingsLive,
+        fceMetricsExposed,
+        requiredScenarioIds: args.scenario ? [args.scenario] : ["scenario-1-byon-arch", "scenario-2-adversarial"],
+        maxObservedS: observedS.length ? Math.max(...observedS) : null,
     });
     const relSnapshot = relRegistry.snapshot();
     const summary = {
@@ -1093,6 +1354,14 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
         mean_claude_latency_ms: latencies.length ? latencies.reduce((a, b) => a + b, 0) / latencies.length : null,
         max_observed_s_t: maxS,
         mean_observed_s_t: meanS,
+        max_observed_ar: maxAR,
+        mean_observed_ar: meanAR,
+        production_embeddings_live: productionEmbeddingsLive,
+        embedder_class: pf.faiss ? pf.faiss.embedder_class : null,
+        embedder_name: pf.faiss ? pf.faiss.embedder_name : null,
+        embedding_dim: pf.faiss ? pf.faiss.embedding_dim : null,
+        fce_metrics_exposed: fceMetricsExposed,
+        fce_metrics_preflight: pf.fce_metrics_detail || null,
         longest_run_above_theta: longest,
         omega_total_initial: omegaInit,
         omega_total_final: omegaFinal,

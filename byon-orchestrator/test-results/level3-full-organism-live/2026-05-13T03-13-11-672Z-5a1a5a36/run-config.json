@@ -1,0 +1,733 @@
+{
+  "schema_version": "level3-full-organism-runner.v1",
+  "run_id": "2026-05-13T03-13-11-672Z-5a1a5a36",
+  "branch": "research/level3-full-organism-runtime",
+  "is_level3_experiment": true,
+  "dry_run": false,
+  "memory_url": "http://localhost:8000",
+  "scenarios_requested": [
+    "scenario-1-byon-arch",
+    "scenario-2-adversarial"
+  ],
+  "turns_per_scenario_cap": 30,
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "flags": {
+    "level3_full_organism_experiment": true
+  },
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": true
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 10434.252358436584
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": true,
+      "embedder_class": "ProductionEmbedder",
+      "embedder_name": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "backend": "FAISS-IndexFlatIP",
+      "fallback_simple_embedder_active": false,
+      "stats": {
+        "success": true,
+        "num_contexts": 1312,
+        "by_type": {
+          "code": 0,
+          "conversation": 1132,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 2.9903507232666016,
+        "uptime_seconds": 10434.267921447754
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 72,
+          "events_since_consolidate": 0,
+          "dedup": {
+            "events_seen": 120,
+            "coherent_repeats_skipped": 2,
+            "first_writes": 118
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "fce_metrics_detail": {
+      "ok": true,
+      "is_level3_experiment_endpoint": true,
+      "forbidden_for_omega_creation": true,
+      "fce_metrics_exposed": true,
+      "theta_s": 0.28,
+      "tau_coag": 12,
+      "per_center": [
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "Omega": 0,
+          "kappa": 0.9127578294420167,
+          "alpha": 1,
+          "rho": 0.937000435903687,
+          "lambda_ar": 0.28593875414491815,
+          "Z_norm": 20.692719865397088,
+          "B_t_from_Z": 0.04609841486936543,
+          "Phi_s_norm": 0.9999999999990342,
+          "cycles": 18,
+          "consec_above_threshold": 0,
+          "sine_type": "not_coagulated"
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "Omega": 0,
+          "kappa": 0.4951469343983774,
+          "alpha": 1,
+          "rho": 1.0588427634132542,
+          "lambda_ar": 0.2551603049203506,
+          "Z_norm": 4.096708623590702,
+          "B_t_from_Z": 0.1962050558219838,
+          "Phi_s_norm": 0.9999999999990263,
+          "cycles": 18,
+          "consec_above_threshold": 0,
+          "sine_type": "not_coagulated"
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "Omega": 0,
+          "kappa": 0.5861612911637905,
+          "alpha": 1,
+          "rho": 1.0360141919648664,
+          "lambda_ar": 0.28244801184426255,
+          "Z_norm": 5.8382463630892945,
+          "B_t_from_Z": 0.14623632242875687,
+          "Phi_s_norm": 0.9999999999990291,
+          "cycles": 18,
+          "consec_above_threshold": 0,
+          "sine_type": "not_coagulated"
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "Omega": 0,
+          "kappa": 0.5567226821749175,
+          "alpha": 1,
+          "rho": 1.0635274748745225,
+          "lambda_ar": 0.2568330136529053,
+          "Z_norm": 4.937967348333467,
+          "B_t_from_Z": 0.1684077970352358,
+          "Phi_s_norm": 0.9999999999990277,
+          "cycles": 18,
+          "consec_above_threshold": 0,
+          "sine_type": "not_coagulated"
+        }
+      ],
+      "morphogenesis_log_tail_length": 72,
+      "morphogenesis_log_tail": [
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.10549342996952847,
+          "AR": 0.8344547467809201,
+          "kappa": 0.5579527673896879,
+          "cycle": 1,
+          "episode_id": 1
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.14981602092042548,
+          "AR": 0.6973893958268772,
+          "kappa": 0.5214739051048736,
+          "cycle": 1,
+          "episode_id": 1
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09744934165017488,
+          "AR": 0.7627031619571406,
+          "kappa": 0.49808315737311976,
+          "cycle": 2,
+          "episode_id": 2
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.11619927862465716,
+          "AR": 0.9800367462593181,
+          "kappa": 0.5688851848850929,
+          "cycle": 2,
+          "episode_id": 2
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.12036000988642058,
+          "AR": 0.9999999999990008,
+          "kappa": 0.5833276979159638,
+          "cycle": 3,
+          "episode_id": 3
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08321356292001754,
+          "AR": 0.831953437873173,
+          "kappa": 0.4780885921423794,
+          "cycle": 3,
+          "episode_id": 3
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.12106485483012218,
+          "AR": 0.9999999999990004,
+          "kappa": 0.599607917682395,
+          "cycle": 4,
+          "episode_id": 4
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.07679804328753757,
+          "AR": 0.8460970798584275,
+          "kappa": 0.4612646302795273,
+          "cycle": 4,
+          "episode_id": 4
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.07726545602022576,
+          "AR": 0.9249399020715897,
+          "kappa": 0.4470619492452746,
+          "cycle": 5,
+          "episode_id": 5
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.12100136728987378,
+          "AR": 0.9999999999989998,
+          "kappa": 0.6173479097252157,
+          "cycle": 5,
+          "episode_id": 5
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.1200301787920789,
+          "AR": 0.9999999999990006,
+          "kappa": 0.6363684614853342,
+          "cycle": 6,
+          "episode_id": 6
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08356254701660966,
+          "AR": 0.9999999999990007,
+          "kappa": 0.43581612994475855,
+          "cycle": 6,
+          "episode_id": 6
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.11803783313993016,
+          "AR": 0.9999999999989999,
+          "kappa": 0.656500221532664,
+          "cycle": 7,
+          "episode_id": 7
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08440156098779841,
+          "AR": 0.9999999999989998,
+          "kappa": 0.42771687482172666,
+          "cycle": 7,
+          "episode_id": 7
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08498174581453032,
+          "AR": 0.9999999999989998,
+          "kappa": 0.4221834696917255,
+          "cycle": 8,
+          "episode_id": 8
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.11494487922615665,
+          "AR": 0.999999999999,
+          "kappa": 0.6775703874364524,
+          "cycle": 8,
+          "episode_id": 8
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.11071955037582573,
+          "AR": 0.9999999999990007,
+          "kappa": 0.6994207201997319,
+          "cycle": 9,
+          "episode_id": 9
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08541992691368565,
+          "AR": 0.9999999999989999,
+          "kappa": 0.41927442262810016,
+          "cycle": 9,
+          "episode_id": 9
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.10538484441571305,
+          "AR": 0.9999999999990002,
+          "kappa": 0.7219063753087097,
+          "cycle": 10,
+          "episode_id": 10
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08624723615515484,
+          "AR": 0.999999999999,
+          "kappa": 0.4189282812256953,
+          "cycle": 10,
+          "episode_id": 10
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.08741929524318963,
+          "AR": 0.9999999999989999,
+          "kappa": 0.42106373182215884,
+          "cycle": 11,
+          "episode_id": 11
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.0990220035889466,
+          "AR": 0.999999999999,
+          "kappa": 0.7448935123021116,
+          "cycle": 11,
+          "episode_id": 11
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.09177085843508635,
+          "AR": 0.9999999999990005,
+          "kappa": 0.7682681917606703,
+          "cycle": 12,
+          "episode_id": 12
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.0888764402236133,
+          "AR": 0.9999999999989998,
+          "kappa": 0.4255718378862661,
+          "cycle": 12,
+          "episode_id": 12
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.0838227624928042,
+          "AR": 0.9999999999990002,
+          "kappa": 0.79193708970761,
+          "cycle": 13,
+          "episode_id": 13
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09054544867447105,
+          "AR": 0.9999999999990005,
+          "kappa": 0.4323294978948039,
+          "cycle": 13,
+          "episode_id": 13
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09234458041978395,
+          "AR": 0.9999999999990002,
+          "kappa": 0.44122653232936593,
+          "cycle": 14,
+          "episode_id": 14
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.07530590542110405,
+          "AR": 0.9999999999990002,
+          "kappa": 0.8158259514811169,
+          "cycle": 14,
+          "episode_id": 14
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.06642326566063474,
+          "AR": 0.9999999999990004,
+          "kappa": 0.8398876311632006,
+          "cycle": 15,
+          "episode_id": 15
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09417663943479405,
+          "AR": 0.999999999999,
+          "kappa": 0.4521351744329915,
+          "cycle": 15,
+          "episode_id": 15
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.05759072398743293,
+          "AR": 0.999999999999,
+          "kappa": 0.8640695935795696,
+          "cycle": 16,
+          "episode_id": 16
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09530431462024948,
+          "AR": 0.9999999999990006,
+          "kappa": 0.46491649712093625,
+          "cycle": 16,
+          "episode_id": 16
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09569916216391547,
+          "AR": 0.9999999999990001,
+          "kappa": 0.479357689817759,
+          "cycle": 17,
+          "episode_id": 17
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.049253918340860105,
+          "AR": 0.9999999999990001,
+          "kappa": 0.8883616150438991,
+          "cycle": 17,
+          "episode_id": 17
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::conversation",
+          "S_t": 0.04156368139063642,
+          "AR": 0.9999999999989999,
+          "kappa": 0.9127578294420167,
+          "cycle": 18,
+          "episode_id": 18
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch::execution_result",
+          "S_t": 0.09533008210298302,
+          "AR": 0.9999999999990002,
+          "kappa": 0.4951469343983774,
+          "cycle": 18,
+          "episode_id": 18
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09953443212121074,
+          "AR": 0.8339239105958363,
+          "kappa": 0.5297643882392038,
+          "cycle": 1,
+          "episode_id": 19
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.15136927622838203,
+          "AR": 0.6974982066026746,
+          "kappa": 0.5269186340884932,
+          "cycle": 1,
+          "episode_id": 19
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09936196522106361,
+          "AR": 0.7628194510448388,
+          "kappa": 0.5082735296211445,
+          "cycle": 2,
+          "episode_id": 20
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.10402107971807872,
+          "AR": 0.9788112120704316,
+          "kappa": 0.5131822958008286,
+          "cycle": 2,
+          "episode_id": 20
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.10361883606444199,
+          "AR": 0.9999999999990002,
+          "kappa": 0.5002497471332197,
+          "cycle": 3,
+          "episode_id": 21
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.08559757766599643,
+          "AR": 0.8320127913277257,
+          "kappa": 0.49280013527283933,
+          "cycle": 3,
+          "episode_id": 21
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.1014245691172057,
+          "AR": 0.9999999999990008,
+          "kappa": 0.49031232116186857,
+          "cycle": 4,
+          "episode_id": 22
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.07967254699592062,
+          "AR": 0.8461256842163442,
+          "kappa": 0.4804293507970516,
+          "cycle": 4,
+          "episode_id": 22
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.0808364938526919,
+          "AR": 0.9249540715974267,
+          "kappa": 0.47046280243580485,
+          "cycle": 5,
+          "episode_id": 23
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09974510331625808,
+          "AR": 0.9999999999990001,
+          "kappa": 0.48313300495296335,
+          "cycle": 5,
+          "episode_id": 23
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09851538628798542,
+          "AR": 0.999999999999,
+          "kappa": 0.47860278939794104,
+          "cycle": 6,
+          "episode_id": 24
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.08801856339153963,
+          "AR": 0.9999999999989996,
+          "kappa": 0.463340662082385,
+          "cycle": 6,
+          "episode_id": 24
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09767028238360119,
+          "AR": 0.9999999999990001,
+          "kappa": 0.4766240725377849,
+          "cycle": 7,
+          "episode_id": 25
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.08925657470093203,
+          "AR": 0.9999999999989997,
+          "kappa": 0.4592818342756858,
+          "cycle": 7,
+          "episode_id": 25
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09014936495165474,
+          "AR": 0.9999999999989997,
+          "kappa": 0.4575926528921514,
+          "cycle": 8,
+          "episode_id": 26
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09713593008812409,
+          "AR": 0.9999999999990002,
+          "kappa": 0.4770767987873314,
+          "cycle": 8,
+          "episode_id": 26
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09683541812376963,
+          "AR": 0.9999999999990005,
+          "kappa": 0.4798485862762902,
+          "cycle": 9,
+          "episode_id": 27
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09065835589401315,
+          "AR": 0.9999999999989997,
+          "kappa": 0.45833992144277325,
+          "cycle": 9,
+          "episode_id": 27
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09668600403368445,
+          "AR": 0.9999999999990006,
+          "kappa": 0.4848253201828743,
+          "cycle": 10,
+          "episode_id": 28
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09139606123592871,
+          "AR": 0.9999999999989997,
+          "kappa": 0.4614623808885743,
+          "cycle": 10,
+          "episode_id": 28
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09229337750465862,
+          "AR": 0.9999999999989998,
+          "kappa": 0.46685824957485944,
+          "cycle": 11,
+          "episode_id": 29
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09659663946516901,
+          "AR": 0.9999999999989998,
+          "kappa": 0.4918789281493321,
+          "cycle": 11,
+          "episode_id": 29
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09647167818086923,
+          "AR": 0.9999999999990004,
+          "kappa": 0.5008806560038377,
+          "cycle": 12,
+          "episode_id": 30
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09326650812376806,
+          "AR": 0.9999999999990007,
+          "kappa": 0.47440045495716465,
+          "cycle": 12,
+          "episode_id": 30
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09621188242969941,
+          "AR": 0.9999999999990008,
+          "kappa": 0.5116987657814055,
+          "cycle": 13,
+          "episode_id": 31
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09422036663587309,
+          "AR": 0.9999999999990008,
+          "kappa": 0.48394949574583085,
+          "cycle": 13,
+          "episode_id": 31
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09505499117308666,
+          "AR": 0.9999999999989998,
+          "kappa": 0.49537863421427486,
+          "cycle": 14,
+          "episode_id": 32
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09554620602860257,
+          "AR": 0.9999999999990005,
+          "kappa": 0.5241935449580085,
+          "cycle": 14,
+          "episode_id": 32
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09388515938812494,
+          "AR": 0.9999999999990002,
+          "kappa": 0.5381924615602648,
+          "cycle": 15,
+          "episode_id": 33
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.0956371848691376,
+          "AR": 0.9999999999990005,
+          "kappa": 0.5085466931781267,
+          "cycle": 15,
+          "episode_id": 33
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.09096885180573193,
+          "AR": 0.9999999999989995,
+          "kappa": 0.5533253582480167,
+          "cycle": 16,
+          "episode_id": 34
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09528477357529702,
+          "AR": 0.9999999999990001,
+          "kappa": 0.5233055796976669,
+          "cycle": 16,
+          "episode_id": 34
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.09409060070272263,
+          "AR": 0.999999999999,
+          "kappa": 0.5394568031019211,
+          "cycle": 17,
+          "episode_id": 35
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.08757134062572271,
+          "AR": 0.9999999999990006,
+          "kappa": 0.5693930898879855,
+          "cycle": 17,
+          "episode_id": 35
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::conversation",
+          "S_t": 0.08358288282528586,
+          "AR": 0.999999999999,
+          "kappa": 0.5861612911637905,
+          "cycle": 18,
+          "episode_id": 36
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial::execution_result",
+          "S_t": 0.092095842302067,
+          "AR": 0.9999999999990004,
+          "kappa": 0.5567226821749175,
+          "cycle": 18,
+          "episode_id": 36
+        }
+      ],
+      "max_S_t_in_log": 0.15136927622838203,
+      "mean_S_t_in_log": 0.09446003968701766,
+      "max_AR_in_log": 0.9999999999990008,
+      "mean_AR_in_log": 0.9688016638614546,
+      "longest_run_above_theta_in_log": 0,
+      "note": "S_t / AR are recovered from the observer's morphogenesis_log (tail of last 200 events). I_t is NOT separately retained by FCE-M v0.6.0; if the runner needs I_t it must be computed from delta_X and Phi_s, which are not exposed by this surface."
+    },
+    "ready": true
+  },
+  "generated_at": "2026-05-13T03:13:11.762Z"
+}

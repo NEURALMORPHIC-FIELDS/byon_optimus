@@ -40,7 +40,6 @@ import {
 
 import {
     RELATION_TYPES,
-    FORBIDDEN_VERDICTS,
     makeRelationEvent,
     RelationalFieldRegistry,
     computeCenterFieldMetrics,
@@ -53,12 +52,16 @@ import {
     ALLOWED_VERDICTS,
     parseArgs,
     estimateTurnCost,
-    computeVerdict,
+    computeVerdict as _computeVerdict,
     containsForbiddenToken,
     deriveRelationEvents,
     main as runnerMain,
     // @ts-ignore
 } from "../../scripts/level3-full-organism-live-runner.mjs";
+
+// The runner is a `.mjs` (untyped) module; `as any` keeps the test
+// surface free of structural-typing noise on the verdict-input shape.
+const computeVerdict: any = _computeVerdict;
 
 import { SCENARIO_1 } from "../../scripts/lib/scenarios/scenario-1-byon-arch.mjs";
 import { SCENARIO_2 } from "../../scripts/lib/scenarios/scenario-2-adversarial.mjs";
@@ -172,10 +175,10 @@ describe("runner safety + dry-run", () => {
         // full-organism verdict if Claude was not live.
         const v = computeVerdict({ claudeLivePresent: false, scenarios: [], fceStatesObserved: [] });
         expect(v).toBe("CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST");
-        // And when Claude IS live but no scenarios completed, we do not
-        // claim full organism — we fall back to inconclusive or level-2.
+        // commit 15: when Claude IS live but no required scenario has
+        // any completed turns, the verdict is PARTIAL_FULL_ORGANISM_SMOKE_RUN.
         const v2 = computeVerdict({ claudeLivePresent: true, scenarios: [], fceStatesObserved: [] });
-        expect(["FULL_ORGANISM_LEVEL2_CONFIRMED", "INCONCLUSIVE_NEEDS_LONGER_RUN"]).toContain(v2);
+        expect(v2).toBe("PARTIAL_FULL_ORGANISM_SMOKE_RUN");
     });
 });
 
@@ -206,7 +209,7 @@ describe("relational field", () => {
             (e: any) => e.source === "SYSTEM_CANONICAL" && e.target === "AUDITOR_AUTHORITY",
         );
         expect(found).toBeDefined();
-        expect(found.relation).toBe("protects");
+        expect(found!.relation).toBe("protects");
         // Common types must be drawn from RELATION_TYPES.
         for (const ev of events) {
             expect(RELATION_TYPES).toContain(ev.relation);
@@ -303,7 +306,7 @@ describe("source-level safety guarantees", () => {
 
     it("test_08_no_manual_omega_registry_register_call", async () => {
         const files = await readScannedFiles();
-        for (const { file, src } of files) {
+        for (const { src } of files) {
             // No `OmegaRegistry.register(` call as code identifier.
             const callPattern = /\bOmegaRegistry\.register\s*\(/;
             expect(callPattern.test(src)).toBe(false);
@@ -320,7 +323,7 @@ describe("source-level safety guarantees", () => {
         // accept its absence as a strict source-level check: no
         // occurrences at all (the runner/library docstrings don't need
         // to mention it).
-        for (const { file, src } of files) {
+        for (const { src } of files) {
             expect(src.includes("is_omega_anchor")).toBe(false);
         }
     });
@@ -353,7 +356,7 @@ describe("source-level safety guarantees", () => {
             /^\s*(self|this)\.THETA_S\s*=(?!\s*0\.28\b)/m,
             /^\s*(self|this)\.TAU_COAG\s*=(?!\s*12\b)/m,
         ];
-        for (const { file, src } of files) {
+        for (const { src } of files) {
             for (const re of forbiddenWrites) {
                 expect(re.test(src)).toBe(false);
             }
@@ -365,7 +368,7 @@ describe("source-level safety guarantees", () => {
         // The runner / lib must NEVER instantiate a ReferenceField. The
         // single permitted occurrence pattern is reading a snapshot via
         // `reference_fields` action — never creating the object.
-        for (const { file, src } of files) {
+        for (const { src } of files) {
             // No `new ReferenceField(` in JS form.
             const jsPattern = /\bnew\s+ReferenceField\b/;
             expect(jsPattern.test(src)).toBe(false);
@@ -385,10 +388,18 @@ describe("source-level safety guarantees", () => {
 
 describe("verdict + report constraints", () => {
     it("test_12_report_says_level_3_not_declared_by_default", () => {
+        // commit 15: provide both required scenarios with completed turns +
+        // production embeddings live + FCE metrics exposed for a healthy
+        // Level 2 verdict.
         const v = computeVerdict({
             claudeLivePresent: true,
-            scenarios: [{ omega_delta: 0, turns: [], scenario_id: "x" }],
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 0, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 30, omega_delta: 0, error: null },
+            ],
             fceStatesObserved: [],
+            productionEmbeddingsLive: true,
+            fceMetricsExposed: true,
         });
         // Default-state verdict is the Level 2 confirmation, not Level 3.
         expect(v).toBe("FULL_ORGANISM_LEVEL2_CONFIRMED");
@@ -408,10 +419,218 @@ describe("verdict + report constraints", () => {
     it("test_12b_omega_observed_verdict_used_only_when_omega_seen", () => {
         const seen = computeVerdict({
             claudeLivePresent: true,
-            scenarios: [{ omega_delta: 1, turns: [], scenario_id: "x" }],
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 1, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 30, omega_delta: 0, error: null },
+            ],
             fceStatesObserved: [],
+            productionEmbeddingsLive: true,
+            fceMetricsExposed: true,
         });
         expect(seen).toBe("OMEGA_OBSERVED_BY_CHECK_COAGULATION_NO_MANUAL_WRITE");
+    });
+});
+
+// ============================================================================
+// commit 15 — 10 new tests for the upgraded runner
+// ============================================================================
+
+describe("commit 15 — upgraded verdict + rate-limit + embedder + FCE metrics", () => {
+    // 15.1
+    it("test_c15_01_zero_completed_turns_in_required_scenario_yields_smoke_run", () => {
+        // Sc2 has 0 turns (rate-limited) → PARTIAL_FULL_ORGANISM_SMOKE_RUN.
+        const v = computeVerdict({
+            claudeLivePresent: true,
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 0, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 0, omega_delta: 0, error: "rate-limit" },
+            ],
+            fceStatesObserved: [],
+            productionEmbeddingsLive: true,
+            fceMetricsExposed: true,
+        });
+        expect(v).toBe("PARTIAL_FULL_ORGANISM_SMOKE_RUN");
+    });
+
+    // 15.2
+    it("test_c15_02_embeddings_not_confirmed_yields_inconclusive_verdict", () => {
+        const v = computeVerdict({
+            claudeLivePresent: true,
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 0, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 30, omega_delta: 0, error: null },
+            ],
+            fceStatesObserved: [],
+            productionEmbeddingsLive: false,
+            fceMetricsExposed: true,
+        });
+        expect(v).toBe("INCONCLUSIVE_EMBEDDINGS_NOT_CONFIRMED");
+    });
+
+    // 15.3
+    it("test_c15_03_fce_metrics_not_exposed_yields_inconclusive_verdict", () => {
+        const v = computeVerdict({
+            claudeLivePresent: true,
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 0, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 30, omega_delta: 0, error: null },
+            ],
+            fceStatesObserved: [],
+            productionEmbeddingsLive: true,
+            fceMetricsExposed: false,
+        });
+        expect(v).toBe("INCONCLUSIVE_FCE_METRICS_NOT_EXPOSED");
+    });
+
+    // 15.4 — rate-limit 429 triggers retry/backoff, not immediate scenario abandonment
+    it("test_c15_04_rate_limit_429_triggers_retry_not_immediate_abandon", async () => {
+        // Spin up a tiny throwaway HTTP server that returns 429 for the
+        // first call and 200 for the second. memPost must succeed on
+        // the second attempt.
+        const http = await import("node:http");
+        let hitCount = 0;
+        const server = http.createServer((_req: any, res: any) => {
+            hitCount += 1;
+            if (hitCount === 1) {
+                res.writeHead(429, { "Retry-After": "0", "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: false, error: "rate limit" }));
+            } else {
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: true, ctx_id: 42 }));
+            }
+        });
+        await new Promise<void>((resolve) => server.listen(0, resolve));
+        const addr = server.address() as any;
+        const url = `http://127.0.0.1:${addr.port}`;
+        try {
+            const { memPost: livePost } = await import(
+                "../../scripts/level3-full-organism-live-runner.mjs"
+                // @ts-ignore
+            );
+            const result = await livePost({ action: "ping" }, { memoryUrl: url, maxRetries: 3 });
+            expect(result.success).toBe(true);
+            expect(hitCount).toBe(2);
+        } finally {
+            server.close();
+        }
+    });
+
+    // 15.5 — report distinguishes smoke run from full run
+    it("test_c15_05_report_distinguishes_smoke_from_full", () => {
+        // PARTIAL smoke verdict must appear in ALLOWED_VERDICTS.
+        expect(ALLOWED_VERDICTS).toContain("PARTIAL_FULL_ORGANISM_SMOKE_RUN");
+        expect(ALLOWED_VERDICTS).toContain("FULL_ORGANISM_LEVEL2_CONFIRMED");
+        // The PARTIAL verdict is distinct from the LEVEL2 verdict.
+        expect("PARTIAL_FULL_ORGANISM_SMOKE_RUN").not.toBe("FULL_ORGANISM_LEVEL2_CONFIRMED");
+        // PARTIAL must NEVER be reported when Claude is missing — that
+        // path is exclusively CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST.
+        const v = computeVerdict({
+            claudeLivePresent: false,
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 0, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 0, omega_delta: 0, error: "rl" },
+            ],
+            fceStatesObserved: [],
+            productionEmbeddingsLive: true,
+            fceMetricsExposed: true,
+        });
+        expect(v).toBe("CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST");
+    });
+
+    // 15.6 — Scenario 2 required for adversarial trust-boundary validation
+    it("test_c15_06_scenario_2_is_required", () => {
+        // Scenario 2 must exist in SCENARIOS map.
+        expect(Object.keys(SCENARIOS)).toContain("scenario-2-adversarial");
+        // It must focus on adversarial / trust-boundary content.
+        expect(SCENARIO_2.purpose.toLowerCase()).toMatch(/adversarial|auditor|trust/);
+        // It must have at least 30 prompts.
+        expect(SCENARIO_2.prompts.length).toBeGreaterThanOrEqual(30);
+        // Sc2 with 0 completed turns must not be treated as Level 2 healthy.
+        const v = computeVerdict({
+            claudeLivePresent: true,
+            scenarios: [
+                { scenario_id: "scenario-1-byon-arch", turns_run: 30, omega_delta: 0, error: null },
+                { scenario_id: "scenario-2-adversarial", turns_run: 0, omega_delta: 0, error: "ops" },
+            ],
+            fceStatesObserved: [],
+            productionEmbeddingsLive: true,
+            fceMetricsExposed: true,
+        });
+        expect(v).not.toBe("FULL_ORGANISM_LEVEL2_CONFIRMED");
+    });
+
+    // 15.7 — embeddings endpoint metadata fields
+    it("test_c15_07_embedder_info_endpoint_returns_class_name_dim", async () => {
+        const py = await fsp.readFile(
+            path.join(PROJECT_ROOT, "memory-service", "level3_experimental_endpoints.py"),
+            "utf-8",
+        );
+        expect(py.includes('"embedder_class"')).toBe(true);
+        expect(py.includes('"embedder_name"')).toBe(true);
+        expect(py.includes('"embedding_dim"')).toBe(true);
+        expect(py.includes('"production_embeddings_live"')).toBe(true);
+        // The endpoint must check `type(embedder).__name__` to discriminate
+        // ProductionEmbedder vs SimpleEmbedder.
+        expect(py.includes("type(embedder).__name__")).toBe(true);
+        // The endpoint path is exactly /level3/embedder-info.
+        expect(py.includes('"/level3/embedder-info"')).toBe(true);
+    });
+
+    // 15.8 — /level3/fce-metrics is gated by env flag
+    it("test_c15_08_fce_metrics_endpoint_gated_by_env_flag", async () => {
+        const py = await fsp.readFile(
+            path.join(PROJECT_ROOT, "memory-service", "level3_experimental_endpoints.py"),
+            "utf-8",
+        );
+        // The endpoint path exists.
+        expect(py.includes('"/level3/fce-metrics"')).toBe(true);
+        // It must be registered INSIDE register_level3_endpoints, which
+        // returns False when flag is OFF. (Window is generous because
+        // the function's docstring is long.)
+        const m = py.match(/def register_level3_endpoints[\s\S]+?if not _flag_enabled\(\):\s*\n\s*return False/);
+        expect(m).toBeTruthy();
+        // The endpoint exposes the metrics-exposed boolean.
+        expect(py.includes('"fce_metrics_exposed"')).toBe(true);
+        // It exposes the observer's per-center state via center_state().
+        expect(py.includes("observer.center_state(")).toBe(true);
+    });
+
+    // 15.9 — no global rate-limit bypass
+    it("test_c15_09_no_global_rate_limit_bypass", async () => {
+        const runner = await fsp.readFile(
+            path.join(PROJECT_ROOT, "scripts", "level3-full-organism-live-runner.mjs"),
+            "utf-8",
+        );
+        // The runner must NOT introduce a "bypass" / "skip" against the
+        // memory-service rate limiter. It must only retry on 429.
+        expect(/RATE_LIMIT_BYPASS|rate_limit_bypass|skipRateLimit/.test(runner)).toBe(false);
+        // The retry path must honor Retry-After header.
+        expect(runner.includes('r.headers.get("retry-after")')).toBe(true);
+        // Exponential backoff must be present.
+        expect(runner.includes("Math.pow(2, attempt)")).toBe(true);
+    });
+
+    // 15.10 — production default behavior unchanged when env flag OFF
+    it("test_c15_10_production_default_unchanged_when_flag_off", async () => {
+        // The new server.py modification must be gated entirely behind
+        // register_level3_endpoints(), which is itself gated by
+        // _flag_enabled(). When flag OFF, no /level3/* route exists.
+        const server = await fsp.readFile(
+            path.join(PROJECT_ROOT, "memory-service", "server.py"),
+            "utf-8",
+        );
+        // Direct mounts of /level3/* in server.py are forbidden.
+        expect(/\@app\.(get|post|put|delete)\(["']\/level3\//.test(server)).toBe(false);
+        // The registration call must be inside try/except.
+        expect(/try:\s*\n[^}]*register_level3_endpoints/.test(server)).toBe(true);
+        // The endpoint module must inspect the flag and return False
+        // before mounting anything.
+        const py = await fsp.readFile(
+            path.join(PROJECT_ROOT, "memory-service", "level3_experimental_endpoints.py"),
+            "utf-8",
+        );
+        const gate = py.match(/def register_level3_endpoints[\s\S]+?if not _flag_enabled\(\):\s*\n\s*return False/);
+        expect(gate).toBeTruthy();
     });
 });
 
@@ -434,16 +653,24 @@ describe("production zero-touch when flag OFF", () => {
         expect(/if\s+not\s+_flag_enabled\s*\(\s*\)\s*:\s*\n\s*return\s+False/.test(py)).toBe(true);
     });
 
-    it("test_13b_server_does_not_import_level3_endpoints", async () => {
-        // server.py must not auto-register the level3 endpoints. The
-        // operator gates registration by an explicit choice; for this
-        // commit, server.py is unchanged.
+    it("test_13b_server_registers_level3_endpoints_only_when_flag_on", async () => {
+        // commit 15: server.py now CONDITIONALLY imports + registers
+        // the level3 endpoints. The hard isolation requirement is that
+        // the registration is a NO-OP when the env flag is OFF — that
+        // contract is enforced by `level3_experimental_endpoints.py`'s
+        // `_flag_enabled()` gate (asserted by test_13_endpoint_registration_inert_when_flag_off).
         const server = await fsp.readFile(
             path.join(PROJECT_ROOT, "memory-service", "server.py"),
             "utf-8",
         );
-        expect(server.includes("register_level3_endpoints")).toBe(false);
-        expect(server.includes("level3_experimental_endpoints")).toBe(false);
+        // The import must exist (the gate is INSIDE the called function).
+        expect(server.includes("level3_experimental_endpoints")).toBe(true);
+        expect(server.includes("register_level3_endpoints")).toBe(true);
+        // The registration call must be inside a try/except so a missing
+        // module never breaks startup, and the call must NOT happen
+        // outside the gated module — i.e., server.py must NOT directly
+        // mount /level3/* routes itself.
+        expect(/\@app\.get\(["']\/level3\//.test(server)).toBe(false);
     });
 });
 
