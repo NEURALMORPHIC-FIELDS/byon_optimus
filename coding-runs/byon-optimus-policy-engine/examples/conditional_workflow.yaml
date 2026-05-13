@@ -1,0 +1,47 @@
+# Example: conditional workflow
+#
+# Variables injected at runtime:
+#   environment: "production" | "staging" | "dev"
+#   run_integration_tests: true | false
+
+name: conditional-deploy
+
+steps:
+  - name: build
+    action: noop
+
+  - name: unit-test
+    action: noop
+    depends_on: [build]
+
+  - name: integration-test
+    action: noop
+    depends_on: [unit-test]
+    condition:
+      equals:
+        var: run_integration_tests
+        value: true
+
+  - name: deploy-staging
+    action: noop
+    depends_on: [unit-test]
+    condition:
+      in:
+        var: environment
+        values: [staging, production]
+
+  - name: smoke-test
+    action: noop
+    depends_on: [deploy-staging]
+    condition:
+      in:
+        var: environment
+        values: [staging, production]
+
+  - name: deploy-production
+    action: noop
+    depends_on: [smoke-test]
+    condition:
+      equals:
+        var: environment
+        value: production

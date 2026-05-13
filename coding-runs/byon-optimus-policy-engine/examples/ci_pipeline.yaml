@@ -1,0 +1,18 @@
+name: ci_pipeline
+steps:
+  - name: lint
+    gate: lint
+
+  - name: test
+    gate: test
+    depends_on: [lint]
+
+  - name: build
+    gate: build
+    depends_on: [test]
+
+  - name: deploy_staging
+    gate: deploy_staging
+    depends_on: [build]
+    params:
+      target: staging

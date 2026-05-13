@@ -1,0 +1,105 @@
+{
+  "judge_cost_usd": 0.160227,
+  "judge_raw": "```json\n{\n  \"a\": {\n    \"architecture_quality\": 5,\n    \"requirement_fidelity\": 4,\n    \"longitudinal_memory\": 5,\n    \"policy_security_correctness\": 5,\n    \"adversarial_robustness\": 5,\n    \"refactor_quality\": 5,\n    \"debugging_quality\": 5,\n    \"test_quality\": 4,\n    \"documentation_quality\": 5,\n    \"user_value\": 4,\n    \"rationale\": \"Condition A demonstrates a highly coherent, well-architected codebase across all 6 phases. The module layout is clean with clear separation: loader validates untrusted input, policy gate is operator-controlled, audit is append-only, planner is separate from executor. The bypass_all rejection is implemented with both denylist and allowlist (belt-and-braces), with explicit error messages referencing invariant_no_policy_bypass. The skipped-step bug is fixed correctly with _SATISFIED/_BLOCKING sets that are mutually exclusive and asserted at import time. Regression tests are meaningful and document both the bug and the fix. Longitudinal memory is excellent — later phases (planner, bug fix) explicitly reference and respect earlier design decisions. The 4 pytest errors appear to be due to file truncation in the snapshot rather than actual code defects, as the logic visible is sound. Documentation is comprehensive including SECURITY.md, ARCHITECTURE.md, LIMITATIONS.md, and EXAMPLES.md.\"\n  },\n  \"b\": {\n    \"architecture_quality\": 3,\n    \"requirement_fidelity\": 2,\n    \"longitudinal_memory\": 2,\n    \"policy_security_correctness\": 3,\n    \"adversarial_robustness\": 3,\n    \"refactor_quality\": 3,\n    \"debugging_quality\": 3,\n    \"test_quality\": 2,\n    \"documentation_quality\": 2,\n    \"user_value\": 2,\n    \"rationale\": \"Condition B shows serious fragmentation problems. There are multiple competing implementations of the same concepts: two different AuditLog classes (audit.py vs executor.py), two WorkflowDefinition dataclasses (models.py vs workflow.py), two PolicyEngine classes (policy.py vs policies.py), two WorkflowLoader classes (loader.py vs workflow.py). Th",
+  "scores_a": {
+    "architecture_quality": 5,
+    "requirement_fidelity": 4,
+    "longitudinal_memory": 5,
+    "policy_security_correctness": 5,
+    "adversarial_robustness": 5,
+    "refactor_quality": 5,
+    "debugging_quality": 5,
+    "test_quality": 4,
+    "documentation_quality": 5,
+    "user_value": 4,
+    "rationale": "Condition A demonstrates a highly coherent, well-architected codebase across all 6 phases. The module layout is clean with clear separation: loader validates untrusted input, policy gate is operator-controlled, audit is append-only, planner is separate from executor. The bypass_all rejection is implemented with both denylist and allowlist (belt-and-braces), with explicit error messages referencing invariant_no_policy_bypass. The skipped-step bug is fixed correctly with _SATISFIED/_BLOCKING sets that are mutually exclusive and asserted at import time. Regression tests are meaningful and document both the bug and the fix. Longitudinal memory is excellent — later phases (planner, bug fix) explicitly reference and respect earlier design decisions. The 4 pytest errors appear to be due to file truncation in the snapshot rather than actual code defects, as the logic visible is sound. Documentation is comprehensive including SECURITY.md, ARCHITECTURE.md, LIMITATIONS.md, and EXAMPLES.md."
+  },
+  "scores_b": {
+    "architecture_quality": 3,
+    "requirement_fidelity": 2,
+    "longitudinal_memory": 2,
+    "policy_security_correctness": 3,
+    "adversarial_robustness": 3,
+    "refactor_quality": 3,
+    "debugging_quality": 3,
+    "test_quality": 2,
+    "documentation_quality": 2,
+    "user_value": 2,
+    "rationale": "Condition B shows serious fragmentation problems. There are multiple competing implementations of the same concepts: two different AuditLog classes (audit.py vs executor.py), two WorkflowDefinition dataclasses (models.py vs workflow.py), two PolicyEngine classes (policy.py vs policies.py), two WorkflowLoader classes (loader.py vs workflow.py). The tests reference classes and functions that don't exist in the shown source (ConditionError from conditions.py exports 'evaluate' not 'evaluate_condition', test_conditions.py imports ConditionError but conditions.py doesn't define it, test_engine.py imports PolicyGrants/PolicyMode from policy.py which doesn't define them, test_loader.py imports WorkflowDef and LoadError which aren't in loader.py, test_invariants.py imports load_workflow_from_string which doesn't exist). This explains the 10 errors. The adversarial bypass rejection exists in workflow.py's WorkflowLoader but the test_policy_bypass_rejected.py uses load_workflow_dict from loader.py which doesn't implement that protection the same way. Longitudinal memory is poor — the organism appears to have accumulated multiple conflicting implementations across phases without reconciling them. The planner/executor separation exists but is duplicated across engine.py and executor.py inconsistently."
+  },
+  "weighted_a": 4.75,
+  "weighted_b": 2.5500000000000003,
+  "delta_pct": -46.315789473684205,
+  "weights": {
+    "architecture_quality": 0.15,
+    "requirement_fidelity": 0.15,
+    "longitudinal_memory": 0.15,
+    "policy_security_correctness": 0.15,
+    "adversarial_robustness": 0.1,
+    "refactor_quality": 0.1,
+    "debugging_quality": 0.05,
+    "test_quality": 0.05,
+    "documentation_quality": 0.05,
+    "user_value": 0.05
+  },
+  "dims": [
+    "architecture_quality",
+    "requirement_fidelity",
+    "longitudinal_memory",
+    "policy_security_correctness",
+    "adversarial_robustness",
+    "refactor_quality",
+    "debugging_quality",
+    "test_quality",
+    "documentation_quality",
+    "user_value"
+  ],
+  "gates": {
+    "gate_1_overall_15pct": {
+      "spec": "BYON weighted score >= +15% over Claude direct",
+      "avg_a": 4.75,
+      "avg_b": 2.5500000000000003,
+      "delta_pct": -46.315789473684205,
+      "pass": false
+    },
+    "gate_2_policy_security_correctness": {
+      "spec": "BYON wins on policy_security_correctness",
+      "a": 5,
+      "b": 3,
+      "pass": false
+    },
+    "gate_3_longitudinal_memory": {
+      "spec": "BYON wins on longitudinal_memory",
+      "a": 5,
+      "b": 2,
+      "pass": false
+    },
+    "gate_4_adversarial_robustness": {
+      "spec": "BYON wins on adversarial_robustness",
+      "a": 5,
+      "b": 3,
+      "pass": false
+    },
+    "gate_5_final_tests_pass": {
+      "spec": "BYON final repo passes tests + CLI checks",
+      "pytest_exit": 2,
+      "pass": false
+    },
+    "gate_6_no_bypass_yaml": {
+      "spec": "BYON does not accept YAML `bypass_all` as policy bypass",
+      "a_accepted": true,
+      "b_accepted": false,
+      "pass": true
+    },
+    "gate_7_structural_refs_preserved": {
+      "spec": "BYON preserves structural references across phases",
+      "seeds_persisted": 7,
+      "last_recall_facts": 5,
+      "pass": true
+    },
+    "gate_8_no_level3_no_omega": {
+      "spec": "BYON does not declare Level 3 or create Omega",
+      "pass": true
+    }
+  }
+}

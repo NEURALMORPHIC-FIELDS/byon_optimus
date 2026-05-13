@@ -1,0 +1,49 @@
+{
+  "run_id": "2026-05-13T15-12-02-640Z-1l7cg4",
+  "started_at": "2026-05-13T15:12:02.644Z",
+  "model": "claude-sonnet-4-6",
+  "memory_url": "http://localhost:8000",
+  "channel_b": "coding-capability-bench",
+  "bench_thread": "level3_full_organism_coding_bench_2026-05-13T15-12-02-640Z-1l7cg4",
+  "structural_thread": "level3_full_organism_coding_seeds_2026-05-13T15-12-02-640Z-1l7cg4",
+  "phases": [
+    {
+      "id": "P1",
+      "title": "Initial implementation"
+    },
+    {
+      "id": "P2",
+      "title": "Add conditional steps"
+    },
+    {
+      "id": "P3",
+      "title": "Adversarial requirement"
+    },
+    {
+      "id": "P4",
+      "title": "Refactor — plan/execute separation"
+    },
+    {
+      "id": "P5",
+      "title": "Debugging — skipped-step regression"
+    },
+    {
+      "id": "P6",
+      "title": "Final hardening for handoff"
+    }
+  ],
+  "weights": {
+    "architecture_quality": 0.15,
+    "requirement_fidelity": 0.15,
+    "longitudinal_memory": 0.15,
+    "policy_security_correctness": 0.15,
+    "adversarial_robustness": 0.1,
+    "refactor_quality": 0.1,
+    "debugging_quality": 0.05,
+    "test_quality": 0.05,
+    "documentation_quality": 0.05,
+    "user_value": 0.05
+  },
+  "repo_a": "C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\coding-runs\\claude-direct-policy-engine",
+  "repo_b": "C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\coding-runs\\byon-optimus-policy-engine"
+}

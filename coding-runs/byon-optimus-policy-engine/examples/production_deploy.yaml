@@ -1,0 +1,20 @@
+name: production_deploy
+steps:
+  - name: lint
+    gate: lint
+
+  - name: test
+    gate: test
+    depends_on: [lint]
+
+  - name: build
+    gate: build
+    depends_on: [test]
+
+  - name: deploy_production
+    gate: deploy_production
+    depends_on: [build]
+    params:
+      target: production
+      # Note: this gate requires an explicit production grant outside workflow config.
+      # Run with: workflow run examples/production_deploy.yaml --role ops --grant-production deploy_production
