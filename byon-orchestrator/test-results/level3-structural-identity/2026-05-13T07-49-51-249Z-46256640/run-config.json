@@ -1,0 +1,124 @@
+{
+  "schema_version": "level3-structural-identity-runner.v1",
+  "run_id": "2026-05-13T07-49-51-249Z-46256640",
+  "branch": "research/level3-full-organism-runtime",
+  "is_level3_experiment": true,
+  "dry_run": false,
+  "memory_url": "http://localhost:8000",
+  "phases_requested": [
+    "phase0_seed",
+    "phase1_reinforcement",
+    "phase2_autonomous",
+    "phase3_adversarial",
+    "phase4_derivative"
+  ],
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": true
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 36.88711500167847
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": true,
+      "embedder_class": "ProductionEmbedder",
+      "embedder_name": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "backend": "FAISS-IndexFlatIP",
+      "fallback_simple_embedder_active": false,
+      "stats": {
+        "success": true,
+        "num_contexts": 1432,
+        "by_type": {
+          "code": 0,
+          "conversation": 1252,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 3.313906669616699,
+        "uptime_seconds": 36.90475559234619
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 0,
+          "events_since_consolidate": 0,
+          "dedup": {
+            "events_seen": 0,
+            "coherent_repeats_skipped": 0,
+            "first_writes": 0
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "fce_metrics_detail": {
+      "ok": true,
+      "is_level3_experiment_endpoint": true,
+      "forbidden_for_omega_creation": true,
+      "fce_metrics_exposed": false,
+      "reason": "FCE-M observer not yet instantiated; consolidate() may not have run yet, or no MEMORY events seen on this server process since startup"
+    },
+    "ready": true
+  },
+  "n_seeds": 7,
+  "admitted_origins": [
+    "operator_seeded",
+    "system_canonical",
+    "verified_project_fact",
+    "domain_verified",
+    "experience_assimilated",
+    "endogenous_derivative_candidate"
+  ],
+  "admitted_states": [
+    "seeded_reference",
+    "active_reference",
+    "assimilating_reference",
+    "assimilated_structural_reference",
+    "structural_identity_node",
+    "endogenous_derivative_candidate"
+  ],
+  "allowed_verdicts": [
+    "STRUCTURAL_SEEDING_COMPLETED",
+    "STRUCTURAL_REFERENCE_SEEDING_ONLY",
+    "STRUCTURAL_REFERENCE_RECALL_CONFIRMED",
+    "STRUCTURAL_REFERENCE_APPLICATION_CONFIRMED",
+    "STRUCTURAL_REFERENCE_ASSIMILATION_OBSERVED",
+    "STRUCTURAL_IDENTITY_FIELD_FORMING",
+    "ENDOGENOUS_DERIVATIVE_CANDIDATES_OBSERVED",
+    "FULL_LEVEL3_NOT_DECLARED",
+    "INCONCLUSIVE_NEEDS_LONGER_RUN"
+  ],
+  "forbidden_verdict_tokens": [
+    "LEVEL_3_REACHED",
+    "OMEGA_CREATED_MANUALLY",
+    "SYNTHETIC_OMEGA",
+    "THRESHOLD_LOWERED",
+    "REFERENCEFIELD_CREATED_WITHOUT_OMEGA",
+    "SEEDED_REFERENCE_AS_ENDOGENOUS_OMEGA"
+  ],
+  "generated_at": "2026-05-13T07:49:51.337Z"
+}
