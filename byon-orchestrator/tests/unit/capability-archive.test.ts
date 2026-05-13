@@ -211,7 +211,7 @@ describe("Contextual Capability Archive", () => {
     });
 
     describe("10. missing required modules are reported, not hidden", () => {
-        it("plan surfaces missing_required_modules for software_engineer", () => {
+        it("plan surfaces missing_required_modules honestly (post-implementation: software_engineer's are now zero)", () => {
             const reg = CapabilityRegistry.fromDirectory(CAPS_DIR);
             const plan = routeCapability(
                 "Refactor the codebase and add tests.",
@@ -219,18 +219,27 @@ describe("Contextual Capability Archive", () => {
                 reg,
             );
             expect(plan.primary_capability).toBe("software_engineer");
-            // All 9 required coding modules are currently `planned`, so they must be missing.
-            expect(plan.missing_required_modules.length).toBeGreaterThanOrEqual(9);
-            // And the reason code must surface it.
-            expect(plan.reason_codes.some(r => r.code === ROUTER_REASON_CODES.MISSING_REQUIRED_MODULE)).toBe(true);
+            // Post Code-Workspace-Memory PR (feat/software-engineer-code-workspace-memory):
+            // all 9 software_engineer required modules are now module_status=active.
+            // Other selected capabilities may still have planned modules, which we
+            // do NOT hide — but software_engineer specifically should have none.
+            const seGaps = reg.missingRequiredModules("software_engineer");
+            expect(seGaps).toEqual([]);
+            // Whichever modules end up missing (from other selected capabilities)
+            // must be REPORTED via the reason_codes whenever the list is non-empty.
+            if (plan.missing_required_modules.length > 0) {
+                expect(plan.reason_codes.some(r => r.code === ROUTER_REASON_CODES.MISSING_REQUIRED_MODULE)).toBe(true);
+            }
         });
 
-        it("registry.missingRequiredModules() returns the same gap list", () => {
+        it("registry.missingRequiredModules() reports zero gaps for software_engineer after this PR", () => {
             const reg = CapabilityRegistry.fromDirectory(CAPS_DIR);
             const gaps = reg.missingRequiredModules("software_engineer");
-            expect(gaps.length).toBeGreaterThanOrEqual(9);
-            expect(gaps).toContain("code_workspace_memory");
-            expect(gaps).toContain("exact_file_state_store");
+            expect(gaps).toEqual([]);
+            // But the API still works: a capability that DOES have planned modules
+            // (e.g. novelist) still surfaces them.
+            const novelistGaps = reg.missingRequiredModules("novelist");
+            expect(novelistGaps.length).toBeGreaterThan(0);
         });
     });
 

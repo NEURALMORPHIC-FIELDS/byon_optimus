@@ -1,0 +1,66 @@
+name: conditional-deployment-pipeline
+version: "1.0"
+metadata:
+  owner: platform-team
+  description: |
+    Demonstrates conditional steps.  Run with:
+      workflow run examples/conditional_pipeline.yaml --role deployer --var environment=staging
+      workflow run examples/conditional_pipeline.yaml --role release-manager --var environment=production
+    Plan without running:
+      workflow plan examples/conditional_pipeline.yaml --role deployer --var environment=staging
+
+steps:
+  - id: lint
+    name: Lint Source Code
+    action: lint
+    policy_gate: lint-gate
+
+  - id: test
+    name: Run Tests
+    action: test
+    depends_on: [lint]
+    policy_gate: test-gate
+
+  - id: build
+    name: Build Artifact
+    action: build
+    depends_on: [test]
+    policy_gate: build-gate
+
+  # Only runs in production — SKIPPED in staging.
+  # Dependents (deploy-staging, notify) still run regardless.
+  - id: security-scan
+    name: Security Scan (production only)
+    action: scan
+    depends_on: [build]
+    condition:
+      equals:
+        var: environment
+        value: production
+
+  - id: deploy-staging
+    name: Deploy to Staging
+    action: deploy
+    environment: staging
+    depends_on: [security-scan]
+    policy_gate: staging-gate
+    condition:
+      equals:
+        var: environment
+        value: staging
+
+  - id: deploy-production
+    name: Deploy to Production
+    action: deploy
+    environment: production
+    depends_on: [security-scan]
+    policy_gate: production-gate
+    condition:
+      equals:
+        var: environment
+        value: production
+
+  - id: notify
+    name: Notify Team
+    action: notify
+    depends_on: [deploy-staging, deploy-production]

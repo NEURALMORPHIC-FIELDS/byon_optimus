@@ -1,0 +1,52 @@
+name: simple-ci-cd-pipeline
+version: "1.0"
+metadata:
+  owner: platform-team
+  description: A simple CI/CD pipeline example
+
+steps:
+  - id: lint
+    name: Lint Source Code
+    action: lint
+    environment: development
+    policy_gate: lint-gate
+    params:
+      target: src/
+
+  - id: unit-test
+    name: Run Unit Tests
+    action: test
+    environment: development
+    depends_on: [lint]
+    policy_gate: test-gate
+    params:
+      suite: unit
+      coverage_threshold: 80
+
+  - id: build-artifact
+    name: Build Application Artifact
+    action: build
+    environment: development
+    depends_on: [unit-test]
+    policy_gate: build-gate
+    params:
+      output: dist/app.tar.gz
+
+  - id: deploy-staging
+    name: Deploy to Staging
+    action: deploy
+    environment: staging
+    depends_on: [build-artifact]
+    policy_gate: staging-gate
+    params:
+      target_host: staging.example.internal
+      artifact: dist/app.tar.gz
+
+  - id: notify-team
+    name: Notify Team of Staging Deploy
+    action: notify
+    environment: staging
+    depends_on: [deploy-staging]
+    params:
+      channel: "#deployments"
+      message: "Staging deployment complete"
