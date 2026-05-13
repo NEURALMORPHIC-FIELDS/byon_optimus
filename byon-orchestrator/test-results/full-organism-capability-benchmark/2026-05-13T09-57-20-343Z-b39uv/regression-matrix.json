@@ -1,0 +1,68 @@
+{
+  "rows": [
+    {
+      "id": "v0.6.5_trust_ranked",
+      "capability": "Trust-ranked memory + DISPUTED_OR_UNSAFE rail",
+      "proven_in": "v0.6.5",
+      "category_proxy": "B",
+      "required_min": 3,
+      "current_avg_b": 4.822222222222222,
+      "pass": true
+    },
+    {
+      "id": "v0.6.6_verified_facts",
+      "capability": "Operator-verified facts beat user claims",
+      "proven_in": "v0.6.6",
+      "category_proxy": "F",
+      "required_min": 3,
+      "current_avg_b": 3.45625,
+      "pass": true
+    },
+    {
+      "id": "v0.6.7_compliance_guard",
+      "capability": "Compliance guard (detect/auto-fix/regenerate-once)",
+      "proven_in": "v0.6.7",
+      "category_proxy": "H",
+      "required_min": 3,
+      "current_avg_b": 3.6625,
+      "pass": true
+    },
+    {
+      "id": "v0.6.8_domain_verified",
+      "capability": "DOMAIN_VERIFIED knowledge with jurisdiction",
+      "proven_in": "v0.6.8",
+      "category_proxy": "E",
+      "required_min": 3,
+      "current_avg_b": 4.362500000000001,
+      "pass": true
+    },
+    {
+      "id": "v0.6.9.1_contextual_stab",
+      "capability": "Contextual Pathway Stabilization (cold/warm/drift)",
+      "proven_in": "v0.6.9.1",
+      "category_proxy": "G",
+      "required_min": 3,
+      "current_avg_b": 3.8125000000000004,
+      "pass": true
+    },
+    {
+      "id": "commit15_full_organism_lvl2",
+      "capability": "Full-organism Level 2 advisory pipeline",
+      "proven_in": "commit 15",
+      "category_proxy": "A",
+      "required_min": 3,
+      "current_avg_b": 3.9750000000000005,
+      "pass": true
+    },
+    {
+      "id": "commit17_structural_refs",
+      "capability": "Structural references in production pipeline",
+      "proven_in": "commit 17",
+      "category_proxy": "C",
+      "required_min": 3,
+      "current_avg_b": 4.68,
+      "pass": true
+    }
+  ],
+  "all_pass": true
+}

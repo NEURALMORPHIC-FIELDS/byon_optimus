@@ -1,0 +1,279 @@
+{
+  "claude_api_live": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "runConditionB",
+    "runtime_evidence": [
+      "tokens=[object Object]",
+      "tokens=[object Object]",
+      "tokens=[object Object]",
+      "tokens=[object Object]",
+      "tokens=[object Object]"
+    ]
+  },
+  "memory_service_live": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "mem",
+    "runtime_evidence": [
+      "MEMORY_URL=http://localhost:8000",
+      "MEMORY_URL=http://localhost:8000",
+      "MEMORY_URL=http://localhost:8000",
+      "MEMORY_URL=http://localhost:8000",
+      "MEMORY_URL=http://localhost:8000"
+    ]
+  },
+  "faiss_live": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "memory-service/handlers.py",
+    "evidence_function": "search_all",
+    "runtime_evidence": [
+      "recall_conv=1",
+      "recall_conv=2",
+      "recall_conv=2",
+      "recall_conv=1",
+      "recall_conv=1"
+    ]
+  },
+  "production_embeddings": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "memory-service/handlers.py",
+    "evidence_function": "embed",
+    "runtime_evidence": [
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2"
+    ]
+  },
+  "fce_m_backend": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "memory-service/fcem_backend.py",
+    "evidence_function": "report",
+    "runtime_evidence": []
+  },
+  "fce_morphogenesis_report": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "memory-service/handlers.py",
+    "evidence_function": "fce_morphogenesis_report",
+    "runtime_evidence": []
+  },
+  "fce_assimilate_receipt": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "memory-service/handlers.py",
+    "evidence_function": "fce_assimilate_receipt",
+    "runtime_evidence": []
+  },
+  "fce_consolidate": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "omega_registry_snapshot": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "reference_field_snapshot": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "contextual_pathway_stabilization": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/lib/context-state.mjs",
+    "evidence_function": "ctxUpdate",
+    "runtime_evidence": []
+  },
+  "context_state_planner": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/lib/context-state.mjs",
+    "evidence_function": "ctxPlan",
+    "runtime_evidence": []
+  },
+  "cold_stabilizing_warm_drift": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/lib/context-state.mjs",
+    "evidence_function": "classify",
+    "runtime_evidence": [
+      "phase=cold",
+      "phase=cold",
+      "phase=cold",
+      "phase=cold",
+      "phase=cold"
+    ]
+  },
+  "memory_route_planner": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/lib/context-state.mjs",
+    "evidence_function": "ctxPlan",
+    "runtime_evidence": []
+  },
+  "trust_ranked_formatter": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "formatFactsForPrompt",
+    "runtime_evidence": []
+  },
+  "verified_project_facts": {
+    "active": true,
+    "turn_count_seen": 127,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "tallyTrustTiers",
+    "runtime_evidence": [
+      "count=1",
+      "count=1",
+      "count=2",
+      "count=4",
+      "count=3"
+    ]
+  },
+  "domain_verified_facts": {
+    "active": true,
+    "turn_count_seen": 49,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "tallyTrustTiers",
+    "runtime_evidence": [
+      "count=1",
+      "count=2",
+      "count=1",
+      "count=1",
+      "count=1"
+    ]
+  },
+  "disputed_or_unsafe_rail": {
+    "active": true,
+    "turn_count_seen": 74,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "tallyTrustTiers",
+    "runtime_evidence": [
+      "count=1",
+      "count=1",
+      "count=1",
+      "count=1",
+      "count=1"
+    ]
+  },
+  "fact_extractor": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/lib/fact-extractor.mjs",
+    "evidence_function": "extractAndStoreFacts",
+    "runtime_evidence": []
+  },
+  "compliance_guard": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "applyComplianceGuard",
+    "runtime_evidence": []
+  },
+  "active_response_constraints": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "buildSystemPrompt",
+    "runtime_evidence": []
+  },
+  "post_generation_checker": {
+    "active": true,
+    "turn_count_seen": 211,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "checkCompliance",
+    "runtime_evidence": []
+  },
+  "regeneration_once": {
+    "active": true,
+    "turn_count_seen": 8,
+    "evidence_file": "scripts/byon-industrial-ab-benchmark.mjs",
+    "evidence_function": "regenerateOnce",
+    "runtime_evidence": [
+      "violations=0",
+      "violations=0",
+      "violations=0",
+      "violations=0",
+      "violations=0"
+    ]
+  },
+  "structural_reference_memory": {
+    "active": true,
+    "turn_count_seen": 1,
+    "evidence_file": "memory-service/level3_experimental_endpoints.py",
+    "evidence_function": "persist-structural-reference",
+    "runtime_evidence": []
+  },
+  "structural_seed_persistence": {
+    "active": true,
+    "turn_count_seen": 1,
+    "evidence_file": "memory-service/level3_experimental_endpoints.py",
+    "evidence_function": "store_fact",
+    "runtime_evidence": []
+  },
+  "thread_scoped_retrieval": {
+    "active": true,
+    "turn_count_seen": 212,
+    "evidence_file": "memory-service/level3_experimental_endpoints.py",
+    "evidence_function": "retrieve-structural-references",
+    "runtime_evidence": [
+      "scope=thread",
+      "scope=thread",
+      "scope=thread",
+      "scope=thread",
+      "scope=thread"
+    ]
+  },
+  "relational_field_instrumentation": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "auditor_authority_boundary": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "experiment_namespace_isolation": {
+    "active": true,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "no_manual_omega": {
+    "active": true,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  },
+  "no_level3_claim": {
+    "active": true,
+    "turn_count_seen": 0,
+    "evidence_file": null,
+    "evidence_function": null,
+    "runtime_evidence": []
+  }
+}
