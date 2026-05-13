@@ -8,23 +8,29 @@ time. When the flag is unset, the function returns immediately without
 adding any routes.
 
 Strict isolation:
-  - The endpoints are READ-ONLY. They never write to OmegaRegistry,
+  - Read endpoints are READ-ONLY. They never write to OmegaRegistry,
     never create OmegaRecord, never create ReferenceField, never call
     `check_coagulation`.
+  - Two endpoints write — but only into the experiment namespace
+    (thread_id prefix `level3_full_organism_`), with explicit
+    `is_structural_reference=true` and `is_level3_experiment=true`
+    markers, using the production memory store path (same FAISS
+    embed + FCE-M assimilate pipeline as a normal store action).
   - The module never modifies `theta_s` or `tau_coag`.
   - The module's import has NO side effects on `app` (registration
     requires an explicit call).
   - When the flag is OFF the registration is a no-op; the host
     application's behavior is unchanged.
 
-Endpoints (all GET, no body, gated by flag):
-  /level3/telemetry                — flag status + FCE module presence
-  /level3/fce-metrics              — FCE state snapshot
-  /level3/omega-registry-snapshot  — OmegaRegistry snapshot
-  /level3/reference-field-snapshot — ReferenceField snapshot
-  /level3/relational-field-snapshot — placeholder (relational layer
-                                      is computed runner-side, not
-                                      memory-service-side)
+Endpoints (gated by flag):
+  GET  /level3/telemetry                — flag status + FCE module presence
+  GET  /level3/fce-metrics              — FCE per-center + morphogenesis log
+  GET  /level3/omega-registry-snapshot  — OmegaRegistry snapshot
+  GET  /level3/reference-field-snapshot — ReferenceField snapshot
+  GET  /level3/relational-field-snapshot — placeholder (runner-side)
+  GET  /level3/embedder-info            — embedder class / model / dim
+  POST /level3/persist-structural-reference   — write a structural ref
+  POST /level3/retrieve-structural-references — thread-scoped recall
 """
 
 from __future__ import annotations
@@ -355,6 +361,241 @@ def register_level3_endpoints(
                 "FCE-M v0.6.0; if the runner needs I_t it must be computed "
                 "from delta_X and Phi_s, which are not exposed by this surface."
             ),
+        }
+
+    # ------------------------------------------------------------------
+    # commit 17: write + read endpoints for structural references.
+    #
+    # We encode the structural metadata in the FACT entry's `tags` list
+    # so we don't have to extend production handler signatures. Each
+    # entry is stored via the production `handlers.store_fact(...)` path
+    # (full FAISS embed). Retrieval uses thread-scoped `search_facts`
+    # and post-filters on the `level3:structural_reference` tag prefix.
+    #
+    # Both endpoints enforce the experiment namespace
+    # (thread_id prefix `level3_full_organism_`). The write endpoint
+    # rejects origin `endogenous_derivative_candidate` — that label is
+    # only reachable via the runner's state machine.
+    #
+    # Note: `from __future__ import annotations` at module top turns
+    # type hints into strings, and FastAPI cannot resolve types defined
+    # in a function-local scope through string evaluation. We therefore
+    # use plain `dict` parameter typing for the JSON body — FastAPI
+    # auto-parses the request body into a dict.
+    # ------------------------------------------------------------------
+    from fastapi import HTTPException
+
+    EXPERIMENT_THREAD_PREFIX = "level3_full_organism_"
+    EXPERIMENT_CHANNEL = "level3-structural-identity-runner"
+    STRUCTURAL_TAG_PREFIX = "level3:structural_reference"
+
+    def _structural_tags_from_body(body, fallback_node_id=None):
+        node_id = str(body.get("structural_node_id", "") or fallback_node_id or "")
+        origin = str(body.get("origin", "operator_seeded") or "operator_seeded")
+        trust_tier = str(body.get("trust_tier", "VERIFIED_PROJECT_FACT") or "VERIFIED_PROJECT_FACT")
+        assim_state = str(body.get("assimilation_state", "seeded_reference") or "seeded_reference")
+        run_id = str(body.get("run_id", "") or "")
+        phase_id = str(body.get("phase_id", "phase0_seed") or "phase0_seed")
+        scenario_id = str(body.get("scenario_id", phase_id) or phase_id)
+        source_turn_id = str(body.get("source_turn_id", "") or "")
+        title = str(body.get("title", "") or "")
+        return [
+            STRUCTURAL_TAG_PREFIX,
+            "level3:experiment",
+            f"level3:node:{node_id}",
+            f"level3:origin:{origin}",
+            f"level3:trust:{trust_tier}",
+            f"level3:state:{assim_state}",
+            f"level3:run:{run_id}",
+            f"level3:phase:{phase_id}",
+            f"level3:scenario:{scenario_id}",
+            f"level3:source_turn:{source_turn_id}",
+            f"level3:title:{title[:120]}",
+        ], {
+            "structural_node_id": node_id,
+            "origin": origin,
+            "trust_tier": trust_tier,
+            "assimilation_state": assim_state,
+            "run_id": run_id,
+            "phase_id": phase_id,
+            "scenario_id": scenario_id,
+            "source_turn_id": source_turn_id,
+            "title": title,
+        }
+
+    def _decode_structural_tags(tags):
+        """Recover structural metadata from a tag list."""
+        if not isinstance(tags, list):
+            return None
+        if STRUCTURAL_TAG_PREFIX not in tags:
+            return None
+        out = {
+            "structural_node_id": None,
+            "origin": None,
+            "trust_tier": None,
+            "assimilation_state": None,
+            "run_id": None,
+            "phase_id": None,
+            "scenario_id": None,
+            "source_turn_id": None,
+            "title": None,
+        }
+        for t in tags:
+            if not isinstance(t, str):
+                continue
+            if t.startswith("level3:node:"):
+                out["structural_node_id"] = t[len("level3:node:"):]
+            elif t.startswith("level3:origin:"):
+                out["origin"] = t[len("level3:origin:"):]
+            elif t.startswith("level3:trust:"):
+                out["trust_tier"] = t[len("level3:trust:"):]
+            elif t.startswith("level3:state:"):
+                out["assimilation_state"] = t[len("level3:state:"):]
+            elif t.startswith("level3:run:"):
+                out["run_id"] = t[len("level3:run:"):]
+            elif t.startswith("level3:phase:"):
+                out["phase_id"] = t[len("level3:phase:"):]
+            elif t.startswith("level3:scenario:"):
+                out["scenario_id"] = t[len("level3:scenario:"):]
+            elif t.startswith("level3:source_turn:"):
+                out["source_turn_id"] = t[len("level3:source_turn:"):]
+            elif t.startswith("level3:title:"):
+                out["title"] = t[len("level3:title:"):]
+        return out
+
+    @app.post("/level3/persist-structural-reference")
+    async def level3_persist_structural_reference(body: dict):
+        """Persist a single operator-introduced structural reference via
+        the production `handlers.store_fact(...)` path. Metadata is
+        encoded in the fact's `tags` list using the `level3:*` prefix
+        scheme; full FAISS embed is performed by the production
+        embedder.
+        """
+        thread_id = str(body.get("thread_id", "") or "")
+        if not thread_id.startswith(EXPERIMENT_THREAD_PREFIX):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"thread_id must start with {EXPERIMENT_THREAD_PREFIX!r} "
+                    "for the level3 experiment namespace"
+                ),
+            )
+        canonical_text = str(body.get("canonical_text", "") or "")
+        if not canonical_text.strip():
+            raise HTTPException(status_code=400, detail="canonical_text required")
+        structural_node_id = str(body.get("structural_node_id", "") or "")
+        if not structural_node_id.strip():
+            raise HTTPException(status_code=400, detail="structural_node_id required")
+        origin = str(body.get("origin", "operator_seeded") or "operator_seeded")
+        if origin == "endogenous_derivative_candidate":
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "origin=endogenous_derivative_candidate is reserved; "
+                    "only the runner can advance a STATE to that label"
+                ),
+            )
+        if handlers_provider is None:
+            raise HTTPException(
+                status_code=500,
+                detail="handlers_provider not supplied to level3 registration",
+            )
+        handlers_obj = handlers_provider()
+        tags, decoded = _structural_tags_from_body(body, fallback_node_id=structural_node_id)
+        try:
+            ctx_id = handlers_obj.store_fact(
+                fact=canonical_text,
+                source="level3-structural-identity",
+                tags=tags,
+                thread_id=thread_id,
+                channel=EXPERIMENT_CHANNEL,
+                trust=decoded["trust_tier"],
+                disputed=False,
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"store_fact failed: {e}")
+        return {
+            "ok": True,
+            "is_level3_experiment_endpoint": True,
+            "is_level3_write_endpoint": True,
+            "forbidden_for_omega_creation": True,
+            "ctx_id": ctx_id,
+            "thread_id": thread_id,
+            "structural_metadata": decoded,
+            "stored_tags": tags,
+        }
+
+    @app.post("/level3/retrieve-structural-references")
+    async def level3_retrieve_structural_references(body: dict):
+        """Thread-scoped recall of structural references. Routes
+        through the production `handlers.search_facts(...)` path with
+        `scope="thread"`, then post-filters on the structural tag
+        prefix.
+        """
+        thread_id = str(body.get("thread_id", "") or "")
+        if not thread_id.startswith(EXPERIMENT_THREAD_PREFIX):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"thread_id must start with {EXPERIMENT_THREAD_PREFIX!r} "
+                    "for the level3 experiment namespace"
+                ),
+            )
+        query = str(body.get("query", "") or "")
+        top_k = int(body.get("top_k", 20) or 20)
+        if handlers_provider is None:
+            raise HTTPException(
+                status_code=500,
+                detail="handlers_provider not supplied to level3 registration",
+            )
+        handlers_obj = handlers_provider()
+        effective_query = query if query.strip() else "structural reference"
+        try:
+            search_result = handlers_obj.search_facts(
+                query=effective_query,
+                top_k=top_k,
+                threshold=0.0,
+                thread_id=thread_id,
+                scope="thread",
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"search_facts failed: {e}")
+        # search_facts returns a dict like {"success": True, "results": [...]}
+        # or a list of hits directly depending on internals — handle both.
+        raw_hits = []
+        if isinstance(search_result, dict):
+            raw_hits = search_result.get("results") or search_result.get("hits") or []
+        elif isinstance(search_result, list):
+            raw_hits = search_result
+        structural_hits = []
+        for h in raw_hits:
+            if not isinstance(h, dict):
+                continue
+            md = h.get("metadata") if isinstance(h.get("metadata"), dict) else h
+            tags = md.get("tags") if isinstance(md, dict) else None
+            decoded = _decode_structural_tags(tags or [])
+            if decoded is None:
+                continue
+            structural_hits.append({
+                "ctx_id": h.get("ctx_id"),
+                "content": h.get("content"),
+                "similarity": h.get("similarity"),
+                "structural_metadata": decoded,
+                "thread_id": md.get("thread_id") if isinstance(md, dict) else thread_id,
+                "channel": md.get("channel") if isinstance(md, dict) else None,
+                "tags": tags,
+            })
+        return {
+            "ok": True,
+            "is_level3_experiment_endpoint": True,
+            "forbidden_for_omega_creation": True,
+            "thread_id": thread_id,
+            "query": query,
+            "top_k": top_k,
+            "scope": "thread",
+            "n_structural_references": len(structural_hits),
+            "structural_references": structural_hits,
+            "raw_hit_count": len(raw_hits),
         }
 
     return True
