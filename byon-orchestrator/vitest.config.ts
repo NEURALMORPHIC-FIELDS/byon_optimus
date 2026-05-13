@@ -8,8 +8,43 @@
  */
 
 import { defineConfig } from "vitest/config";
+import * as fs from "node:fs";
+
+/**
+ * Strip the leading `#!/usr/bin/env node` shebang from .mjs files before
+ * Vite's `vite:import-analysis` plugin parses them. Node strips shebangs
+ * natively at runtime, but Vite's import analyser does not, so .mjs scripts
+ * that are imported by test files were rejected by Vitest 4 with the very
+ * misleading error "SyntaxError: Invalid or unexpected token".
+ *
+ * This plugin is read-only and test-harness only: it does not modify the
+ * files on disk, does not change runtime semantics (Node still strips the
+ * shebang exactly as before when the script is executed directly), and does
+ * not weaken any test.
+ */
+const stripShebangPlugin = {
+    name: "strip-mjs-shebang",
+    enforce: "pre" as const,
+    load(id: string) {
+        if (!id.endsWith(".mjs")) return null;
+        const fsPath = id.split("?")[0];
+        try {
+            const raw = fs.readFileSync(fsPath, "utf-8");
+            if (raw.startsWith("#!")) {
+                const newlineIdx = raw.indexOf("\n");
+                if (newlineIdx >= 0) {
+                    return "//" + raw.slice(2, newlineIdx) + raw.slice(newlineIdx);
+                }
+            }
+        } catch {
+            // fall through; let Vite handle the load normally
+        }
+        return null;
+    },
+};
 
 export default defineConfig({
+    plugins: [stripShebangPlugin],
     test: {
         // Test environment
         environment: "node",

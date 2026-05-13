@@ -29,6 +29,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { promises as fsp } from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { fileURLToPath } from "node:url";
+
+// ESM equivalent of CommonJS `__dirname` (package.json: "type": "module").
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import {
     LEVEL3_FLAG_NAME,
