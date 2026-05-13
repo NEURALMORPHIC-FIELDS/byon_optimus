@@ -95,11 +95,18 @@ const RESULTS_DIR = path.join(REPO_ROOT, "test-results");
 const MEMORY_URL = process.env.MEMORY_SERVICE_URL || "http://localhost:8000";
 const MODEL = process.env.LLM_MODEL || "claude-sonnet-4-6";
 const apiKey = process.env.ANTHROPIC_API_KEY;
-if (!apiKey) {
+// commit 17: when imported as a library (e.g., by the level3 structural
+// identity runner or by vitest), don't kill the process if the key is
+// missing — the consumer may have its own preflight that decides whether
+// to call Claude. When invoked as a script (main()), the check below
+// still fires and exits.
+const _isImported = !process.argv[1]
+    || import.meta.url !== pathToFileURL(process.argv[1]).href;
+if (!apiKey && !_isImported) {
     console.error("FATAL: ANTHROPIC_API_KEY missing in environment.");
     process.exit(2);
 }
-const anthropic = new Anthropic({ apiKey });
+const anthropic = apiKey ? new Anthropic({ apiKey }) : null;
 
 const ARGS = (() => {
     const out = { items: null, categories: null, skipJudge: false, dryRun: false, noStabilization: false };
@@ -770,12 +777,13 @@ async function runConditionB({
     extractFacts = true,
     storeReply = true,
     turnIndex = null,           // v0.6.9: allow caller to pin the turn index
+    channel = "ab-bench",       // commit 17: allow caller to override channel for isolated experiments
 }) {
     const t0 = Date.now();
     const sIn = await mem({
         action: "store",
         type: "conversation",
-        data: { content: userMsg, role: "user", thread_id: threadId, channel: "ab-bench" },
+        data: { content: userMsg, role: "user", thread_id: threadId, channel },
     });
     fceCacheInvalidate(threadId); // a new conversation entry invalidates the FCE snapshot
 
@@ -796,10 +804,10 @@ async function runConditionB({
         if (extractionMode === "sync") {
             await extractAndStoreFacts({
                 anthropic, model: MODEL, mem,
-                text: userMsg, role: "user", threadId, channel: "ab-bench",
+                text: userMsg, role: "user", threadId, channel,
             }).catch(() => null);
         } else if (extractionMode === "async") {
-            fireAsyncExtractor({ text: userMsg, role: "user", threadId, channel: "ab-bench" });
+            fireAsyncExtractor({ text: userMsg, role: "user", threadId, channel });
         }
     }
 
@@ -1111,7 +1119,7 @@ async function runConditionB({
         await mem({
             action: "store",
             type: "conversation",
-            data: { content: finalText, role: "assistant", thread_id: threadId, channel: "ab-bench" },
+            data: { content: finalText, role: "assistant", thread_id: threadId, channel },
         });
         fceCacheInvalidate(threadId);
         await mem({
@@ -4103,5 +4111,19 @@ async function main() {
     console.log(`  ${rawPath}`);
 }
 
-const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
+// commit 17: guard against undefined argv[1] when this file is imported
+// rather than run as a script (e.g., by the level3-structural-identity-runner).
+const isMain = process.argv[1]
+    ? import.meta.url === pathToFileURL(process.argv[1]).href
+    : false;
 if (isMain) main().catch(e => { console.error("FATAL:", e); process.exit(1); });
+
+// ---------------------------------------------------------------------------
+// commit 17: expose `runConditionB` + the `mem` HTTP helper so the level3
+// structural-identity experiment can run through the same production
+// pipeline (Contextual Pathway Stabilization, trust-ranked memory formatter,
+// ACTIVE RESPONSE CONSTRAINTS, full compliance guard with regenerate-once,
+// fact extraction, FCE assimilate-receipt) instead of recreating that
+// pipeline manually.
+// ---------------------------------------------------------------------------
+export { runConditionB, mem, anthropic, MODEL, MEMORY_URL };

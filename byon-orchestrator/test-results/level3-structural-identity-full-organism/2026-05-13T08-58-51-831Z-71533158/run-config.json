@@ -1,0 +1,81 @@
+{
+  "schema_version": "level3-structural-identity-full-organism-runner.v1",
+  "run_id": "2026-05-13T08-58-51-831Z-71533158",
+  "branch": "research/level3-full-organism-runtime",
+  "is_level3_experiment": true,
+  "dry_run": false,
+  "memory_url": "http://localhost:8000",
+  "thread_id": "level3_full_organism_2026-05-13T08-58-51-831Z-71533158__structural_identity_full",
+  "phases_requested": [
+    "phase1_reinforcement",
+    "phase2_autonomous",
+    "phase3_adversarial",
+    "phase4_derivative"
+  ],
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "preflight": {
+    "flag": true,
+    "claude_present": true,
+    "memory_live": true,
+    "faiss_live": true,
+    "embeddings_live": true,
+    "embedder_info": {
+      "ok": true,
+      "is_level3_experiment_endpoint": true,
+      "forbidden_for_omega_creation": true,
+      "embedder_class": "ProductionEmbedder",
+      "embedder_name": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "backend": "FAISS-IndexFlatIP",
+      "fallback_simple_embedder_active": false,
+      "production_embeddings_live": true
+    },
+    "fce_live": true
+  },
+  "n_seeds": 7,
+  "admitted_origins": [
+    "operator_seeded",
+    "system_canonical",
+    "verified_project_fact",
+    "domain_verified",
+    "experience_assimilated",
+    "endogenous_derivative_candidate"
+  ],
+  "admitted_states": [
+    "seeded_reference",
+    "active_reference",
+    "assimilating_reference",
+    "assimilated_structural_reference",
+    "structural_identity_node",
+    "endogenous_derivative_candidate"
+  ],
+  "allowed_verdicts": [
+    "BEHAVIORAL_OBSERVATION_ONLY",
+    "STRUCTURAL_REFERENCE_PERSISTED",
+    "STRUCTURAL_REFERENCE_RETRIEVED",
+    "STRUCTURAL_REFERENCE_USED_IN_PROMPT",
+    "STRUCTURAL_REFERENCE_BEHAVIORALLY_APPLIED",
+    "STRUCTURAL_IDENTITY_INTERNALIZATION_PARTIAL",
+    "STRUCTURAL_IDENTITY_FIELD_ACTIVE_IN_PIPELINE",
+    "FULL_ORGANISM_INCOMPLETE_MODULES_INACTIVE",
+    "FULL_LEVEL3_NOT_DECLARED",
+    "INCONCLUSIVE_NEEDS_LONGER_RUN"
+  ],
+  "forbidden_verdict_tokens": [
+    "LEVEL_3_REACHED",
+    "OMEGA_CREATED_MANUALLY",
+    "SYNTHETIC_OMEGA",
+    "THRESHOLD_LOWERED",
+    "SEEDED_REFERENCE_AS_ENDOGENOUS_OMEGA",
+    "REFERENCEFIELD_CREATED_WITHOUT_OMEGA"
+  ],
+  "derivative_classifications": [
+    "lexical_derivative_candidate",
+    "behavioral_derivative_candidate",
+    "memory_persisted_derivative_candidate",
+    "structurally_retrieved_derivative_candidate",
+    "endogenous_derivative_candidate"
+  ],
+  "generated_at": "2026-05-13T08:58:51.899Z"
+}
