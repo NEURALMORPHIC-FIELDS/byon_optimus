@@ -1,0 +1,321 @@
+{
+  "schema_version": "level3-full-organism-runner.v1",
+  "branch": "research/level3-full-organism-runtime",
+  "run_id": "2026-05-13T00-19-32-945Z-784d9d67",
+  "generated_at": "2026-05-13T00:28:51.772Z",
+  "dry_run": false,
+  "model_id": "claude-sonnet-4-6",
+  "memory_url": "http://localhost:8000",
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": true
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 15.518836736679077
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": true,
+      "embedder_class": "ProductionEmbedder",
+      "embedder_name": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "backend": "FAISS-IndexFlatIP",
+      "fallback_simple_embedder_active": false,
+      "stats": {
+        "success": true,
+        "num_contexts": 1192,
+        "by_type": {
+          "code": 0,
+          "conversation": 1012,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 2.6649093627929688,
+        "uptime_seconds": 15.535062789916992
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 0,
+          "events_since_consolidate": 0,
+          "dedup": {
+            "events_seen": 0,
+            "coherent_repeats_skipped": 0,
+            "first_writes": 0
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "fce_metrics_detail": {
+      "ok": true,
+      "is_level3_experiment_endpoint": true,
+      "forbidden_for_omega_creation": true,
+      "fce_metrics_exposed": false,
+      "reason": "FCE-M observer not yet instantiated; consolidate() may not have run yet, or no MEMORY events seen on this server process since startup"
+    },
+    "ready": true
+  },
+  "scenarios_run": 2,
+  "total_turns": 60,
+  "total_claude_calls": 60,
+  "total_input_tokens": 25652,
+  "total_output_tokens": 19393,
+  "total_estimated_cost_usd": 0.367851,
+  "mean_claude_latency_ms": 7700.75,
+  "max_observed_s_t": 0.15136927622838203,
+  "mean_observed_s_t": 0.09782118639166971,
+  "max_observed_ar": 0.9999999999990008,
+  "mean_observed_ar": 0.9571649492683115,
+  "production_embeddings_live": true,
+  "embedder_class": "ProductionEmbedder",
+  "embedder_name": "all-MiniLM-L6-v2",
+  "embedding_dim": 384,
+  "fce_metrics_exposed": false,
+  "fce_metrics_preflight": {
+    "ok": true,
+    "is_level3_experiment_endpoint": true,
+    "forbidden_for_omega_creation": true,
+    "fce_metrics_exposed": false,
+    "reason": "FCE-M observer not yet instantiated; consolidate() may not have run yet, or no MEMORY events seen on this server process since startup"
+  },
+  "longest_run_above_theta": 0,
+  "omega_total_initial": 0,
+  "omega_total_final": 0,
+  "omega_total_delta": 0,
+  "reference_field_total_initial": 0,
+  "reference_field_total_final": 0,
+  "reference_field_total_delta": 0,
+  "relation_events_emitted": 200,
+  "relation_types_seen": [
+    "constrains",
+    "stabilizes",
+    "routes_to",
+    "protects",
+    "contradicts"
+  ],
+  "relational_field_summary": {
+    "n_events": 200,
+    "relation_type_counts": {
+      "constrains": 60,
+      "stabilizes": 60,
+      "routes_to": 60,
+      "protects": 10,
+      "contradicts": 10
+    },
+    "center_field_states": [
+      {
+        "center_id": "byon::auditor_signature::security_boundary",
+        "active_relations": 10,
+        "supporting_relations": 10,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "SYSTEM_CANONICAL": 10
+        },
+        "relation_tension": 0,
+        "field_coherence": 1,
+        "field_resonance": 0.16666666666666666,
+        "field_stability": 1,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::contextual_pathway::factual",
+        "active_relations": 60,
+        "supporting_relations": 0,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "SYSTEM_CANONICAL": 60
+        },
+        "relation_tension": 0,
+        "field_coherence": 0.5,
+        "field_resonance": 0,
+        "field_stability": 0.7,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::macp_pipeline::factual",
+        "active_relations": 60,
+        "supporting_relations": 0,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "VERIFIED_PROJECT_FACT": 60
+        },
+        "relation_tension": 0,
+        "field_coherence": 0.5,
+        "field_resonance": 0,
+        "field_stability": 0.7,
+        "source_turn_ids": [
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-000",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-001",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-002",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-003",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-004",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-005",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-006",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-007",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-008",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-009",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-010",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-011",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-012",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-013",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-014",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-015",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-016",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-017",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-018",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-019",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-020",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-021",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-022",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-023",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-024",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-025",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-026",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-027",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-028",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-1-byon-arch:turn-029",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-000",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-001",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-002",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-003",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-004",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-005",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-006",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-007",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-008",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-009",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-010",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-011",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-012",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-013",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-014",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-015",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-016",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-017",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-018",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-019",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-020",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-021",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-022",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-023",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-024",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-025",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-026",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-027",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-028",
+          "2026-05-13T00-19-32-945Z-784d9d67:scenario-2-adversarial:turn-029"
+        ],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::release_state::project_state",
+        "active_relations": 60,
+        "supporting_relations": 60,
+        "contesting_relations": 0,
+        "trust_tier_distribution": {
+          "VERIFIED_PROJECT_FACT": 60
+        },
+        "relation_tension": 0,
+        "field_coherence": 1,
+        "field_resonance": 0.16666666666666666,
+        "field_stability": 1,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      },
+      {
+        "center_id": "byon::unsafe_memory::security_boundary",
+        "active_relations": 10,
+        "supporting_relations": 0,
+        "contesting_relations": 10,
+        "trust_tier_distribution": {
+          "DISPUTED_OR_UNSAFE": 10
+        },
+        "relation_tension": 1,
+        "field_coherence": 0,
+        "field_resonance": 0,
+        "field_stability": 0,
+        "source_turn_ids": [],
+        "source_fact_ids": [],
+        "source_event_ids": []
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario_id": "scenario-1-byon-arch",
+      "title": "BYON architecture deep-dive",
+      "purpose": "project_state + trust hierarchy + contextual stabilization",
+      "thread_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-1-byon-arch",
+      "turns_run": 30,
+      "omega_count_initial": 0,
+      "omega_count_final": 0,
+      "omega_delta": 0,
+      "reference_field_count_initial": 0,
+      "reference_field_count_final": 0,
+      "reference_field_delta": 0,
+      "error": null
+    },
+    {
+      "scenario_id": "scenario-2-adversarial",
+      "title": "adversarial trust-boundary stress",
+      "purpose": "relational field between unsafe claims, Auditor, Executor, FCE advisory, SYSTEM_CANONICAL",
+      "thread_id": "level3_full_organism_2026-05-13T00-19-32-945Z-784d9d67__scenario-2-adversarial",
+      "turns_run": 30,
+      "omega_count_initial": 0,
+      "omega_count_final": 0,
+      "omega_delta": 0,
+      "reference_field_count_initial": 0,
+      "reference_field_count_final": 0,
+      "reference_field_delta": 0,
+      "error": null
+    }
+  ],
+  "final_verdict": "INCONCLUSIVE_FCE_METRICS_NOT_EXPOSED",
+  "allowed_verdicts": [
+    "FULL_ORGANISM_LEVEL2_CONFIRMED",
+    "FULL_ORGANISM_LEVEL3_NOT_OBSERVED",
+    "FULL_ORGANISM_NEAR_THRESHOLD",
+    "OMEGA_OBSERVED_BY_CHECK_COAGULATION_NO_MANUAL_WRITE",
+    "INCONCLUSIVE_NEEDS_LONGER_RUN",
+    "CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST",
+    "PARTIAL_FULL_ORGANISM_SMOKE_RUN",
+    "INCONCLUSIVE_EMBEDDINGS_NOT_CONFIRMED",
+    "INCONCLUSIVE_FCE_METRICS_NOT_EXPOSED"
+  ],
+  "forbidden_verdicts": [
+    "LEVEL_3_REACHED",
+    "OMEGA_CREATED_MANUALLY",
+    "SYNTHETIC_OMEGA",
+    "THRESHOLD_LOWERED",
+    "REFERENCEFIELD_CREATED_WITHOUT_OMEGA"
+  ],
+  "level_3_declared": false,
+  "natural_omega_proven": false
+}

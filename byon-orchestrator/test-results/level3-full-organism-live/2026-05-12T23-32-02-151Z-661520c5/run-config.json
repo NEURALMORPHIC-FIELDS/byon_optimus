@@ -1,0 +1,78 @@
+{
+  "schema_version": "level3-full-organism-runner.v1",
+  "run_id": "2026-05-12T23-32-02-151Z-661520c5",
+  "branch": "research/level3-full-organism-runtime",
+  "is_level3_experiment": true,
+  "dry_run": false,
+  "memory_url": "http://localhost:8000",
+  "scenarios_requested": [
+    "scenario-1-byon-arch",
+    "scenario-2-adversarial"
+  ],
+  "turns_per_scenario_cap": 30,
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "flags": {
+    "level3_full_organism_experiment": true
+  },
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": true
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 20029.603924512863
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": false,
+      "embedder": null,
+      "stats": {
+        "success": true,
+        "num_contexts": 950,
+        "by_type": {
+          "code": 0,
+          "conversation": 770,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 2.03737735748291,
+        "uptime_seconds": 20029.619149923325
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 745,
+          "events_since_consolidate": 4,
+          "dedup": {
+            "events_seen": 929,
+            "coherent_repeats_skipped": 14,
+            "first_writes": 915
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "ready": true
+  },
+  "generated_at": "2026-05-12T23:32:02.237Z"
+}

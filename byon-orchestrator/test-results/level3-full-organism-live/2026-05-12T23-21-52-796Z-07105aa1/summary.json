@@ -1,0 +1,105 @@
+{
+  "schema_version": "level3-full-organism-runner.v1",
+  "branch": "research/level3-full-organism-runtime",
+  "run_id": "2026-05-12T23-21-52-796Z-07105aa1",
+  "generated_at": "2026-05-12T23:21:52.949Z",
+  "dry_run": true,
+  "model_id": null,
+  "memory_url": "http://localhost:8000",
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": false,
+      "reason": "ANTHROPIC_API_KEY missing"
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 19420.28586769104
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": false,
+      "embedder": null,
+      "stats": {
+        "success": true,
+        "num_contexts": 835,
+        "by_type": {
+          "code": 0,
+          "conversation": 655,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 1.7286615371704102,
+        "uptime_seconds": 19420.316905498505
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 673,
+          "events_since_consolidate": 2,
+          "dedup": {
+            "events_seen": 814,
+            "coherent_repeats_skipped": 14,
+            "first_writes": 800
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "ready": true
+  },
+  "scenarios_run": 0,
+  "total_turns": 0,
+  "total_claude_calls": 0,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_estimated_cost_usd": 0,
+  "mean_claude_latency_ms": null,
+  "max_observed_s_t": null,
+  "mean_observed_s_t": null,
+  "longest_run_above_theta": 0,
+  "omega_total_initial": 0,
+  "omega_total_final": 0,
+  "omega_total_delta": 0,
+  "reference_field_total_initial": 0,
+  "reference_field_total_final": 0,
+  "reference_field_total_delta": 0,
+  "relation_events_emitted": 0,
+  "relation_types_seen": [],
+  "scenarios": [],
+  "final_verdict": "FULL_ORGANISM_LEVEL2_CONFIRMED",
+  "allowed_verdicts": [
+    "FULL_ORGANISM_LEVEL2_CONFIRMED",
+    "FULL_ORGANISM_LEVEL3_NOT_OBSERVED",
+    "FULL_ORGANISM_NEAR_THRESHOLD",
+    "OMEGA_OBSERVED_BY_CHECK_COAGULATION_NO_MANUAL_WRITE",
+    "INCONCLUSIVE_NEEDS_LONGER_RUN",
+    "CLAUDE_API_REQUIRED_FOR_FULL_ORGANISM_TEST"
+  ],
+  "forbidden_verdicts": [
+    "LEVEL_3_REACHED",
+    "OMEGA_CREATED_MANUALLY",
+    "SYNTHETIC_OMEGA",
+    "THRESHOLD_LOWERED",
+    "REFERENCEFIELD_CREATED_WITHOUT_OMEGA"
+  ],
+  "note": "dry-run; no Claude API calls were made; no memory writes were made"
+}

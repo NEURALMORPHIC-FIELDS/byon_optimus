@@ -1,0 +1,500 @@
+{
+  "schema_version": "level3-structural-identity-runner.v1",
+  "run_id": "2026-05-13T07-57-22-166Z-59172e34",
+  "branch": "research/level3-full-organism-runtime",
+  "is_level3_experiment": true,
+  "dry_run": false,
+  "memory_url": "http://localhost:8000",
+  "phases_requested": [
+    "phase0_seed",
+    "phase1_reinforcement",
+    "phase2_autonomous",
+    "phase3_adversarial",
+    "phase4_derivative"
+  ],
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "preflight": {
+    "flag": true,
+    "claude": {
+      "present": true
+    },
+    "memory_service": {
+      "live": true,
+      "details": {
+        "status": "healthy",
+        "service": "byon-memory-service",
+        "backend": "FAISS-IndexFlatIP",
+        "uptime_seconds": 487.7968444824219
+      }
+    },
+    "faiss": {
+      "faiss_live": true,
+      "embeddings_live": true,
+      "embedder_class": "ProductionEmbedder",
+      "embedder_name": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "backend": "FAISS-IndexFlatIP",
+      "fallback_simple_embedder_active": false,
+      "stats": {
+        "success": true,
+        "num_contexts": 1502,
+        "by_type": {
+          "code": 0,
+          "conversation": 1322,
+          "fact": 180
+        },
+        "fcpe_dim": 384,
+        "fhrss_profile": "FAISS-IndexFlatIP",
+        "total_storage_mb": 3.5116491317749023,
+        "uptime_seconds": 487.8116307258606
+      }
+    },
+    "fcem": {
+      "fce_live": true,
+      "state": {
+        "success": true,
+        "state": {
+          "enabled": true,
+          "omega_registry": {
+            "count": 0,
+            "active": 0,
+            "contested": 0,
+            "inexpressed": 0,
+            "records": []
+          },
+          "reference_fields_count": 0,
+          "advisory_count": 42,
+          "events_since_consolidate": 0,
+          "dedup": {
+            "events_seen": 70,
+            "coherent_repeats_skipped": 0,
+            "first_writes": 70
+          },
+          "coherent_repeat_threshold": 0.92
+        }
+      }
+    },
+    "fce_metrics_detail": {
+      "ok": true,
+      "is_level3_experiment_endpoint": true,
+      "forbidden_for_omega_creation": true,
+      "fce_metrics_exposed": true,
+      "theta_s": 0.28,
+      "tau_coag": 12,
+      "per_center": [
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "Omega": 0,
+          "kappa": 0.41096407916711974,
+          "alpha": 1,
+          "rho": 1.6335152096575176,
+          "lambda_ar": 0.33323783980241634,
+          "Z_norm": 3.8998676461810065,
+          "B_t_from_Z": 0.20408714524756758,
+          "Phi_s_norm": 0.9999999999990321,
+          "cycles": 21,
+          "consec_above_threshold": 0,
+          "sine_type": "not_coagulated"
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "Omega": 0,
+          "kappa": 0.23569235577910924,
+          "alpha": 1,
+          "rho": 1.237732352315389,
+          "lambda_ar": 0.32439899024966223,
+          "Z_norm": 2.4755677457804453,
+          "B_t_from_Z": 0.28772277600229834,
+          "Phi_s_norm": 0.9999999999990247,
+          "cycles": 21,
+          "consec_above_threshold": 0,
+          "sine_type": "not_coagulated"
+        }
+      ],
+      "morphogenesis_log_tail_length": 42,
+      "morphogenesis_log_tail": [
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.09697548241801773,
+          "AR": 0.833848214126443,
+          "kappa": 0.5163664124311702,
+          "cycle": 1,
+          "episode_id": 1
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.1522582400511402,
+          "AR": 0.6975778562087607,
+          "kappa": 0.5298733025675321,
+          "cycle": 1,
+          "episode_id": 1
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.0992720682522282,
+          "AR": 0.7628633323205665,
+          "kappa": 0.5081033209545657,
+          "cycle": 2,
+          "episode_id": 2
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.09834749426467228,
+          "AR": 0.9787036615923994,
+          "kappa": 0.48478542604438574,
+          "cycle": 2,
+          "episode_id": 2
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.09515837821103419,
+          "AR": 0.9999999999989996,
+          "kappa": 0.456606923950367,
+          "cycle": 3,
+          "episode_id": 3
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.08390730058603754,
+          "AR": 0.8319784684757711,
+          "kappa": 0.48400623303998513,
+          "cycle": 3,
+          "episode_id": 3
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.09073082499861672,
+          "AR": 0.9999999999989996,
+          "kappa": 0.43168098672427224,
+          "cycle": 4,
+          "episode_id": 4
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.07564512686662556,
+          "AR": 0.8459799216275151,
+          "kappa": 0.4573182115867363,
+          "cycle": 4,
+          "episode_id": 4
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.07327291057261082,
+          "AR": 0.9243954612882016,
+          "kappa": 0.4278986074279312,
+          "cycle": 5,
+          "episode_id": 5
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08712987117600836,
+          "AR": 0.9999999999989999,
+          "kappa": 0.40983640996790643,
+          "cycle": 5,
+          "episode_id": 5
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.0842987328350091,
+          "AR": 0.999999999999,
+          "kappa": 0.3910211600033051,
+          "cycle": 6,
+          "episode_id": 6
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.07523700415599402,
+          "AR": 0.9999999999989999,
+          "kappa": 0.3957582849162265,
+          "cycle": 6,
+          "episode_id": 6
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08219781656842762,
+          "AR": 0.9999999999989999,
+          "kappa": 0.3752019339421795,
+          "cycle": 7,
+          "episode_id": 7
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.07179579404665047,
+          "AR": 0.9999999999989994,
+          "kappa": 0.36431085279591624,
+          "cycle": 7,
+          "episode_id": 7
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06845331076077728,
+          "AR": 0.9999999999989997,
+          "kappa": 0.3359899154237024,
+          "cycle": 8,
+          "episode_id": 8
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08079248122643402,
+          "AR": 0.9999999999990002,
+          "kappa": 0.36231974023665275,
+          "cycle": 8,
+          "episode_id": 8
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08005942021692394,
+          "AR": 0.9999999999990005,
+          "kappa": 0.3523287756565912,
+          "cycle": 9,
+          "episode_id": 9
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06528687398749099,
+          "AR": 0.9999999999990001,
+          "kappa": 0.310755626455298,
+          "cycle": 9,
+          "episode_id": 9
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.07998110916233682,
+          "AR": 0.9999999999990007,
+          "kappa": 0.3451835774255397,
+          "cycle": 10,
+          "episode_id": 10
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06271995260810971,
+          "AR": 0.9999999999989998,
+          "kappa": 0.2885744720634514,
+          "cycle": 10,
+          "episode_id": 10
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06075512575471254,
+          "AR": 0.999999999999,
+          "kappa": 0.26947259768945364,
+          "cycle": 11,
+          "episode_id": 11
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08053892835067493,
+          "AR": 0.9999999999990004,
+          "kappa": 0.34082164228073525,
+          "cycle": 11,
+          "episode_id": 11
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08171403506282658,
+          "AR": 0.9999999999989998,
+          "kappa": 0.33917982423683735,
+          "cycle": 12,
+          "episode_id": 12
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.05940379547273899,
+          "AR": 0.9999999999989999,
+          "kappa": 0.25344258015300125,
+          "cycle": 12,
+          "episode_id": 12
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.0834830360860896,
+          "AR": 0.9999999999990001,
+          "kappa": 0.3401896913492574,
+          "cycle": 13,
+          "episode_id": 13
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.05868881408387217,
+          "AR": 0.999999999999001,
+          "kappa": 0.24046240252525314,
+          "cycle": 13,
+          "episode_id": 13
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.05865290625133573,
+          "AR": 0.9999999999989995,
+          "kappa": 0.23053657816325268,
+          "cycle": 14,
+          "episode_id": 14
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.0856461075556987,
+          "AR": 0.9999999999989996,
+          "kappa": 0.34376870759307365,
+          "cycle": 14,
+          "episode_id": 14
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08743007147988965,
+          "AR": 0.999999999999,
+          "kappa": 0.34976704782459994,
+          "cycle": 15,
+          "episode_id": 15
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.05932070014877971,
+          "AR": 0.9999999999989997,
+          "kappa": 0.22364853473751567,
+          "cycle": 15,
+          "episode_id": 15
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08785871729717619,
+          "AR": 0.9999999999989999,
+          "kappa": 0.3576039979380246,
+          "cycle": 16,
+          "episode_id": 16
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06016479441518585,
+          "AR": 0.9999999999990002,
+          "kappa": 0.2197671384700663,
+          "cycle": 16,
+          "episode_id": 16
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.061034702946520795,
+          "AR": 0.9999999999990001,
+          "kappa": 0.21867781374904907,
+          "cycle": 17,
+          "episode_id": 17
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08792640613473336,
+          "AR": 0.9999999999990006,
+          "kappa": 0.36696120763073775,
+          "cycle": 17,
+          "episode_id": 17
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08716195215088873,
+          "AR": 0.9999999999989996,
+          "kappa": 0.37740406218577843,
+          "cycle": 18,
+          "episode_id": 18
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.061838593978662953,
+          "AR": 0.9999999999989997,
+          "kappa": 0.22001017877962048,
+          "cycle": 18,
+          "episode_id": 18
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08423544505571398,
+          "AR": 0.9999999999990001,
+          "kappa": 0.38811226226438894,
+          "cycle": 19,
+          "episode_id": 19
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06372036787547626,
+          "AR": 0.9999999999990005,
+          "kappa": 0.22383140617439912,
+          "cycle": 19,
+          "episode_id": 19
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.0641045142707688,
+          "AR": 0.9999999999990001,
+          "kappa": 0.22919087998421286,
+          "cycle": 20,
+          "episode_id": 20
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.08229271674918608,
+          "AR": 0.999999999999,
+          "kappa": 0.3993609541856313,
+          "cycle": 20,
+          "episode_id": 20
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::conversation",
+          "S_t": 0.07999242992347334,
+          "AR": 0.9999999999990005,
+          "kappa": 0.41096407916711974,
+          "cycle": 21,
+          "episode_id": 21
+        },
+        {
+          "center_id": "level3_full_organism_2026-05-13T07-49-51-249Z-46256640__structural_identity::execution_result",
+          "S_t": 0.06413775549665716,
+          "AR": 0.999999999999,
+          "kappa": 0.23569235577910924,
+          "cycle": 21,
+          "episode_id": 21
+        }
+      ],
+      "max_S_t_in_log": 0.1522582400511402,
+      "mean_S_t_in_log": 0.07865766927395731,
+      "max_AR_in_log": 0.999999999999001,
+      "mean_AR_in_log": 0.9732225456096347,
+      "longest_run_above_theta_in_log": 0,
+      "note": "S_t / AR are recovered from the observer's morphogenesis_log (tail of last 200 events). I_t is NOT separately retained by FCE-M v0.6.0; if the runner needs I_t it must be computed from delta_X and Phi_s, which are not exposed by this surface."
+    },
+    "ready": true
+  },
+  "n_seeds": 7,
+  "admitted_origins": [
+    "operator_seeded",
+    "system_canonical",
+    "verified_project_fact",
+    "domain_verified",
+    "experience_assimilated",
+    "endogenous_derivative_candidate"
+  ],
+  "admitted_states": [
+    "seeded_reference",
+    "active_reference",
+    "assimilating_reference",
+    "assimilated_structural_reference",
+    "structural_identity_node",
+    "endogenous_derivative_candidate"
+  ],
+  "allowed_verdicts": [
+    "STRUCTURAL_SEEDING_COMPLETED",
+    "STRUCTURAL_REFERENCE_SEEDING_ONLY",
+    "STRUCTURAL_REFERENCE_RECALL_CONFIRMED",
+    "STRUCTURAL_REFERENCE_APPLICATION_CONFIRMED",
+    "STRUCTURAL_REFERENCE_ASSIMILATION_OBSERVED",
+    "STRUCTURAL_IDENTITY_FIELD_FORMING",
+    "ENDOGENOUS_DERIVATIVE_CANDIDATES_OBSERVED",
+    "FULL_LEVEL3_NOT_DECLARED",
+    "INCONCLUSIVE_NEEDS_LONGER_RUN"
+  ],
+  "forbidden_verdict_tokens": [
+    "LEVEL_3_REACHED",
+    "OMEGA_CREATED_MANUALLY",
+    "SYNTHETIC_OMEGA",
+    "THRESHOLD_LOWERED",
+    "REFERENCEFIELD_CREATED_WITHOUT_OMEGA",
+    "SEEDED_REFERENCE_AS_ENDOGENOUS_OMEGA"
+  ],
+  "generated_at": "2026-05-13T07:57:22.243Z"
+}
