@@ -1,0 +1,53 @@
+{
+  "id": "security_auditor",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Threat modeling, vulnerability assessment, auditor authority enforcement, policy bypass detection. Operates within MACP — flags risk, never approves bypass.",
+  "domains": ["security", "policy", "threat_model", "audit", "compliance"],
+  "intents": ["audit", "threat-model", "detect-bypass", "assess-risk", "review-policy"],
+  "roles": ["security_auditor", "security_engineer", "compliance_officer"],
+  "activation_keywords": [
+    "security", "vulnerability", "exploit", "CVE", "CWE",
+    "policy", "bypass", "privilege", "auth", "token",
+    "secret", "credential", "key", "leak",
+    "audit", "threat", "attack surface", "STRIDE",
+    "injection", "XSS", "SSRF", "RCE", "buffer overflow",
+    "Auditor", "Ed25519", "MACP", "air-gap"
+  ],
+  "negative_keywords": [
+    "novel", "poem", "scene",
+    "dosage", "ICD-10"
+  ],
+  "required_modules": [
+    "verified_project_fact",
+    "structural_reference_memory",
+    "auditor_authority_boundary",
+    "policy_engine",
+    "trust_ranked_formatter",
+    "disputed_or_unsafe_rail"
+  ],
+  "optional_modules": [
+    "ci_status_observer",
+    "secret_scanner"
+  ],
+  "memory_routes": [
+    "structural_reference_memory",
+    "verified_project_fact",
+    "domain_verified_fact"
+  ],
+  "context_builder": "security_context_builder",
+  "output_contract": "ranked_findings_with_severity",
+  "guards": [
+    "no_policy_bypass_acceptance",
+    "no_secret_leakage",
+    "auditor_authority_preserved",
+    "no_destructive_action_without_approval"
+  ],
+  "module_status": {
+    "policy_engine": "planned",
+    "secret_scanner": "planned",
+    "security_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}

@@ -1,0 +1,77 @@
+{
+  "id": "software_engineer",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Long-form software engineering across multi-file repos. Requires exact workspace memory, symbol awareness, and patch-level recall — none of which a similarity-based conversational memory provides. The v0.6 coding benchmark failed without this capability pack; see docs/CONTEXTUAL_CAPABILITY_ARCHIVE.md.",
+  "domains": ["code", "software", "engineering", "refactor", "tests", "ci"],
+  "intents": ["implement", "refactor", "fix", "debug", "review", "test", "build", "plan-implementation", "explain-code"],
+  "roles": ["developer", "engineer", "tech_lead", "architect", "maintainer"],
+  "activation_keywords": [
+    "code", "function", "class", "method", "file", "module", "package",
+    "implement", "build", "refactor", "rewrite", "patch", "diff", "merge",
+    "bug", "fix", "regression", "stack trace", "exception", "error",
+    "test", "pytest", "vitest", "unit test", "integration test", "tsc",
+    "typescript", "python", "javascript", "node", "npm", "pnpm", "pip",
+    "import", "export", "interface", "type", "dataclass",
+    "src/", "tests/", "build", "compile",
+    "API", "endpoint", "handler", "schema", "migration",
+    "PR", "pull request", "commit", "branch",
+    "repo", "repository", "workspace"
+  ],
+  "negative_keywords": [
+    "novel", "poem", "scene", "character", "plot", "metaphor",
+    "ontology", "epistemic", "metaethics",
+    "GDPR", "ANSPDCP", "jurisdiction",
+    "concrete", "foundation", "structural beam",
+    "dosage", "contraindication", "pharmacokinetics"
+  ],
+  "required_modules": [
+    "code_workspace_memory",
+    "exact_file_state_store",
+    "symbol_index",
+    "requirements_ledger",
+    "patch_memory",
+    "test_failure_memory",
+    "architecture_map",
+    "workspace_diff_guard",
+    "coding_context_builder"
+  ],
+  "optional_modules": [
+    "lint_telemetry",
+    "build_telemetry",
+    "ci_status_observer",
+    "security_lint",
+    "type_checker_bridge"
+  ],
+  "memory_routes": [
+    "verified_project_fact",
+    "structural_reference_memory",
+    "code_workspace_memory",
+    "exact_file_state_store",
+    "test_failure_memory",
+    "patch_memory"
+  ],
+  "context_builder": "coding_context_builder",
+  "output_contract": "fenced_code_blocks_with_file_headers",
+  "guards": [
+    "no_deleted_tests",
+    "no_benchmark_regression",
+    "no_secret_leakage",
+    "no_destructive_action_without_approval",
+    "no_silent_api_break"
+  ],
+  "module_status": {
+    "code_workspace_memory": "planned",
+    "exact_file_state_store": "planned",
+    "symbol_index": "planned",
+    "requirements_ledger": "planned",
+    "patch_memory": "planned",
+    "test_failure_memory": "planned",
+    "architecture_map": "planned",
+    "workspace_diff_guard": "planned",
+    "coding_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false,
+  "notes": "All required_modules are currently 'planned'. Until they exist, software_engineer capability activates but flags the gaps via router.missing_required_modules. Do NOT treat coding as solved."
+}

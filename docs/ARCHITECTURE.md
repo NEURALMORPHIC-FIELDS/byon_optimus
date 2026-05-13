@@ -10,9 +10,12 @@
 
 ## Active organism — input to telemetry
 
+The Contextual Capability Archive (v0.7 infrastructure, additive) sits between context-state classification and trust-ranked retrieval: it decides *which cognitive capacity is activated* — `software_engineer`, `novelist`, `philosopher`, `domain_analyst`, etc. — without replacing Contextual Pathway Stabilization. See [`CONTEXTUAL_CAPABILITY_ARCHIVE.md`](CONTEXTUAL_CAPABILITY_ARCHIVE.md). Nine manifests ship; most required modules (especially `software_engineer`'s workspace stack) remain `planned`, so coding is **not** declared solved.
+
 ```
 input
   → contextual routing (Contextual Pathway Stabilization: cold / stabilizing / warm / drift)
+  → [v0.7 infra, additive] capability router (Contextual Capability Archive)
   → trust-ranked retrieval (SYSTEM_CANONICAL > VERIFIED_PROJECT_FACT > DOMAIN_VERIFIED
                              > USER_PREFERENCE > EXTRACTED_USER_CLAIM > DISPUTED_OR_UNSAFE)
   → structural references (7 operator-seeded, origin=operator_seeded, thread-scoped)

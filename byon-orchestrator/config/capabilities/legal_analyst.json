@@ -1,0 +1,52 @@
+{
+  "id": "legal_analyst",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Statutory / case-law / contractual analysis with jurisdictional awareness. Stronger 'this is not legal advice' boundary than domain_analyst.",
+  "domains": ["law", "contract", "statute", "case_law", "litigation"],
+  "intents": ["analyze-contract", "check-statute", "compare-jurisdiction", "summarize-case"],
+  "roles": ["legal_analyst", "paralegal", "in_house_counsel"],
+  "activation_keywords": [
+    "contract", "clause", "indemnity", "warranty", "liability",
+    "statute", "regulation", "case", "ruling", "precedent",
+    "court", "judge", "litigation", "claim", "damages",
+    "jurisdiction", "venue", "choice of law",
+    "GDPR", "Law 506/2004", "CCPA",
+    "patent", "EP25216372", "trademark", "copyright", "IP"
+  ],
+  "negative_keywords": [
+    "implement", "refactor",
+    "scene", "novel",
+    "dosage", "ICD-10"
+  ],
+  "required_modules": [
+    "statute_index",
+    "case_index",
+    "jurisdiction_resolver",
+    "domain_verified_facts"
+  ],
+  "optional_modules": [
+    "contract_diff_tool",
+    "structural_reference_memory"
+  ],
+  "memory_routes": [
+    "domain_verified_fact",
+    "verified_project_fact"
+  ],
+  "context_builder": "legal_context_builder",
+  "output_contract": "structured_analysis_with_jurisdiction_and_disclaimer",
+  "guards": [
+    "no_legal_advice_without_disclaimer",
+    "no_jurisdiction_transplant",
+    "no_invented_case_citation"
+  ],
+  "module_status": {
+    "statute_index": "planned",
+    "case_index": "planned",
+    "jurisdiction_resolver": "planned",
+    "contract_diff_tool": "planned",
+    "legal_context_builder": "planned"
+  },
+  "experience_log": true,
+  "level3_claim": false
+}

@@ -101,6 +101,7 @@ For the short status block see [`docs/LEVEL_STATUS.md`](docs/LEVEL_STATUS.md). F
 | [docs/RESEARCH_PROGRESS_v0.6.md](docs/RESEARCH_PROGRESS_v0.6.md) | Scientific narrative (v0.6.0 → v0.6.4) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current architecture (component table, MACP flow, endpoints) |
 | [docs/CONTEXTUAL_PATHWAY_STABILIZATION_v0.6.9.md](docs/CONTEXTUAL_PATHWAY_STABILIZATION_v0.6.9.md) | Contextual Pathway Stabilization spec |
+| [docs/CONTEXTUAL_CAPABILITY_ARCHIVE.md](docs/CONTEXTUAL_CAPABILITY_ARCHIVE.md) | Contextual Capability Archive — v0.7 infrastructure layer for capability routing. Coding is **not** declared solved. |
 | [docs/ROADMAP_v0.6.6_to_v0.7.0.md](docs/ROADMAP_v0.6.6_to_v0.7.0.md) | Roadmap |
 | [docs/LEVEL3_FULL_ORGANISM_RUNTIME_EXPERIMENT.md](docs/LEVEL3_FULL_ORGANISM_RUNTIME_EXPERIMENT.md) | Commit-15/17 research design (Level 3 *not* declared) |
 | [docs/LEVEL3_STRUCTURAL_IDENTITY_EXPERIMENT.md](docs/LEVEL3_STRUCTURAL_IDENTITY_EXPERIMENT.md) | Commit-16/17 structural identity research |
