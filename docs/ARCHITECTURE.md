@@ -1,6 +1,49 @@
-# BYON Optimus — Architecture (v0.6.4)
+# BYON Optimus — Architecture
 
-> **Status:** research-in-progress. The architecture below reflects the current v0.6.4 state. For the full scientific narrative, classification rationale, and per-stage evolution (v0.6.0 → v0.6.4) see [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
+> **Status:** Level 2 full-organism confirmed. The MACP / FCE-M / hybrid-memory snapshot below started as the v0.6.4 reference and remains accurate; commit 17 added structural references in the production pipeline, PR #3 validated the organism (BYON +34.94 % vs Claude Sonnet 4.6 direct, 7 / 7 gates PASS), PR #4 stabilized the test harness (586 / 586 tests pass).
+>
+> - Operational level: **Level 2 of 4 — Morphogenetic Advisory Memory**
+> - Level 3: **not declared**
+> - Natural Omega: **not proven**
+> - `θ_s = 0.28`, `τ_coag = 12`: operator-locked
+> - Short status: [`LEVEL_STATUS.md`](LEVEL_STATUS.md) — End-to-end record: [`VALIDATION_SUMMARY.md`](VALIDATION_SUMMARY.md) — Research history (v0.6.0 → v0.6.4): [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
+
+## Active organism — input to telemetry
+
+```
+input
+  → contextual routing (Contextual Pathway Stabilization: cold / stabilizing / warm / drift)
+  → trust-ranked retrieval (SYSTEM_CANONICAL > VERIFIED_PROJECT_FACT > DOMAIN_VERIFIED
+                             > USER_PREFERENCE > EXTRACTED_USER_CLAIM > DISPUTED_OR_UNSAFE)
+  → structural references (7 operator-seeded, origin=operator_seeded, thread-scoped)
+  → prompt builder (canonical facts + trust-ranked formatter + ACTIVE RESPONSE CONSTRAINTS)
+  → Claude Sonnet 4.6
+  → compliance guard (detect / auto-fix / regenerate-once)
+  → fact extraction (sync / async / skip routing)
+  → memory writeback (FAISS + FCE-M)
+  → FCE-M receipt assimilation (success → aligned, partial → tensioned,
+                                 failure → residue, security_rejected → contested)
+  → telemetry (module activation matrix, structural derivative classification)
+```
+
+### Modules active in the 211-turn canonical benchmark run
+
+`claude_api_live`, `memory_service_live`, `faiss_live`, `production_embeddings`,
+`fce_m_backend`, `fce_morphogenesis_report`, `fce_assimilate_receipt`,
+`contextual_pathway_stabilization`, `context_state_planner`, `cold_stabilizing_warm_drift`,
+`memory_route_planner`, `trust_ranked_formatter`, `verified_project_facts`,
+`domain_verified_facts`, `disputed_or_unsafe_rail`, `fact_extractor`, `compliance_guard`,
+`active_response_constraints`, `post_generation_checker`, `regeneration_once`,
+`structural_reference_memory`, `structural_seed_persistence`, `thread_scoped_retrieval`,
+`experiment_namespace_isolation`, `no_manual_omega`, `no_level3_claim`.
+
+Honestly inactive (documented, not hidden):
+
+- `fce_consolidate` — no consolidate call was issued by the benchmark
+- `omega_registry_snapshot` — no endogenous Omega registered (by design)
+- `reference_field_snapshot` — no ReferenceField coagulated (by design)
+- `relational_field_instrumentation` — runner does not invoke the commit-14/15 lib
+- `auditor_authority_boundary` — MACP Auditor is not part of the conversational surface; the boundary is structurally enforced elsewhere
 
 ## Main components
 

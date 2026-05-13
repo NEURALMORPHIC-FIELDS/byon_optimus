@@ -6,8 +6,10 @@
   *Research-in-progress integration platform for FCE-M (Fragmergent Causal Exponentiation Memory) over a MACP v1.1 multi-agent pipeline.*
 
   [![CI](https://github.com/NEURALMORPHIC-FIELDS/byon_optimus/actions/workflows/ci.yml/badge.svg)](https://github.com/NEURALMORPHIC-FIELDS/byon_optimus/actions/workflows/ci.yml)
-  [![Status](https://img.shields.io/badge/status-research--in--progress-orange.svg)](docs/RESEARCH_PROGRESS_v0.6.md)
-  [![Level](https://img.shields.io/badge/FCE--M%20level-2%20of%204-yellow.svg)](docs/RESEARCH_PROGRESS_v0.6.md#classification)
+  [![Status](https://img.shields.io/badge/status-Level%202%20full--organism%20confirmed-green.svg)](docs/LEVEL_STATUS.md)
+  [![Level](https://img.shields.io/badge/FCE--M%20level-2%20of%204-yellow.svg)](docs/LEVEL_STATUS.md)
+  [![Benchmark](https://img.shields.io/badge/BYON%20vs%20Claude%20direct-+34.94%25-brightgreen.svg)](docs/VALIDATION_SUMMARY.md)
+  [![Tests](https://img.shields.io/badge/tests-586%2F586-brightgreen.svg)](docs/validation/POST_MERGE_TEST_HARNESS_STABILIZATION.md)
   [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
   [![Patent](https://img.shields.io/badge/Patent-EP25216372.0-blue.svg)](LICENSE)
   [![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
@@ -33,7 +35,24 @@ This README documents the current state of integration: **a hybrid memory archit
   4. Self-applying memory (orchestrator autonomously adapts to FCE advisory without LLM mediation).
 - **RQ3 — Sufficient conditions for coagulation:** Under what input regimes can OmegaRecord coagulation be reached *through the BYON conversational loop*, given fixed coagulation thresholds (`θ_s=0.28`, `τ_coag=12`)?
 
-## Current findings (v0.6.4)
+## Current state (post-PR #4)
+
+| Aspect | Status |
+|---|---|
+| Operational classification | **Level 2 of 4 — Morphogenetic Advisory Memory, full-organism confirmed** |
+| Full-organism capability benchmark | **Passed.** 100 items × 12 categories × 211 BYON turns. BYON wins **11 / 12** categories; overall **+34.94 %** weighted advantage over Claude Sonnet 4.6 direct. All 7 operator-defined acceptance gates PASS. |
+| Test suite | **586 / 586 pass** across 27 test files (after PR #4 Vitest 4 shebang fix) |
+| Regression vs v0.6.5 → commit 17 | **None.** All 7 previously validated capabilities ≥ 3.0 B-avg in the regression matrix. |
+| Structural reference memory in production pipeline | **Active.** 7 operator-seeded references persisted via `/level3/persist-structural-reference`, retrieved thread-scoped, included in trust-ranked prompts, 6/7 adversarially robust. |
+| Level 3 | **Not declared.** |
+| Natural Omega | **Not proven.** `θ_s = 0.28` and `τ_coag = 12` are operator-locked and never lowered. |
+| Single category lost to Claude direct | K — Novel / contextual skill precursor (creative latitude reduced by structural constraints). Documented as a design trade-off, not a regression. |
+
+**Canonical artefacts:** [`byon-orchestrator/test-results/full-organism-capability-benchmark/2026-05-13T09-57-20-343Z-b39uv/`](byon-orchestrator/test-results/full-organism-capability-benchmark/2026-05-13T09-57-20-343Z-b39uv/) (`report.md`, `summary.json`, `per-item-scores.json`, `module-activation-matrix.json`, `capability-deltas.json`, `regression-matrix.json`, Condition A jsonl, Condition B jsonl).
+
+For the short status block see [`docs/LEVEL_STATUS.md`](docs/LEVEL_STATUS.md). For the end-to-end validation record see [`docs/VALIDATION_SUMMARY.md`](docs/VALIDATION_SUMMARY.md).
+
+## Earlier findings (v0.6.4 research snapshot)
 
 | Aspect | Status |
 |---|---|
@@ -48,25 +67,44 @@ This README documents the current state of integration: **a hybrid memory archit
 | **ReferenceField projection from the conversational loop** | **Not reached** (dependent on the above). |
 | Pipeline self-applying advisory (Level 4) | **Not claimed.** The bridge surfaces FCE advisory in the LLM system prompt but does not autonomously gate orchestration. |
 
-**Operational classification: Level 2 of 4.** See [`docs/RESEARCH_PROGRESS_v0.6.md`](docs/RESEARCH_PROGRESS_v0.6.md) for the full methodology, metrics, and bottleneck analysis. Empirical artefacts are stored under [`test-results/`](test-results/).
+**Operational classification: Level 2 of 4.** The v0.6.4 row above represents the v0.6.0 → v0.6.4 research baseline. After that, commit 17 added structural references in the production pipeline; the full-organism capability benchmark (PR #3) validated the organism as a whole; PR #4 stabilized the test harness. The full methodology, metrics, and bottleneck analysis still lives in [`docs/RESEARCH_PROGRESS_v0.6.md`](docs/RESEARCH_PROGRESS_v0.6.md). Post-benchmark empirical artefacts are under [`byon-orchestrator/test-results/full-organism-capability-benchmark/2026-05-13T09-57-20-343Z-b39uv/`](byon-orchestrator/test-results/full-organism-capability-benchmark/2026-05-13T09-57-20-343Z-b39uv/).
 
 ## Status
 
-> **This is an active research project.** The architectural boundaries (Worker plans, Auditor approves, Executor air-gapped) are production-stable; the morphogenetic layer (FCE-M v0.6.0) is **integrated and observable** but **does not yet coagulate Omega centers from natural conversational input** under default thresholds. We do **not** lower `θ_s` or `τ_coag` to manufacture coagulation; we report exactly which factor (AR, κ, I_t, B_t) blocks it and why.
+> **The architectural boundaries (Worker plans, Auditor approves, Executor air-gapped) are production-stable.** The morphogenetic layer (FCE-M v0.6.0) is **integrated, observable, and benchmark-validated against Claude Sonnet 4.6 direct** with a measured +34.94 % advantage across 100 items in 12 categories. Structural reference memory is **active in the production pipeline**. We do **not** lower `θ_s` or `τ_coag` to manufacture coagulation; we report exactly which factor blocks endogenous Omega coagulation and we do not claim Level 3.
 
 ---
 
 ## Documentation
 
+### Status and validation (canonical post-PR #4)
+
+| Document | Purpose |
+|----------|---------|
+| [docs/LEVEL_STATUS.md](docs/LEVEL_STATUS.md) | **Operational level status** — Level 2 confirmed, Level 3 not declared, locked thresholds |
+| [docs/VALIDATION_SUMMARY.md](docs/VALIDATION_SUMMARY.md) | **End-to-end validation record** — PR #3 + PR #4, gates, per-category deltas, regression matrix |
+| [docs/MEMORY_MODEL.md](docs/MEMORY_MODEL.md) | Trust tiers and memory categories used by the runtime |
+| [docs/STRUCTURAL_REFERENCE_MEMORY.md](docs/STRUCTURAL_REFERENCE_MEMORY.md) | The seven operator-seeded structural references; what is proven vs not proven |
+| [docs/RUNTIME.md](docs/RUNTIME.md) | Practical runtime guide — install / test / build / benchmark commands |
+| [docs/validation/CANONIZATION_APPROVAL_REPORT.md](docs/validation/CANONIZATION_APPROVAL_REPORT.md) | All 7 acceptance gates PASS |
+| [docs/validation/REGRESSION_MATRIX.md](docs/validation/REGRESSION_MATRIX.md) | v0.6.5 → commit 17 regression check |
+| [docs/validation/FINAL_ARTIFACT_REVIEW_CHECKLIST.md](docs/validation/FINAL_ARTIFACT_REVIEW_CHECKLIST.md) | 20-item artifact freeze |
+| [docs/validation/POST_MERGE_TEST_HARNESS_STABILIZATION.md](docs/validation/POST_MERGE_TEST_HARNESS_STABILIZATION.md) | PR #4 — Vitest 4 shebang fix |
+| [docs/validation/00_PROTECTED_BASELINE.md](docs/validation/00_PROTECTED_BASELINE.md) | Backup-tag baseline before validation work began |
+
+### Architecture and research history
+
 | Document | Purpose |
 |----------|---------|
 | [INSTALL.md](INSTALL.md) | Practical installation guide |
 | [CHANGELOG.md](CHANGELOG.md) | Versioned change history (incl. v0.6.x research line) |
-| [docs/RESEARCH_PROGRESS_v0.6.md](docs/RESEARCH_PROGRESS_v0.6.md) | **Scientific narrative** of the FCE-M integration (v0.6.0 → v0.6.4) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current v0.6.4 architecture (component table, MACP flow, endpoints) |
-| [test-results/v0.6.4-synthesis.md](test-results/v0.6.4-synthesis.md) | Cross-stage synthesis report with metrics |
-| [test-results/fcem-deep-v0.6.4a-report.md](test-results/fcem-deep-v0.6.4a-report.md) | Latest deep-functional run |
-| [test-results/fcem-coagulation-harness-v0.6.4b.md](test-results/fcem-coagulation-harness-v0.6.4b.md) | Single-center coagulation feasibility experiment |
+| [docs/RESEARCH_PROGRESS_v0.6.md](docs/RESEARCH_PROGRESS_v0.6.md) | Scientific narrative (v0.6.0 → v0.6.4) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current architecture (component table, MACP flow, endpoints) |
+| [docs/CONTEXTUAL_PATHWAY_STABILIZATION_v0.6.9.md](docs/CONTEXTUAL_PATHWAY_STABILIZATION_v0.6.9.md) | Contextual Pathway Stabilization spec |
+| [docs/ROADMAP_v0.6.6_to_v0.7.0.md](docs/ROADMAP_v0.6.6_to_v0.7.0.md) | Roadmap |
+| [docs/LEVEL3_FULL_ORGANISM_RUNTIME_EXPERIMENT.md](docs/LEVEL3_FULL_ORGANISM_RUNTIME_EXPERIMENT.md) | Commit-15/17 research design (Level 3 *not* declared) |
+| [docs/LEVEL3_STRUCTURAL_IDENTITY_EXPERIMENT.md](docs/LEVEL3_STRUCTURAL_IDENTITY_EXPERIMENT.md) | Commit-16/17 structural identity research |
+| [docs/LEVEL3_NATURAL_OMEGA_RESEARCH.md](docs/LEVEL3_NATURAL_OMEGA_RESEARCH.md) | Natural Omega research design (Level 3 *not* declared) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [SECURITY.md](SECURITY.md) | Security policy and disclosure |
 
