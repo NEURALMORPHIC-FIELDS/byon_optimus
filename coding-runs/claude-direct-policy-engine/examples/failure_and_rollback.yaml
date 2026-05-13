@@ -1,0 +1,26 @@
+id: failure_rollback_demo
+name: Failure and Rollback Demo
+
+steps:
+  - id: build
+    name: Build
+    action: build
+
+  - id: deploy_staging
+    name: Deploy Staging
+    action: deploy
+    depends_on: [build]
+    policy_gate: deploy_gate
+
+  - id: run_smoke
+    name: Run Smoke Tests
+    action: test
+    depends_on: [deploy_staging]
+    params:
+      simulate_failure: true   # injects a simulated failure for demo purposes
+
+  - id: promote
+    name: Promote to Production
+    action: deploy
+    depends_on: [run_smoke]
+    policy_gate: deploy_gate

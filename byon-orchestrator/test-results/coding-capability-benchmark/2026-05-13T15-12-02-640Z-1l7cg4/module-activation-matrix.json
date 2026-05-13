@@ -1,0 +1,244 @@
+{
+  "claude_api_live": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "tokens_in=0 out=0",
+      "tokens_in=0 out=0",
+      "tokens_in=0 out=0",
+      "tokens_in=0 out=0",
+      "tokens_in=0 out=0"
+    ]
+  },
+  "memory_service_live": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "http://localhost:8000",
+      "http://localhost:8000",
+      "http://localhost:8000",
+      "http://localhost:8000",
+      "http://localhost:8000"
+    ]
+  },
+  "faiss_live": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "recall_conv=1 recall_facts=2",
+      "recall_conv=3 recall_facts=5",
+      "recall_conv=4 recall_facts=3",
+      "recall_conv=5 recall_facts=5",
+      "recall_conv=5 recall_facts=4"
+    ]
+  },
+  "production_embeddings": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2",
+      "all-MiniLM-L6-v2"
+    ]
+  },
+  "fce_m_backend": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ]
+  },
+  "fce_morphogenesis_report": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "report present",
+      "report present",
+      "report present",
+      "report present",
+      "report present"
+    ]
+  },
+  "fce_assimilate_receipt": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "called per turn",
+      "called per turn",
+      "called per turn",
+      "called per turn",
+      "called per turn"
+    ]
+  },
+  "contextual_pathway_stabilization": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "phase=cold",
+      "phase=cold",
+      "phase=cold",
+      "phase=cold",
+      "phase=cold"
+    ]
+  },
+  "context_state_planner": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ]
+  },
+  "cold_stabilizing_warm_drift": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "phase=cold",
+      "phase=cold",
+      "phase=cold",
+      "phase=cold",
+      "phase=cold"
+    ]
+  },
+  "memory_route_planner": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ]
+  },
+  "trust_ranked_formatter": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "formatFactsForPrompt",
+      "formatFactsForPrompt",
+      "formatFactsForPrompt",
+      "formatFactsForPrompt",
+      "formatFactsForPrompt"
+    ]
+  },
+  "verified_project_facts": {
+    "active": true,
+    "turn_count_seen": 3,
+    "evidence": [
+      "n=1",
+      "n=1",
+      "n=2"
+    ]
+  },
+  "domain_verified_facts": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence": []
+  },
+  "disputed_or_unsafe_rail": {
+    "active": false,
+    "turn_count_seen": 0,
+    "evidence": []
+  },
+  "fact_extractor": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "routed",
+      "routed",
+      "routed",
+      "routed",
+      "routed"
+    ]
+  },
+  "compliance_guard": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "violations=0",
+      "violations=0",
+      "violations=0",
+      "violations=0",
+      "violations=1"
+    ]
+  },
+  "active_response_constraints": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "buildSystemPrompt",
+      "buildSystemPrompt",
+      "buildSystemPrompt",
+      "buildSystemPrompt",
+      "buildSystemPrompt"
+    ]
+  },
+  "post_generation_checker": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "ran",
+      "ran",
+      "ran",
+      "ran",
+      "ran"
+    ]
+  },
+  "regeneration_once": {
+    "active": true,
+    "turn_count_seen": 1,
+    "evidence": [
+      "triggered"
+    ]
+  },
+  "structural_reference_memory": {
+    "active": true,
+    "turn_count_seen": 1,
+    "evidence": [
+      "phase 0 persist"
+    ]
+  },
+  "structural_seed_persistence": {
+    "active": true,
+    "turn_count_seen": 1,
+    "evidence": [
+      "/level3/persist-structural-reference"
+    ]
+  },
+  "thread_scoped_retrieval": {
+    "active": true,
+    "turn_count_seen": 6,
+    "evidence": [
+      "scope=thread",
+      "scope=thread",
+      "scope=thread",
+      "scope=thread",
+      "scope=thread"
+    ]
+  },
+  "experiment_namespace_isolation": {
+    "active": true,
+    "turn_count_seen": 0,
+    "evidence": []
+  },
+  "no_manual_omega": {
+    "active": true,
+    "turn_count_seen": 0,
+    "evidence": []
+  },
+  "no_level3_claim": {
+    "active": true,
+    "turn_count_seen": 0,
+    "evidence": []
+  }
+}

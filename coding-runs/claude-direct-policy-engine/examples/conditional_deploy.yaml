@@ -1,0 +1,33 @@
+id: conditional_deploy
+name: Conditional Production Deploy
+
+variables:
+  environment: staging   # default — override with --var environment=production
+
+steps:
+  - id: build
+    name: Build Release
+    action: build
+
+  - id: run_tests
+    name: Run Tests
+    action: test
+    depends_on: [build]
+    policy_gate: test_gate
+
+  - id: prod_deploy
+    name: Deploy to Production
+    action: deploy
+    depends_on: [run_tests]
+    environment: production
+    policy_gate: deploy_gate
+    condition:
+      equals:
+        var: environment
+        value: production
+
+  - id: notify
+    name: Notify Team
+    action: notify
+    depends_on: [prod_deploy]
+    policy_gate: notify_gate

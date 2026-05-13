@@ -1,0 +1,24 @@
+id: production_deploy
+name: Production Deployment (requires explicit grant)
+
+steps:
+  - id: build
+    name: Build Release
+    action: build
+    params:
+      tag: v2.0.0
+
+  - id: validate_build
+    name: Validate Build Artifact
+    action: validate
+    depends_on: [build]
+
+  - id: prod_deploy
+    name: Deploy to Production
+    action: deploy
+    depends_on: [validate_build]
+    environment: production
+    policy_gate: production_gate
+    params:
+      target: prod.example.com
+      # simulate_failure: true   # uncomment to test failure + rollback
