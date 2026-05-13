@@ -1,0 +1,12 @@
+name: minimal-workflow
+version: "1.0"
+description: Minimal example with no policy gates.
+
+gates: {}
+
+steps:
+  - id: hello
+    name: Say Hello
+    action: echo.hello
+    params:
+      message: "Hello, World!"

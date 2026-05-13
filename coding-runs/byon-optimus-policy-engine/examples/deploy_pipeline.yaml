@@ -1,47 +1,42 @@
 name: deploy-pipeline
 steps:
   - name: build
-    action: build_image
+    action: compile
     environment: dev
-    policy_gates: [dev-gate]
-    params:
-      image: myapp:latest
 
   - name: unit-tests
-    action: run_tests
-    environment: dev
+    action: pytest
     depends_on: [build]
-    policy_gates: [dev-gate]
+    environment: dev
 
   - name: staging-deploy
     action: deploy
-    environment: staging
     depends_on: [unit-tests]
     policy_gates: [staging-gate]
-    params:
-      target: staging-cluster
+    environment: staging
 
   - name: smoke-tests
-    action: run_smoke
-    environment: staging
+    action: smoke
     depends_on: [staging-deploy]
-    policy_gates: [staging-gate]
+    environment: staging
 
+  # prod-deploy only runs when environment variable equals "production".
+  # If skipped, post-deploy-notify is still attempted (skipped != failed).
   - name: prod-deploy
     action: deploy
-    environment: prod
     depends_on: [smoke-tests]
     policy_gates: [prod-gate]
+    environment: prod
     condition:
       equals:
-        var: environment
+        var: target_env
         value: production
-    params:
-      target: prod-cluster
 
-  - name: notify-slack
+  - name: post-deploy-notify
     action: notify
-    environment: dev
     depends_on: [prod-deploy]
-    params:
-      channel: "#deployments"
+    environment: prod
+    condition:
+      equals:
+        var: target_env
+        value: production

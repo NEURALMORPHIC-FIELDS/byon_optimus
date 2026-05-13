@@ -1,52 +1,51 @@
-name: simple-ci-cd-pipeline
+name: simple-ci-pipeline
 version: "1.0"
-metadata:
-  owner: platform-team
-  description: A simple CI/CD pipeline example
+description: A simple CI pipeline demonstrating policy-gated steps.
+
+gates:
+  dev_gate:
+    required_role: developer
+    description: Requires developer role to proceed
+  qa_gate:
+    required_role: qa
+    description: Requires QA role to proceed
+  staging_gate:
+    required_role: release_manager
+    description: Requires release manager role to proceed
 
 steps:
+  - id: checkout
+    name: Checkout Source Code
+    action: git.checkout
+    params:
+      branch: main
+
   - id: lint
-    name: Lint Source Code
-    action: lint
-    environment: development
-    policy_gate: lint-gate
-    params:
-      target: src/
+    name: Lint Code
+    action: lint.run
+    depends_on: [checkout]
+    policy_gates: [dev_gate]
 
-  - id: unit-test
+  - id: unit_tests
     name: Run Unit Tests
-    action: test
-    environment: development
-    depends_on: [lint]
-    policy_gate: test-gate
-    params:
-      suite: unit
-      coverage_threshold: 80
+    action: test.unit
+    depends_on: [checkout]
+    policy_gates: [dev_gate]
 
-  - id: build-artifact
-    name: Build Application Artifact
-    action: build
-    environment: development
-    depends_on: [unit-test]
-    policy_gate: build-gate
-    params:
-      output: dist/app.tar.gz
+  - id: build
+    name: Build Artefact
+    action: build.package
+    depends_on: [lint, unit_tests]
+    policy_gates: [dev_gate]
 
-  - id: deploy-staging
+  - id: integration_tests
+    name: Integration Tests
+    action: test.integration
+    depends_on: [build]
+    policy_gates: [qa_gate]
+
+  - id: staging_deploy
     name: Deploy to Staging
-    action: deploy
-    environment: staging
-    depends_on: [build-artifact]
-    policy_gate: staging-gate
-    params:
-      target_host: staging.example.internal
-      artifact: dist/app.tar.gz
-
-  - id: notify-team
-    name: Notify Team of Staging Deploy
-    action: notify
-    environment: staging
-    depends_on: [deploy-staging]
-    params:
-      channel: "#deployments"
-      message: "Staging deployment complete"
+    action: deploy.staging
+    depends_on: [integration_tests]
+    policy_gates: [staging_gate]

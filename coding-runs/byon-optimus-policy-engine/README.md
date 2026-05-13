@@ -1,10 +1,9 @@
 # policy-gated-workflow-engine
 
-Policy-gated workflow engine with DAG execution, conditional steps, audit log,
-and rollback. Pure Python — stdlib + PyYAML only. All side effects are
-**simulated**.
+A pure-Python, policy-gated workflow engine with DAG execution, audit log, and rollback.
+All side effects are **simulated** — no real network, shell, or deployment calls are made.
 
-## Run All Tests
+## Run all tests
 
 ```bash
-python -m pytest -q
+pytest

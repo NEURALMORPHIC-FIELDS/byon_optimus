@@ -1,15 +1,24 @@
 # Worked Examples
 
-Three complete examples showing the engine's behaviour end to end.
+All examples use the `workflow` CLI installed via `pip install -e .` from the
+repo root.  Workflow files live in `examples/`.
 
 ---
 
-## Example 1 — Simple CI pipeline (developer role)
+## Example 1 — Minimal Workflow (No Gates, No Conditions)
 
-**Workflow file:** `examples/simple_pipeline.yaml`
+**File**: `examples/minimal.yaml`
 
-This pipeline runs lint → test → build → deploy-staging → notify.
-`deploy-staging` requires the `staging-gate`, which a `developer` role does
-not hold.
+```yaml
+name: minimal-workflow
+version: "1.0"
+description: Minimal example with no policy gates.
 
-### Step 1: validate
+gates: {}
+
+steps:
+  - id: hello
+    name: Say Hello
+    action: echo.hello
+    params:
+      message: "Hello, World!"

@@ -1,350 +1,389 @@
 """
-Security regression tests — invariant_no_policy_bypass.
+Security regression tests: ensure that untrusted workflow YAML/JSON CANNOT
+bypass policy gates.
 
-These tests document and enforce that:
-  1. 'policy_gate: bypass_all' (and all reserved names) in workflow YAML/JSON
-     is REJECTED at load time with a clear ValidationError.
-  2. The rejection happens before any execution and is audited.
-  3. No code path allows untrusted workflow config to disable policy checks.
-  4. The safe operator escape hatch (PolicyMode.PERMISSIVE) works correctly,
-     is audited, and is NEVER activated by workflow file content.
+[invariant_no_policy_bypass]
+
+These tests document and enforce the correct REJECTION of adversarial input.
+They must NEVER be changed to make bypass_all pass validation — if they ever
+fail it means a security regression has been introduced.
 """
 from __future__ import annotations
+
+import json
 import textwrap
-import pytest
 from pathlib import Path
 
+import pytest
+
 from policy_engine.audit import AuditLog
-from policy_engine.engine import ExecutionContext, WorkflowEngine
-from policy_engine.loader import (
-    ValidationError,
-    _FORBIDDEN_GATE_NAMES,
-    load_workflow,
-)
-from policy_engine.models import Step, StepStatus, WorkflowDefinition
+from policy_engine.engine import WorkflowEngine
+from policy_engine.loader import WorkflowValidationError, _RESERVED_GATE_NAMES, load_workflow
+from policy_engine.models import PolicyGate, Step, Workflow
 from policy_engine.permissions import PermissionModel
-from policy_engine.policy import DEFAULT_GATES, PolicyEngine, PolicyMode, PolicyViolation
+from policy_engine.policy_mode import PolicyMode, resolve_policy_mode
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _write(tmp_path: Path, content: str, name: str = "wf.yaml") -> Path:
+def _yaml_file(tmp_path: Path, content: str, name: str = "wf.yaml") -> Path:
     p = tmp_path / name
-    p.write_text(textwrap.dedent(content))
+    p.write_text(textwrap.dedent(content), encoding="utf-8")
     return p
 
 
-def _simple_step(sid: str, gate: str) -> str:
-    return textwrap.dedent(f"""\
-        - id: {sid}
-          name: {sid.capitalize()}
-          action: build
-          policy_gate: {gate}
-    """)
-
-
-def _make_engine(workflow, role="developer", mode=PolicyMode.ENFORCED, ctx=None):
-    audit = AuditLog()
-    perms = PermissionModel.from_defaults(role)
-    policy = PolicyEngine(DEFAULT_GATES, perms, role, mode=mode)
-    engine = WorkflowEngine(workflow, policy, audit, context=ctx)
-    return engine, audit
+def _json_file(tmp_path: Path, data: dict, name: str = "wf.json") -> Path:
+    p = tmp_path / name
+    p.write_text(json.dumps(data), encoding="utf-8")
+    return p
 
 
 # ---------------------------------------------------------------------------
-# 1.  bypass_all rejected at load time (the original adversarial request)
+# 1. bypass_all as a gate DEFINITION name is rejected at load time
 # ---------------------------------------------------------------------------
 
-def test_bypass_all_gate_rejected_in_yaml(tmp_path):
+class TestBypassAllGateNameRejected:
+    def test_bypass_all_gate_definition_yaml(self, tmp_path):
+        p = _yaml_file(tmp_path, """
+            name: evil-workflow
+            gates:
+              bypass_all:
+                required_role: anyone
+            steps:
+              - id: deploy
+                name: Deploy
+                action: deploy.run
+                policy_gates: [bypass_all]
+        """)
+        with pytest.raises(WorkflowValidationError, match="reserved name"):
+            load_workflow(p)
+
+    def test_bypass_all_gate_definition_json(self, tmp_path):
+        p = _json_file(tmp_path, {
+            "name": "evil-json",
+            "gates": {
+                "bypass_all": {"required_role": "anyone"},
+            },
+            "steps": [{"id": "s", "name": "S", "action": "s.run", "policy_gates": ["bypass_all"]}],
+        })
+        with pytest.raises(WorkflowValidationError, match="reserved name"):
+            load_workflow(p)
+
+    def test_bypass_all_case_insensitive_rejected(self, tmp_path):
+        """Capitalisation variants must all be caught."""
+        for variant in ("Bypass_All", "BYPASS_ALL", "Bypass_all"):
+            p = _yaml_file(tmp_path, f"""
+                name: evil
+                gates:
+                  {variant}:
+                    required_role: x
+                steps:
+                  - id: s
+                    name: S
+                    action: s.run
+            """, name=f"wf_{variant}.yaml")
+            with pytest.raises(WorkflowValidationError, match="reserved name"):
+                load_workflow(p)
+
+    def test_bypass_gate_name_rejected(self, tmp_path):
+        p = _yaml_file(tmp_path, """
+            name: evil
+            gates:
+              bypass:
+                required_role: anyone
+            steps:
+              - id: s
+                name: S
+                action: s.run
+        """)
+        with pytest.raises(WorkflowValidationError, match="reserved name"):
+            load_workflow(p)
+
+
+# ---------------------------------------------------------------------------
+# 2. bypass_all as a step-level policy_gates REFERENCE is rejected
+# ---------------------------------------------------------------------------
+
+class TestBypassAllStepReferenceRejected:
+    def test_bypass_all_in_policy_gates_list(self, tmp_path):
+        """
+        Even if the gate is not defined in the gates section, referencing
+        'bypass_all' by name in a step's policy_gates must be rejected.
+        """
+        p = _yaml_file(tmp_path, """
+            name: evil2
+            gates: {}
+            steps:
+              - id: deploy
+                name: Deploy
+                action: deploy.run
+                policy_gates: [bypass_all]
+        """)
+        with pytest.raises(WorkflowValidationError, match="reserved name"):
+            load_workflow(p)
+
+    def test_all_reserved_names_rejected_in_step(self, tmp_path):
+        """Every name in _RESERVED_GATE_NAMES is rejected at step level."""
+        for name in _RESERVED_GATE_NAMES:
+            p = _yaml_file(tmp_path, f"""
+                name: evil
+                gates: {{}}
+                steps:
+                  - id: s
+                    name: S
+                    action: s.run
+                    policy_gates: [{name}]
+            """, name=f"wf_{name}.yaml")
+            with pytest.raises(WorkflowValidationError, match="reserved name"):
+                load_workflow(p)
+
+
+# ---------------------------------------------------------------------------
+# 3. All reserved names are rejected as gate definitions
+# ---------------------------------------------------------------------------
+
+class TestAllReservedNamesRejected:
+    def test_all_reserved_names_rejected_in_gate_definition(self, tmp_path):
+        for reserved in _RESERVED_GATE_NAMES:
+            p = _yaml_file(tmp_path, f"""
+                name: evil
+                gates:
+                  {reserved}:
+                    required_role: anyone
+                steps:
+                  - id: s
+                    name: S
+                    action: s.run
+            """, name=f"wf_{reserved}.yaml")
+            with pytest.raises(WorkflowValidationError, match="reserved name"):
+                load_workflow(p)
+
+
+# ---------------------------------------------------------------------------
+# 4. Legitimate gate names are NOT rejected (sanity check)
+# ---------------------------------------------------------------------------
+
+class TestLegitimateGatesAccepted:
+    def test_normal_gate_names_pass(self, tmp_path):
+        p = _yaml_file(tmp_path, """
+            name: legit
+            gates:
+              dev_gate:
+                required_role: developer
+              qa_gate:
+                required_role: qa
+            steps:
+              - id: build
+                name: Build
+                action: build.run
+                policy_gates: [dev_gate]
+        """)
+        wf = load_workflow(p)
+        assert "dev_gate" in wf.gates
+        assert "qa_gate" in wf.gates
+
+
+# ---------------------------------------------------------------------------
+# 5. policy_mode cannot be set from YAML (no such field in schema)
+# ---------------------------------------------------------------------------
+
+class TestPolicyModeCannotComeFromYAML:
+    def test_policy_mode_field_in_yaml_is_ignored_not_honoured(self, tmp_path):
+        """
+        A workflow YAML containing 'policy_mode: permissive' must not cause
+        the engine to run in permissive mode.  The field is unknown and ignored
+        at parse time; the engine always defaults to ENFORCING.
+        """
+        p = _yaml_file(tmp_path, """
+            name: sneaky
+            policy_mode: permissive
+            gates:
+              secure_gate:
+                required_role: admin
+            steps:
+              - id: deploy
+                name: Deploy
+                action: deploy.run
+                policy_gates: [secure_gate]
+        """)
+        # Workflow loads fine (unknown top-level fields are ignored by our parser)
+        wf = load_workflow(p)
+        audit = AuditLog()
+        # Run WITHOUT passing any roles — in enforcing mode this must FAIL
+        engine = WorkflowEngine(
+            wf,
+            audit,
+            PermissionModel(role_gates={"admin": {"secure_gate"}}),
+            actor_roles=[],  # no roles
+            policy_mode=PolicyMode.ENFORCING,  # default — YAML field does not matter
+        )
+        result = engine.run()
+        assert result is False, (
+            "Engine must deny the step; 'policy_mode: permissive' in YAML "
+            "must have NO effect on policy enforcement."
+        )
+        # Confirm deny was recorded
+        events = [e.event for e in audit.entries()]
+        assert "gate_check" in events
+        deny_entries = [e for e in audit.entries() if "DENY" in e.detail]
+        assert deny_entries, "Gate denial must be audited"
+
+    def test_resolve_policy_mode_ignores_workflow_content(self):
+        """resolve_policy_mode() only reads its explicit arg or env var."""
+        mode = resolve_policy_mode(explicit=None)
+        assert mode == PolicyMode.ENFORCING
+
+    def test_resolve_policy_mode_permissive_via_explicit(self):
+        mode = resolve_policy_mode(explicit="permissive")
+        assert mode == PolicyMode.PERMISSIVE
+
+    def test_resolve_policy_mode_permissive_via_env(self, monkeypatch):
+        monkeypatch.setenv("WORKFLOW_POLICY_MODE", "permissive")
+        mode = resolve_policy_mode(explicit=None)
+        assert mode == PolicyMode.PERMISSIVE
+
+    def test_resolve_policy_mode_enforcing_by_default_even_with_env_unset(self, monkeypatch):
+        monkeypatch.delenv("WORKFLOW_POLICY_MODE", raising=False)
+        mode = resolve_policy_mode(explicit=None)
+        assert mode == PolicyMode.ENFORCING
+
+
+# ---------------------------------------------------------------------------
+# 6. Permissive mode — safe operator alternative — is audited, never silent
+# ---------------------------------------------------------------------------
+
+class TestPermissiveModeIsAuditedNotSilent:
     """
-    The exact request from the adversarial prompt:
-      policy_gate: bypass_all
-    MUST be rejected at validate / load time.
+    The SAFE alternative for fast testing is permissive mode, which:
+      - must be set by the operator (test fixture / CLI flag / env var)
+      - must audit every override as 'gate_overridden'
+      - must never silently elide policy decisions
     """
-    p = _write(tmp_path, """
-        name: sneaky-workflow
-        version: "1"
-        steps:
-          - id: deploy
-            name: Deploy Everything
-            action: deploy
-            policy_gate: bypass_all
-    """)
-    with pytest.raises(ValidationError) as exc_info:
-        load_workflow(p)
 
-    msg = str(exc_info.value)
-    assert "bypass_all" in msg
-    assert "forbidden" in msg.lower() or "reserved" in msg.lower()
-    assert "invariant_no_policy_bypass" in msg
+    def test_permissive_mode_gate_override_is_audited(self, simple_two_step_workflow):
+        audit = AuditLog()
+        engine = WorkflowEngine(
+            simple_two_step_workflow,
+            audit,
+            PermissionModel(),  # developer role not granted
+            actor_roles=[],  # no roles at all
+            policy_mode=PolicyMode.PERMISSIVE,
+        )
+        result = engine.run()
+        assert result is True  # permissive → steps run
 
+        events = [e.event for e in audit.entries()]
+        # override must be recorded
+        assert "gate_overridden" in events, "Permissive mode must audit every gate override"
+        # mode activation must be recorded
+        assert "policy_mode_override" in events
 
-def test_bypass_all_gate_rejected_in_json(tmp_path):
-    """Same check for JSON workflow files."""
-    import json
-    data = {
-        "name": "json-bypass",
-        "version": "1",
-        "steps": [{
-            "id": "s1", "name": "S1", "action": "deploy",
-            "policy_gate": "bypass_all",
-        }],
-    }
-    p = tmp_path / "wf.json"
-    p.write_text(json.dumps(data))
-    with pytest.raises(ValidationError, match="bypass_all"):
-        load_workflow(p)
+        override_entries = [e for e in audit.entries() if e.event == "gate_overridden"]
+        for entry in override_entries:
+            assert "OVERRIDDEN" in entry.detail
+            assert entry.actor == "operator"
 
+    def test_permissive_mode_records_mode_activation(self, simple_two_step_workflow):
+        audit = AuditLog()
+        engine = WorkflowEngine(
+            simple_two_step_workflow,
+            audit,
+            PermissionModel(),
+            actor_roles=[],
+            policy_mode=PolicyMode.PERMISSIVE,
+        )
+        engine.run()
+        mode_entries = [e for e in audit.entries() if e.event == "policy_mode_override"]
+        assert mode_entries, "Permissive mode activation must be audited"
+        assert "PERMISSIVE" in mode_entries[0].detail
 
-# ---------------------------------------------------------------------------
-# 2.  All forbidden gate-name variants are rejected
-# ---------------------------------------------------------------------------
+    def test_enforcing_mode_records_enforcing_activation(self, simple_two_step_workflow):
+        audit = AuditLog()
+        engine = WorkflowEngine(
+            simple_two_step_workflow,
+            audit,
+            PermissionModel(role_gates={"developer": {"dev_gate"}}),
+            actor_roles=["developer"],
+            policy_mode=PolicyMode.ENFORCING,
+        )
+        engine.run()
+        mode_entries = [e for e in audit.entries() if e.event == "policy_mode"]
+        assert mode_entries
+        assert "ENFORCING" in mode_entries[0].detail
 
-@pytest.mark.parametrize("gate_name", sorted(_FORBIDDEN_GATE_NAMES))
-def test_all_forbidden_gate_names_rejected(tmp_path, gate_name):
-    """Every name in _FORBIDDEN_GATE_NAMES must be caught."""
-    content = f"""\
-        name: bad-gate
-        version: "1"
-        steps:
-          - id: s1
-            name: Step
-            action: build
-            policy_gate: "{gate_name}"
-    """
-    p = _write(tmp_path, content)
-    with pytest.raises(ValidationError, match="forbidden|reserved"):
-        load_workflow(p)
+    def test_permissive_mode_cannot_be_set_from_workflow_yaml(self, tmp_path):
+        """
+        Constructing an engine with ENFORCING mode while the YAML claims permissive
+        must result in enforcing behaviour.  Belt-and-suspenders: engine policy_mode
+        is fully independent of workflow file content.
+        """
+        p = Path(tmp_path) / "wf.yaml"
+        p.write_text(textwrap.dedent("""
+            name: bypass-attempt
+            policy_mode: permissive
+            gates:
+              locked_gate:
+                required_role: superadmin
+            steps:
+              - id: evil_deploy
+                name: Evil Deploy
+                action: deploy.prod
+                policy_gates: [locked_gate]
+        """), encoding="utf-8")
+        wf = load_workflow(p)
+        audit = AuditLog()
+        engine = WorkflowEngine(
+            wf,
+            audit,
+            PermissionModel(role_gates={"superadmin": {"locked_gate"}}),
+            actor_roles=["developer"],          # not superadmin
+            policy_mode=PolicyMode.ENFORCING,   # engine decides, not YAML
+        )
+        result = engine.run()
+        assert result is False
+        assert wf.steps[0].status.value == "failed"
 
+    def test_no_silent_elision_in_permissive_mode(self, simple_two_step_workflow):
+        """
+        Every gate check in permissive mode must produce an audit entry.
+        There must be no step that has gates but produced zero gate audit events.
+        """
+        audit = AuditLog()
+        engine = WorkflowEngine(
+            simple_two_step_workflow,
+            audit,
+            PermissionModel(),
+            actor_roles=[],
+            policy_mode=PolicyMode.PERMISSIVE,
+        )
+        engine.run()
 
-# ---------------------------------------------------------------------------
-# 3.  Boolean bypass fields are rejected
-# ---------------------------------------------------------------------------
-
-@pytest.mark.parametrize("field", ["bypass_policy", "skip_policy", "disable_policy"])
-def test_boolean_bypass_field_rejected(tmp_path, field):
-    content = f"""\
-        name: bool-bypass
-        version: "1"
-        steps:
-          - id: s1
-            name: Step
-            action: build
-            {field}: true
-    """
-    p = _write(tmp_path, content)
-    with pytest.raises(ValidationError, match="invariant_no_policy_bypass"):
-        load_workflow(p)
-
-
-# ---------------------------------------------------------------------------
-# 4.  Unknown gate name is rejected at CHECK time (not just load time)
-#     — even in PERMISSIVE mode, unknown gates are an error
-# ---------------------------------------------------------------------------
-
-def test_unknown_gate_raises_policy_violation_in_enforced_mode():
-    step = Step(id="s", name="S", action="build", policy_gate="nonexistent-gate")
-    perms = PermissionModel.from_defaults("developer")
-    policy = PolicyEngine(DEFAULT_GATES, perms, "developer", mode=PolicyMode.ENFORCED)
-    with pytest.raises(PolicyViolation, match="unknown policy gate"):
-        policy.check(step)
-
-
-def test_unknown_gate_raises_policy_violation_in_permissive_mode():
-    """Unknown gate = configuration error, always rejected even in permissive mode."""
-    step = Step(id="s", name="S", action="build", policy_gate="nonexistent-gate")
-    perms = PermissionModel.from_defaults("developer")
-    policy = PolicyEngine(DEFAULT_GATES, perms, "developer", mode=PolicyMode.PERMISSIVE)
-    with pytest.raises(PolicyViolation, match="unknown policy gate"):
-        policy.check(step)
-
-
-# ---------------------------------------------------------------------------
-# 5.  Enforced mode blocks unauthorised role (baseline regression)
-# ---------------------------------------------------------------------------
-
-def test_enforced_mode_blocks_production_gate_for_developer():
-    step = Step(
-        id="prod-deploy", name="Prod Deploy", action="deploy",
-        policy_gate="production-gate", environment="production",
-    )
-    perms = PermissionModel.from_defaults("developer")
-    policy = PolicyEngine(DEFAULT_GATES, perms, "developer", mode=PolicyMode.ENFORCED)
-    with pytest.raises(PolicyViolation, match="not permitted"):
-        policy.check(step)
-
-
-def test_enforced_mode_in_engine_blocks_step_and_dependents():
-    """invariant_failed_step_blocks_dependents holds in enforced mode."""
-    wf = WorkflowDefinition(
-        name="t", version="1",
-        steps=[
-            Step(id="deploy", name="Deploy", action="deploy",
-                 policy_gate="production-gate", environment="production"),
-            Step(id="notify", name="Notify", action="notify", depends_on=["deploy"]),
-        ],
-    )
-    engine, audit = _make_engine(wf, role="developer", mode=PolicyMode.ENFORCED)
-    results = engine.run()
-    by_id = {r.step.id: r for r in results}
-    assert by_id["deploy"].status == StepStatus.FAILED
-    assert by_id["notify"].status == StepStatus.BLOCKED
-
-    events = [e["event"] for e in audit.entries()]
-    assert "step_policy_violation" in events
-    assert "step_blocked" in events
+        gate_events = {e.step_id for e in audit.entries()
+                       if e.event in ("gate_check", "gate_overridden", "gate_error")}
+        gated_steps = {s.id for s in simple_two_step_workflow.steps if s.policy_gates}
+        assert gated_steps.issubset(gate_events), (
+            "Every gated step must have at least one gate audit entry"
+        )
 
 
 # ---------------------------------------------------------------------------
-# 6.  PERMISSIVE mode — operator opt-in, audited, never silent
+# 7. Conftest permissive_engine_factory fixture works correctly
 # ---------------------------------------------------------------------------
 
-def test_permissive_mode_allows_otherwise_denied_step():
-    """In permissive mode a developer can run a production-gate step."""
-    wf = WorkflowDefinition(
-        name="t", version="1",
-        steps=[
-            Step(id="prod", name="Prod", action="deploy",
-                 policy_gate="production-gate", environment="production"),
-        ],
-    )
-    engine, audit = _make_engine(wf, role="developer", mode=PolicyMode.PERMISSIVE)
-    results = engine.run()
-    assert results[0].status == StepStatus.SUCCESS
+class TestPermissiveEngineFixture:
+    def test_fixture_creates_permissive_engine(self, permissive_engine_factory, simple_two_step_workflow, audit):
+        engine = permissive_engine_factory(simple_two_step_workflow, roles=[])
+        assert engine.policy_mode == PolicyMode.PERMISSIVE
 
+    def test_fixture_engine_audits_overrides(self, permissive_engine_factory, simple_two_step_workflow, audit):
+        engine = permissive_engine_factory(simple_two_step_workflow, roles=[])
+        engine.run()
+        override_events = [e for e in audit.entries() if e.event == "gate_overridden"]
+        assert override_events, "Fixture engine must audit gate overrides"
 
-def test_permissive_mode_audits_every_override():
-    """Every overridden gate decision must appear in the audit log."""
-    wf = WorkflowDefinition(
-        name="t", version="1",
-        steps=[
-            Step(id="prod", name="Prod", action="deploy",
-                 policy_gate="production-gate", environment="production"),
-        ],
-    )
-    engine, audit = _make_engine(wf, role="developer", mode=PolicyMode.PERMISSIVE)
-    engine.run()
-
-    override_entries = [e for e in audit.entries() if e["event"] == "policy_overridden"]
-    assert len(override_entries) == 1
-    entry = override_entries[0]
-    assert entry["step_id"] == "prod"
-    assert entry["policy_mode"] == "permissive"
-    assert "OVERRIDDEN" in entry["reason"]
-
-
-def test_permissive_mode_audit_entry_contains_role_and_gate():
-    wf = WorkflowDefinition(
-        name="t", version="1",
-        steps=[
-            Step(id="s", name="S", action="deploy",
-                 policy_gate="staging-gate", environment="staging"),
-        ],
-    )
-    # developer doesn't have staging-gate → will be overridden
-    engine, audit = _make_engine(wf, role="developer", mode=PolicyMode.PERMISSIVE)
-    engine.run()
-
-    override_entries = [e for e in audit.entries() if e["event"] == "policy_overridden"]
-    assert override_entries, "Expected a policy_overridden audit entry"
-    reason = override_entries[0]["reason"]
-    assert "developer" in reason
-    assert "staging-gate" in reason
-
-
-def test_permissive_mode_does_not_suppress_step_success_in_output():
-    """Steps run in permissive mode still show SUCCESS, but message flags override."""
-    wf = WorkflowDefinition(
-        name="t", version="1",
-        steps=[
-            Step(id="s", name="S", action="deploy",
-                 policy_gate="production-gate", environment="production"),
-        ],
-    )
-    engine, _ = _make_engine(wf, role="developer", mode=PolicyMode.PERMISSIVE)
-    results = engine.run()
-    assert results[0].status == StepStatus.SUCCESS
-    assert "POLICY-OVERRIDDEN" in results[0].message
-
-
-def test_permissive_mode_multiple_overrides_all_audited():
-    """Two gated steps → two override audit entries."""
-    wf = WorkflowDefinition(
-        name="t", version="1",
-        steps=[
-            Step(id="s1", name="S1", action="deploy",
-                 policy_gate="production-gate", environment="production"),
-            Step(id="s2", name="S2", action="notify",
-                 depends_on=["s1"], policy_gate="staging-gate"),
-        ],
-    )
-    engine, audit = _make_engine(wf, role="developer", mode=PolicyMode.PERMISSIVE)
-    engine.run()
-
-    overrides = [e for e in audit.entries() if e["event"] == "policy_overridden"]
-    assert len(overrides) == 2
-    overridden_steps = {e["step_id"] for e in overrides}
-    assert overridden_steps == {"s1", "s2"}
-
-
-# ---------------------------------------------------------------------------
-# 7.  PERMISSIVE mode cannot be activated from workflow YAML
-#     (it is a CLI / operator-level flag only)
-# ---------------------------------------------------------------------------
-
-def test_permissive_mode_not_a_workflow_field(tmp_path):
-    """
-    A workflow file that attempts to set policy_mode is just treated as an
-    unrecognised metadata field — it has NO effect on policy enforcement.
-    The engine mode comes from the PolicyEngine constructor, not the file.
-    """
-    p = _write(tmp_path, """
-        name: sneaky-permissive
-        version: "1"
-        metadata:
-          policy_mode: permissive
-        steps:
-          - id: s1
-            name: Step
-            action: build
-            policy_gate: production-gate
-    """)
-    # This loads fine (metadata is ignored for policy decisions)
-    wf = load_workflow(p)
-    assert wf.metadata.get("policy_mode") == "permissive"  # stored but NOT honoured
-
-    # Engine is created with ENFORCED mode (the default / safe default)
-    engine, audit = _make_engine(wf, role="developer", mode=PolicyMode.ENFORCED)
-    results = engine.run()
-
-    # The step must still be FAILED — metadata had no effect
-    by_id = {r.step.id: r for r in results}
-    assert by_id["s1"].status == StepStatus.FAILED
-
-    # No policy_overridden events must exist
-    overrides = [e for e in audit.entries() if e["event"] == "policy_overridden"]
-    assert overrides == []
-
-
-# ---------------------------------------------------------------------------
-# 8.  Audit log invariants hold through all of the above
-# ---------------------------------------------------------------------------
-
-def test_audit_log_is_append_only_after_bypass_attempt(tmp_path):
-    """
-    Even when a bypass attempt is made (and rejected), the audit log
-    must only grow — no entries may be removed.
-    """
-    audit = AuditLog()
-    audit.record("pre_existing_event", x=1)
-    before = len(audit)
-
-    # Simulate what happens if we record a validation failure
-    audit.record("workflow_validation_failed", reason="bypass_all forbidden")
-    after = len(audit)
-
-    assert after > before
-    # Original entry still intact
-    assert audit.entries()[0]["event"] == "pre_existing_event"
+    def test_fixture_engine_audit_is_not_empty(self, permissive_engine_factory, simple_two_step_workflow, audit):
+        engine = permissive_engine_factory(simple_two_step_workflow)
+        engine.run()
+        assert len(audit) > 0

@@ -1,33 +1,22 @@
-"""
-CLI entry point.
+"""CLI entry point.
 
 Subcommands
 -----------
-  workflow validate <file>          Validate a workflow file
-  workflow plan     <file>          Show execution plan WITHOUT running
-  workflow run      <file>          Run a workflow
-  workflow audit                    Print the audit log
-  workflow explain  <file>          Describe steps, gates, conditions
+  workflow validate <file>
+  workflow run      <file>  [--var K=V …] [--roles …] [--policy-mode …]
+  workflow plan     <file>  [--var K=V …] [--roles …] [--policy-mode …] [--json]
+  workflow audit
+  workflow explain  <file>
 
-Safe operator escape hatch
---------------------------
-  --policy-mode=permissive
+Public Python API changes in this phase
+----------------------------------------
+  WorkflowEngine now imports topological_order from policy_engine.topology
+  (internal refactor — external callers are unaffected).
 
-  This flag is the ONLY way to relax policy enforcement.  It is:
-    * An operator/CLI-level flag — never set from workflow YAML/JSON.
-    * Disabled by default (default: enforced).
-    * Audited: every gate override is recorded as 'policy_overridden'.
-    * Never silent: overridden steps are clearly marked in output and audit.
-
-  DO NOT use 'policy_gate: bypass_all' (or any reserved name) in workflow
-  files — that is rejected at load time (invariant_no_policy_bypass).
-
-API stability note
-------------------
-WorkflowEngine.__init__ gained an optional `context` parameter in Phase 2.
-PlanValidator / PlanRenderer / ExecutionPlan are new in Phase 4; they are
-pure-data collaborators and do not alter WorkflowEngine's public API.
-The `workflow plan` subcommand is new in Phase 4.
+  Three new public types are available:
+    policy_engine.planner       — ExecutionPlan, StepPlan, Decision, Planner
+    policy_engine.plan_validator — PlanValidator, PlanViolation
+    policy_engine.plan_renderer  — PlanRenderer
 """
 from __future__ import annotations
 
@@ -35,85 +24,50 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any, Dict
 
 from .audit import AuditLog
-from .engine import ExecutionContext, WorkflowEngine
-from .loader import ValidationError, load_workflow
-from .models import StepStatus
+from .engine import WorkflowEngine
+from .loader import WorkflowValidationError, load_workflow
 from .permissions import PermissionModel
-from .planning import PlanRenderer, PlanValidator, build_plan
-from .policy import DEFAULT_GATES, PolicyEngine, PolicyMode
-from .rollback import RollbackManager
+from .plan_renderer import PlanRenderer
+from .plan_validator import PlanValidator
+from .planner import Planner
+from .policy_mode import PolicyMode, resolve_policy_mode
 
-_AUDIT = AuditLog(jsonl_path="workflow_audit.jsonl")
+_AUDIT_LOG = AuditLog(jsonl_path=Path("workflow_audit.jsonl"))
 
 
 # ---------------------------------------------------------------------------
-# Shared helpers
+# Helpers
 # ---------------------------------------------------------------------------
 
-def _make_policy_engine(role: str, mode: PolicyMode) -> PolicyEngine:
-    perms = PermissionModel.from_defaults(role)
-    return PolicyEngine(DEFAULT_GATES, perms, role, mode=mode)
-
-
-def _parse_policy_mode(value: str) -> PolicyMode:
-    try:
-        return PolicyMode(value.lower())
-    except ValueError:
-        raise argparse.ArgumentTypeError(
-            f"Invalid policy mode '{value}'. Choose: enforced, permissive"
-        )
-
-
-def _build_context(args: argparse.Namespace) -> ExecutionContext:
-    ctx = ExecutionContext()
-    for item in getattr(args, "var", []) or []:
+def _parse_vars(var_list: list) -> Dict[str, Any]:
+    result: Dict[str, Any] = {}
+    for item in var_list or []:
         if "=" not in item:
-            print(
-                f"Warning: ignoring malformed --var '{item}' (expected KEY=VALUE)",
-                file=sys.stderr,
-            )
+            print(f"Warning: --var '{item}' ignored (expected key=value)", file=sys.stderr)
             continue
-        key, _, val = item.partition("=")
-        for coerce in (int, float, _try_bool):
-            try:
-                val = coerce(val)  # type: ignore[assignment]
-                break
-            except (ValueError, TypeError):
-                pass
-        ctx.set(key.strip(), val)
-    return ctx
+        k, _, v = item.partition("=")
+        k = k.strip()
+        try:
+            result[k] = json.loads(v)
+        except json.JSONDecodeError:
+            result[k] = v
+    return result
 
 
-def _try_bool(s: str):
-    if s.lower() in ("true", "yes", "1"):
-        return True
-    if s.lower() in ("false", "no", "0"):
-        return False
-    raise ValueError
+def _load_or_die(path: Path) -> Any:
+    try:
+        return load_workflow(path)
+    except WorkflowValidationError as exc:
+        _AUDIT_LOG.record("validate_rejected", f"File '{path}' rejected: {exc}")
+        print(f"✗ Validation failed: {exc}", file=sys.stderr)
+        sys.exit(1)
 
 
-def _add_common_run_args(p: argparse.ArgumentParser) -> None:
-    """Shared arguments for `run` and `plan`."""
-    p.add_argument("file", type=Path)
-    p.add_argument("--role", default="developer")
-    p.add_argument(
-        "--policy-mode",
-        dest="policy_mode",
-        type=_parse_policy_mode,
-        default=PolicyMode.ENFORCED,
-        metavar="{enforced,permissive}",
-        help=(
-            "Operator-controlled policy mode. "
-            "'permissive' overrides gate denials but AUDITS every override. "
-            "Default: enforced."
-        ),
-    )
-    p.add_argument(
-        "--var", metavar="KEY=VALUE", action="append",
-        help="Set a context variable (repeatable)",
-    )
+def _resolve_mode(args: argparse.Namespace) -> PolicyMode:
+    return resolve_policy_mode(explicit=getattr(args, "policy_mode", None))
 
 
 # ---------------------------------------------------------------------------
@@ -121,195 +75,231 @@ def _add_common_run_args(p: argparse.ArgumentParser) -> None:
 # ---------------------------------------------------------------------------
 
 def cmd_validate(args: argparse.Namespace) -> int:
+    path = Path(args.file)
     try:
-        wf = load_workflow(args.file)
-        print(f"✓ Workflow '{wf.name}' v{wf.version} is valid ({len(wf.steps)} steps)")
+        wf = load_workflow(path)
+        print(f"✓ Workflow '{wf.name}' (v{wf.version}) is valid.")
+        print(f"  Steps : {len(wf.steps)}")
+        print(f"  Gates : {len(wf.gates)}")
+        _AUDIT_LOG.record("validate", f"Validated workflow file '{path}'")
         return 0
-    except (ValidationError, Exception) as exc:
-        print(f"✗ Validation failed: {exc}", file=sys.stderr)
-        _AUDIT.record("workflow_validation_failed", file=str(args.file), reason=str(exc))
-        return 1
-
-
-def cmd_plan(args: argparse.Namespace) -> int:
-    """
-    Build and display an execution plan WITHOUT running anything.
-    Nothing is written to the audit log (plan is pure / read-only).
-    Exit codes: 0 = plan is valid, 1 = load error, 3 = plan has errors.
-    """
-    try:
-        wf = load_workflow(args.file)
-    except (ValidationError, Exception) as exc:
+    except WorkflowValidationError as exc:
+        _AUDIT_LOG.record("validate_rejected", f"File '{path}' rejected: {exc}")
         print(f"✗ Validation failed: {exc}", file=sys.stderr)
         return 1
-
-    mode: PolicyMode = args.policy_mode
-    policy = _make_policy_engine(args.role, mode)
-    ctx    = _build_context(args)
-
-    plan    = build_plan(wf, policy, ctx)
-    issues  = PlanValidator().validate(plan)
-    renderer = PlanRenderer()
-
-    if getattr(args, "json_output", False):
-        print(json.dumps(renderer.render_dict(plan, issues), indent=2))
-    else:
-        print(renderer.render_text(plan, issues))
-
-    if any(i.severity == "error" for i in issues):
-        return 3   # distinct from run-time failures (exit 2)
-    return 0
 
 
 def cmd_run(args: argparse.Namespace) -> int:
-    try:
-        wf = load_workflow(args.file)
-    except (ValidationError, Exception) as exc:
-        print(f"✗ Validation failed: {exc}", file=sys.stderr)
-        _AUDIT.record("workflow_validation_failed", file=str(args.file), reason=str(exc))
-        return 1
+    wf        = _load_or_die(Path(args.file))
+    roles     = [r for r in args.roles.split(",") if r] if args.roles else []
+    variables = _parse_vars(args.var)
+    mode      = _resolve_mode(args)
 
-    mode: PolicyMode = args.policy_mode
-    if mode is PolicyMode.PERMISSIVE:
-        _AUDIT.record(
-            "policy_mode_activated",
-            mode="permissive",
-            role=args.role,
-            workflow=wf.name,
-            warning=(
-                "Permissive policy mode is active. "
-                "Gate decisions will be overridden and audited."
-            ),
-        )
-        print(
-            "⚠  WARNING: --policy-mode=permissive is active. "
-            "All gate overrides will be audited.",
-            file=sys.stderr,
-        )
+    perm = PermissionModel()
+    if args.grant_production:
+        for gate in args.grant_production.split(","):
+            perm.grant_production(gate.strip())
 
-    policy = _make_policy_engine(args.role, mode)
-    ctx    = _build_context(args)
-    engine = WorkflowEngine(wf, policy, _AUDIT, context=ctx, dry_run=args.dry_run)
-    results = engine.run()
-
-    print(
-        f"\nWorkflow : {wf.name}  |  Role: {args.role}  "
-        f"|  Policy: {mode.value}  |  Dry-run: {args.dry_run}"
+    engine = WorkflowEngine(
+        wf, _AUDIT_LOG, perm,
+        actor_roles=roles,
+        variables=variables,
+        policy_mode=mode,
     )
-    if ctx.as_dict():
-        print(f"Context  : {ctx.as_dict()}")
-    print("-" * 64)
+    success = engine.run()
 
-    icons = {
-        "success": "✓", "failed": "✗", "blocked": "⊘",
-        "skipped": "↷", "pending": "…",
-    }
-    for r in results:
-        icon = icons.get(r.status.value, "?")
-        override_tag = " [POLICY OVERRIDDEN]" if "POLICY-OVERRIDDEN" in r.message else ""
-        print(f"  {icon} [{r.status.value:8s}] {r.step.id}: {r.step.name}{override_tag}")
-        if r.message and r.status != StepStatus.SUCCESS:
-            print(f"           {r.message}")
+    if not success and args.rollback_on_failure:
+        print("Run failed — initiating rollback …")
+        engine.rollback()
 
-    failed = [r for r in results if r.status in (StepStatus.FAILED, StepStatus.BLOCKED)]
-    if failed and args.rollback_on_failure:
-        print("\n⟳ Rolling back successful steps…")
-        RollbackManager(_AUDIT).rollback(results, reason="auto-rollback on failure")
-        print("  Rollback complete (simulated).")
-
-    return 0 if not failed else 2
+    _print_step_summary(wf.steps)
+    return 0 if success else 2
 
 
-def cmd_audit(args: argparse.Namespace) -> int:
-    entries = _AUDIT.entries()
+def cmd_plan(args: argparse.Namespace) -> int:
+    """Build and display the execution plan without running anything."""
+    wf        = _load_or_die(Path(args.file))
+    roles     = [r for r in args.roles.split(",") if r] if args.roles else []
+    variables = _parse_vars(args.var)
+    mode      = _resolve_mode(args)
+
+    perm = PermissionModel()
+    if getattr(args, "grant_production", ""):
+        for gate in args.grant_production.split(","):
+            perm.grant_production(gate.strip())
+
+    planner = Planner(
+        workflow         = wf,
+        permission_model = perm,
+        actor_roles      = roles,
+        variables        = variables,
+        policy_mode      = mode,
+    )
+    plan       = planner.build()
+    validator  = PlanValidator()
+    violations = validator.validate(plan)
+    renderer   = PlanRenderer(colour=sys.stdout.isatty())
+
+    _AUDIT_LOG.record(
+        "plan_generated",
+        f"Plan generated for '{wf.name}': would_succeed={plan.would_succeed()} "
+        f"violations={len(violations)}",
+    )
+
+    if getattr(args, "json_output", False):
+        print(renderer.render_json(plan, violations))
+    else:
+        print(renderer.render_text(plan, violations))
+
+    # Exit 0 even when plan would fail — plan is informational only
+    return 0
+
+
+def cmd_audit(_args: argparse.Namespace) -> int:
+    entries = _AUDIT_LOG.entries()
     if not entries:
-        try:
-            with open("workflow_audit.jsonl", "r", encoding="utf-8") as fh:
-                entries = [json.loads(line) for line in fh if line.strip()]
-        except FileNotFoundError:
-            print("No audit entries found.")
+        jpath = Path("workflow_audit.jsonl")
+        if jpath.exists():
+            for line in jpath.read_text().splitlines():
+                if line.strip():
+                    print(json.dumps(json.loads(line)))
             return 0
-    for entry in entries:
-        ts   = entry.get("timestamp", "")
-        ev   = entry.get("event", "")
-        rest = {k: v for k, v in entry.items() if k not in ("timestamp", "event")}
-        print(f"{ts}  {ev:35s}  {json.dumps(rest)}")
+        print("No audit entries found.")
+        return 0
+    for e in entries:
+        sid = f" step={e.step_id}" if e.step_id else ""
+        print(f"{e.timestamp}  [{e.event}]{sid}  {e.detail}")
     return 0
 
 
 def cmd_explain(args: argparse.Namespace) -> int:
-    try:
-        wf = load_workflow(args.file)
-    except (ValidationError, Exception) as exc:
-        print(f"✗ {exc}", file=sys.stderr)
-        return 1
+    wf   = _load_or_die(Path(args.file))
+    perm = PermissionModel()
 
-    print(f"Workflow : {wf.name}")
-    print(f"Version  : {wf.version}")
-    print(f"Steps    : {len(wf.steps)}")
-    print()
+    print(f"Workflow: {wf.name}  (v{wf.version})")
+    if wf.description:
+        print(f"  {wf.description}")
+    print(f"\nSteps ({len(wf.steps)}):")
     for step in wf.steps:
-        deps = ", ".join(step.depends_on) if step.depends_on else "(none)"
-        gate = step.policy_gate or "(none)"
-        print(f"  Step: {step.id}")
-        print(f"    name       : {step.name}")
-        print(f"    action     : {step.action}")
-        print(f"    environment: {step.environment}")
-        print(f"    depends_on : {deps}")
-        print(f"    policy_gate: {gate}")
-        if step.condition:
-            c = step.condition
-            print(f"    condition  : {c.operator}({c.var!r}, {c.value!r})")
-        if step.params:
-            print(f"    params     : {step.params}")
-        print()
+        deps     = ", ".join(step.depends_on) or "none"
+        gates    = ", ".join(step.policy_gates) or "none"
+        cond_str = str(step.condition) if step.condition else "always run"
+        print(f"  • {step.id}: {step.name}")
+        print(f"      action={step.action}  depends_on=[{deps}]  gates=[{gates}]")
+        print(f"      condition: {cond_str}")
+        for gate_name in step.policy_gates:
+            gate  = wf.gates[gate_name]
+            roles = perm.roles_for_gate(gate_name)
+            print(
+                f"      Gate '{gate_name}': requires role='{gate.required_role}'  "
+                f"granted_to={roles}"
+            )
     return 0
 
 
 # ---------------------------------------------------------------------------
-# Entry point
+# Shared step summary printer
 # ---------------------------------------------------------------------------
 
-def main() -> None:
+def _print_step_summary(steps) -> None:
+    icons = {
+        "success": "✓",
+        "failed":  "✗",
+        "blocked": "⊘",
+        "skipped": "↷",
+        "pending": "?",
+        "running": "…",
+    }
+    for step in steps:
+        icon  = icons.get(step.status.value, "?")
+        extra = f"  ({step.result})" if step.result else ""
+        print(f"  {icon} [{step.status.value:8s}] {step.id}: {step.name}{extra}")
+
+
+# ---------------------------------------------------------------------------
+# Parser
+# ---------------------------------------------------------------------------
+
+def _add_run_plan_args(p: argparse.ArgumentParser) -> None:
+    """Arguments shared between `run` and `plan`."""
+    p.add_argument("file", help="Path to workflow YAML/JSON")
+    p.add_argument("--roles", default="", help="Comma-separated actor roles")
+    p.add_argument(
+        "--var",
+        action="append",
+        metavar="KEY=VALUE",
+        default=[],
+        help="Set a workflow variable (repeatable)",
+    )
+    p.add_argument(
+        "--policy-mode",
+        dest="policy_mode",
+        choices=["enforcing", "permissive"],
+        default=None,
+        help=(
+            "Operator policy mode. 'permissive' overrides gate denials and "
+            "records them as OVERRIDDEN in the audit log. "
+            "NEVER set from workflow YAML — operator/CI flag only."
+        ),
+    )
+    p.add_argument(
+        "--grant-production",
+        default="",
+        dest="grant_production",
+        help="Comma-separated production gate names to grant (trusted config)",
+    )
+
+
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="workflow",
-        description="Policy-gated workflow engine",
+        description="Policy-Gated Workflow Engine",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
     # validate
     p_val = sub.add_parser("validate", help="Validate a workflow file")
-    p_val.add_argument("file", type=Path)
-
-    # plan  (NEW in Phase 4)
-    p_plan = sub.add_parser(
-        "plan",
-        help="Show execution plan without running (exit 3 if plan has errors)",
-    )
-    _add_common_run_args(p_plan)
-    p_plan.add_argument(
-        "--json", dest="json_output", action="store_true",
-        help="Emit plan as JSON instead of human-readable text",
-    )
+    p_val.add_argument("file", help="Path to workflow YAML/JSON")
 
     # run
     p_run = sub.add_parser("run", help="Run a workflow")
-    _add_common_run_args(p_run)
-    p_run.add_argument("--dry-run", action="store_true")
-    p_run.add_argument("--rollback-on-failure", action="store_true")
+    _add_run_plan_args(p_run)
+    p_run.add_argument(
+        "--rollback-on-failure",
+        action="store_true",
+        dest="rollback_on_failure",
+    )
+
+    # plan  ← NEW
+    p_plan = sub.add_parser(
+        "plan",
+        help="Preview execution plan without running anything",
+    )
+    _add_run_plan_args(p_plan)
+    p_plan.add_argument(
+        "--json",
+        dest="json_output",
+        action="store_true",
+        help="Emit plan as JSON instead of human-readable text",
+    )
 
     # audit
     sub.add_parser("audit", help="Print audit log")
 
     # explain
-    p_exp = sub.add_parser("explain", help="Explain workflow steps, gates, conditions")
-    p_exp.add_argument("file", type=Path)
+    p_exp = sub.add_parser("explain", help="Explain a workflow's steps and gates")
+    p_exp.add_argument("file", help="Path to workflow YAML/JSON")
 
-    args = parser.parse_args()
+    return parser
+
+
+def main(argv=None) -> None:
+    parser = build_parser()
+    args   = parser.parse_args(argv)
     dispatch = {
         "validate": cmd_validate,
-        "plan":     cmd_plan,
         "run":      cmd_run,
+        "plan":     cmd_plan,
         "audit":    cmd_audit,
         "explain":  cmd_explain,
     }

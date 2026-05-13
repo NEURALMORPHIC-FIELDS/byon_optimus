@@ -1,143 +1,150 @@
-"""Unit tests for the conditions module."""
+"""Tests for the condition evaluation module."""
 import pytest
-from policy_engine.conditions import evaluate, parse_condition, ConditionError
-from policy_engine.models import ConditionExpr
+
+from policy_engine.conditions import (
+    ConditionError,
+    ConditionResult,
+    evaluate_condition,
+    validate_condition,
+)
 
 
 # ---------------------------------------------------------------------------
-# evaluate() — all operators
+# validate_condition
 # ---------------------------------------------------------------------------
 
-class TestEquals:
-    def test_true(self):
-        c = ConditionExpr("equals", "env", "production")
-        assert evaluate(c, {"env": "production"}) is True
+class TestValidateCondition:
+    def test_none_is_valid(self):
+        validate_condition(None, "step1")  # must not raise
 
-    def test_false(self):
-        c = ConditionExpr("equals", "env", "production")
-        assert evaluate(c, {"env": "staging"}) is False
+    def test_equals_valid(self):
+        validate_condition({"equals": {"var": "env", "value": "prod"}}, "s")
 
-    def test_missing_var_is_false(self):
-        c = ConditionExpr("equals", "env", "production")
-        assert evaluate(c, {}) is False
+    def test_not_equals_valid(self):
+        validate_condition({"not_equals": {"var": "env", "value": "prod"}}, "s")
 
+    def test_in_valid(self):
+        validate_condition({"in": {"var": "env", "values": ["prod", "staging"]}}, "s")
 
-class TestNotEquals:
-    def test_true(self):
-        c = ConditionExpr("not_equals", "env", "production")
-        assert evaluate(c, {"env": "staging"}) is True
+    def test_not_in_valid(self):
+        validate_condition({"not_in": {"var": "env", "values": ["dev"]}}, "s")
 
-    def test_false(self):
-        c = ConditionExpr("not_equals", "env", "production")
-        assert evaluate(c, {"env": "production"}) is False
+    def test_exists_valid(self):
+        validate_condition({"exists": {"var": "flag"}}, "s")
 
+    def test_not_exists_valid(self):
+        validate_condition({"not_exists": {"var": "flag"}}, "s")
 
-class TestIn:
-    def test_true(self):
-        c = ConditionExpr("in", "tier", ["gold", "platinum"])
-        assert evaluate(c, {"tier": "gold"}) is True
+    def test_unknown_operator_raises(self):
+        with pytest.raises(ConditionError, match="no recognised operator"):
+            validate_condition({"banana": {}}, "step1")
 
-    def test_false(self):
-        c = ConditionExpr("in", "tier", ["gold", "platinum"])
-        assert evaluate(c, {"tier": "bronze"}) is False
+    def test_non_dict_raises(self):
+        with pytest.raises(ConditionError, match="must be a mapping"):
+            validate_condition("equals", "step1")
 
-    def test_value_not_list_raises(self):
-        c = ConditionExpr("in", "tier", "gold")
-        with pytest.raises(ConditionError, match="list"):
-            evaluate(c, {"tier": "gold"})
+    def test_multiple_operators_raises(self):
+        with pytest.raises(ConditionError, match="exactly one operator"):
+            validate_condition({"equals": {"var": "x", "value": 1}, "in": {"var": "x", "values": []}}, "s")
 
+    def test_equals_missing_value_key_raises(self):
+        with pytest.raises(ConditionError, match="'var' and 'value'"):
+            validate_condition({"equals": {"var": "x"}}, "s")
 
-class TestNotIn:
-    def test_true(self):
-        c = ConditionExpr("not_in", "tier", ["gold", "platinum"])
-        assert evaluate(c, {"tier": "bronze"}) is True
+    def test_in_missing_values_key_raises(self):
+        with pytest.raises(ConditionError, match="'var' and 'values'"):
+            validate_condition({"in": {"var": "x"}}, "s")
 
-    def test_false(self):
-        c = ConditionExpr("not_in", "tier", ["gold", "platinum"])
-        assert evaluate(c, {"tier": "gold"}) is False
+    def test_exists_missing_var_raises(self):
+        with pytest.raises(ConditionError, match="'var' key"):
+            validate_condition({"exists": {}}, "s")
 
-    def test_value_not_list_raises(self):
-        c = ConditionExpr("not_in", "tier", "gold")
-        with pytest.raises(ConditionError, match="list"):
-            evaluate(c, {"tier": "bronze"})
-
-
-class TestExists:
-    def test_true(self):
-        c = ConditionExpr("exists", "webhook", None)
-        assert evaluate(c, {"webhook": "https://..."}) is True
-
-    def test_false_missing(self):
-        c = ConditionExpr("exists", "webhook", None)
-        assert evaluate(c, {}) is False
-
-    def test_false_none_value_still_present(self):
-        # var is present (even if None) → exists is True
-        c = ConditionExpr("exists", "webhook", None)
-        assert evaluate(c, {"webhook": None}) is True
-
-
-class TestNotExists:
-    def test_true(self):
-        c = ConditionExpr("not_exists", "webhook", None)
-        assert evaluate(c, {}) is True
-
-    def test_false(self):
-        c = ConditionExpr("not_exists", "webhook", None)
-        assert evaluate(c, {"webhook": "x"}) is False
-
-
-def test_unknown_operator_raises():
-    c = ConditionExpr("greater_than", "count", 5)
-    with pytest.raises(ConditionError, match="Unknown condition operator"):
-        evaluate(c, {"count": 10})
+    def test_var_must_be_string(self):
+        with pytest.raises(ConditionError, match="non-empty string"):
+            validate_condition({"equals": {"var": 123, "value": "x"}}, "s")
 
 
 # ---------------------------------------------------------------------------
-# parse_condition()
+# evaluate_condition — equals / not_equals
 # ---------------------------------------------------------------------------
 
-def test_parse_equals():
-    raw = {"equals": {"var": "environment", "value": "production"}}
-    c = parse_condition(raw, "step-1")
-    assert c.operator == "equals"
-    assert c.var == "environment"
-    assert c.value == "production"
+class TestEvaluateEquals:
+    def test_equals_true(self):
+        r = evaluate_condition({"equals": {"var": "env", "value": "production"}}, {"env": "production"})
+        assert r.passed is True
+        assert "==" in r.reason
+
+    def test_equals_false(self):
+        r = evaluate_condition({"equals": {"var": "env", "value": "production"}}, {"env": "staging"})
+        assert r.passed is False
+
+    def test_equals_missing_var_is_false(self):
+        r = evaluate_condition({"equals": {"var": "env", "value": "production"}}, {})
+        assert r.passed is False
+
+    def test_not_equals_true(self):
+        r = evaluate_condition({"not_equals": {"var": "env", "value": "production"}}, {"env": "staging"})
+        assert r.passed is True
+
+    def test_not_equals_false(self):
+        r = evaluate_condition({"not_equals": {"var": "env", "value": "prod"}}, {"env": "prod"})
+        assert r.passed is False
 
 
-def test_parse_in():
-    raw = {"in": {"var": "tier", "value": ["gold", "silver"]}}
-    c = parse_condition(raw, "step-1")
-    assert c.operator == "in"
-    assert c.value == ["gold", "silver"]
+# ---------------------------------------------------------------------------
+# evaluate_condition — in / not_in
+# ---------------------------------------------------------------------------
+
+class TestEvaluateIn:
+    def test_in_true(self):
+        r = evaluate_condition({"in": {"var": "env", "values": ["prod", "staging"]}}, {"env": "prod"})
+        assert r.passed is True
+
+    def test_in_false(self):
+        r = evaluate_condition({"in": {"var": "env", "values": ["prod", "staging"]}}, {"env": "dev"})
+        assert r.passed is False
+
+    def test_not_in_true(self):
+        r = evaluate_condition({"not_in": {"var": "env", "values": ["prod"]}}, {"env": "dev"})
+        assert r.passed is True
+
+    def test_not_in_false(self):
+        r = evaluate_condition({"not_in": {"var": "env", "values": ["prod"]}}, {"env": "prod"})
+        assert r.passed is False
 
 
-def test_parse_exists_no_value_field():
-    raw = {"exists": {"var": "slack_webhook"}}
-    c = parse_condition(raw, "step-1")
-    assert c.operator == "exists"
-    assert c.value is None
+# ---------------------------------------------------------------------------
+# evaluate_condition — exists / not_exists
+# ---------------------------------------------------------------------------
+
+class TestEvaluateExists:
+    def test_exists_true(self):
+        r = evaluate_condition({"exists": {"var": "feature_flag"}}, {"feature_flag": True})
+        assert r.passed is True
+
+    def test_exists_false_when_missing(self):
+        r = evaluate_condition({"exists": {"var": "feature_flag"}}, {})
+        assert r.passed is False
+
+    def test_exists_false_when_none(self):
+        r = evaluate_condition({"exists": {"var": "x"}}, {"x": None})
+        assert r.passed is False
+
+    def test_not_exists_true_when_missing(self):
+        r = evaluate_condition({"not_exists": {"var": "x"}}, {})
+        assert r.passed is True
+
+    def test_not_exists_false_when_present(self):
+        r = evaluate_condition({"not_exists": {"var": "x"}}, {"x": "value"})
+        assert r.passed is False
 
 
-def test_parse_rejects_unknown_operator():
-    raw = {"greater_than": {"var": "x", "value": 5}}
-    with pytest.raises(ValueError, match="condition must contain one of"):
-        parse_condition(raw, "step-1")
+# ---------------------------------------------------------------------------
+# evaluate_condition — None condition (always run)
+# ---------------------------------------------------------------------------
 
-
-def test_parse_rejects_multiple_operators():
-    raw = {"equals": {"var": "x", "value": 1}, "not_equals": {"var": "x", "value": 2}}
-    with pytest.raises(ValueError, match="exactly one operator"):
-        parse_condition(raw, "step-1")
-
-
-def test_parse_rejects_missing_var():
-    raw = {"equals": {"value": "production"}}
-    with pytest.raises(ValueError, match="var.*non-empty string"):
-        parse_condition(raw, "step-1")
-
-
-def test_parse_rejects_non_dict_body():
-    raw = {"equals": "production"}
-    with pytest.raises(ValueError, match="must be a mapping"):
-        parse_condition(raw, "step-1")
+class TestEvaluateNone:
+    def test_none_always_passes(self):
+        r = evaluate_condition(None, {})
+        assert r.passed is True
+        assert r.reason == "no condition"

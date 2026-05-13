@@ -1,29 +1,36 @@
-"""Simple role-based permission model. REQ_PROD_REQUIRES_GRANT."""
+"""PermissionModel: maps roles to allowed PolicyGates."""
 from __future__ import annotations
-from policy_engine.models import PolicyGate
+from .models import PolicyGate
+
+# Built-in gates — REQ_NO_POLICY_BYPASS: gates are defined here, not in workflow YAML.
+BUILTIN_GATES: dict[str, PolicyGate] = {
+    "dev-gate": PolicyGate(name="dev-gate", required_role="developer"),
+    "staging-gate": PolicyGate(name="staging-gate", required_role="deployer"),
+    "prod-gate": PolicyGate(
+        name="prod-gate",
+        required_role="release-manager",
+        environment_restriction="prod",
+    ),
+}
 
 
 class PermissionModel:
-    """Maps roles to the set of gates they satisfy."""
+    """REQ_PROD_REQUIRES_GRANT: production gate requires explicit role grant."""
 
-    def __init__(self) -> None:
-        self._gates: dict[str, PolicyGate] = {}
+    def __init__(
+        self,
+        role: str,
+        extra_gates: dict[str, PolicyGate] | None = None,
+    ) -> None:
+        self.role = role
+        self._gates: dict[str, PolicyGate] = {**BUILTIN_GATES, **(extra_gates or {})}
 
-    def register_gate(self, gate: PolicyGate) -> None:
-        self._gates[gate.name] = gate
-
-    def is_allowed(self, gate_name: str, role: str, environment: str) -> bool:
+    def check(self, gate_name: str, environment: str) -> bool:
         gate = self._gates.get(gate_name)
         if gate is None:
-            return False  # REQ_NO_POLICY_BYPASS: unknown gate = deny
-        return gate.allows(role, environment)
+            # Unknown gate → deny by default (REQ_NO_POLICY_BYPASS)
+            return False
+        return gate.evaluate(self.role, environment)
 
-    @classmethod
-    def default(cls) -> "PermissionModel":
-        """Built-in gates. REQ_PROD_REQUIRES_GRANT: prod gate requires 'release-manager'."""
-        pm = cls()
-        pm.register_gate(PolicyGate("dev-gate", required_role="developer", environment_scope="dev"))
-        pm.register_gate(PolicyGate("staging-gate", required_role="qa-engineer", environment_scope="staging"))
-        pm.register_gate(PolicyGate("prod-gate", required_role="release-manager", environment_scope="prod"))
-        pm.register_gate(PolicyGate("any-gate", required_role="developer", environment_scope="*"))
-        return pm
+    def list_gates(self) -> list[PolicyGate]:
+        return list(self._gates.values())

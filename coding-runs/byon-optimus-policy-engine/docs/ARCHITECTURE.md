@@ -2,7 +2,7 @@
 
 ## Overview
 
-`policy-gated-workflow-engine` is a pure-Python library and CLI tool that
-executes DAG-structured workflows while enforcing policy gates at every step.
-All side effects are **simulated** — no real deployments, file writes, or
-network calls occur during execution.
+`policy-gated-workflow-engine` is a pure-Python library and CLI for executing
+DAG-structured workflows where every step is subject to operator-controlled
+policy gates.  All execution is **simulated** — no real network, shell, or
+deployment calls are made.

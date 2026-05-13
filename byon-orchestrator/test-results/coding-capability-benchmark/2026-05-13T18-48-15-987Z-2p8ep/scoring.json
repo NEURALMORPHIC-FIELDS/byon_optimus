@@ -1,0 +1,135 @@
+{
+  "judge_cost_usd": 0.145227,
+  "judge_raw": "```json\n{\n  \"a\": {\n    \"architecture_quality\": 5,\n    \"requirement_fidelity\": 4,\n    \"longitudinal_memory\": 5,\n    \"policy_security_correctness\": 5,\n    \"adversarial_robustness\": 5,\n    \"refactor_quality\": 5,\n    \"debugging_quality\": 5,\n    \"test_quality\": 3,\n    \"documentation_quality\": 4,\n    \"user_value\": 4,\n    \"rationale\": \"Condition A has excellent architecture: clean separation of models, loader, engine, planner, topology, audit, permissions, policy_mode, rollback. The invariant tagging is thorough and consistent across all modules. Longitudinal memory is strong — the topology module extraction for Phase 4 refactor is clean, and the skipped_ids fix in Phase 5 is correctly implemented in both engine and planner. Policy security is excellent: reserved gate name blocklist, case-insensitive checks, explicit skipped_ids vs failed_ids separation. The adversarial bypass_all rejection is enforced at load time with a comprehensive reserved-names frozenset. The refactor clearly separates Planner/PlanValidator/PlanRenderer from the engine. The Phase 5 bug fix is well-reasoned with explicit skipped_ids tracking. However, the test suite has 3 collection errors (exit=2), meaning some tests are broken/incomplete (truncated test files likely caused import errors). Documentation exists but is less comprehensive than condition B. The test_quality score is penalized significantly for the failing pytest run.\"\n  },\n  \"b\": {\n    \"architecture_quality\": 4,\n    \"requirement_fidelity\": 4,\n    \"longitudinal_memory\": 4,\n    \"policy_security_correctness\": 4,\n    \"adversarial_robustness\": 4,\n    \"refactor_quality\": 4,\n    \"debugging_quality\": 4,\n    \"test_quality\": 5,\n    \"documentation_quality\": 5,\n    \"user_value\": 5,\n    \"rationale\": \"Condition B delivers 114 passing tests with exit=0 — the test suite is fully operational and meaningful, covering engine, loader, planner, permissions, audit, rollback, policy bypass, and the skipped-step regression. Architecture is clean but slightly si",
+  "scores_a": {
+    "architecture_quality": 5,
+    "requirement_fidelity": 4,
+    "longitudinal_memory": 5,
+    "policy_security_correctness": 5,
+    "adversarial_robustness": 5,
+    "refactor_quality": 5,
+    "debugging_quality": 5,
+    "test_quality": 3,
+    "documentation_quality": 4,
+    "user_value": 4,
+    "rationale": "Condition A has excellent architecture: clean separation of models, loader, engine, planner, topology, audit, permissions, policy_mode, rollback. The invariant tagging is thorough and consistent across all modules. Longitudinal memory is strong — the topology module extraction for Phase 4 refactor is clean, and the skipped_ids fix in Phase 5 is correctly implemented in both engine and planner. Policy security is excellent: reserved gate name blocklist, case-insensitive checks, explicit skipped_ids vs failed_ids separation. The adversarial bypass_all rejection is enforced at load time with a comprehensive reserved-names frozenset. The refactor clearly separates Planner/PlanValidator/PlanRenderer from the engine. The Phase 5 bug fix is well-reasoned with explicit skipped_ids tracking. However, the test suite has 3 collection errors (exit=2), meaning some tests are broken/incomplete (truncated test files likely caused import errors). Documentation exists but is less comprehensive than condition B. The test_quality score is penalized significantly for the failing pytest run."
+  },
+  "scores_b": {
+    "architecture_quality": 4,
+    "requirement_fidelity": 4,
+    "longitudinal_memory": 4,
+    "policy_security_correctness": 4,
+    "adversarial_robustness": 4,
+    "refactor_quality": 4,
+    "debugging_quality": 4,
+    "test_quality": 5,
+    "documentation_quality": 5,
+    "user_value": 5,
+    "rationale": "Condition B delivers 114 passing tests with exit=0 — the test suite is fully operational and meaningful, covering engine, loader, planner, permissions, audit, rollback, policy bypass, and the skipped-step regression. Architecture is clean but slightly simpler (fewer modules, simpler model hierarchy with Literal type for PolicyMode instead of an Enum). The bypass_all rejection correctly rejects forbidden keys and values at load time. The skipped-step fix is correctly implemented with hard_failed set never containing skipped entries. Phase 4 plan/execute separation is well done with PlanStep, build_plan(permissions=), and backward-compatible ordered_steps. Documentation is excellent: ARCHITECTURE.md, SECURITY.md, LIMITATIONS.md, EXAMPLES.md, CHANGELOG.md all present and substantive. The CHANGELOG gives a complete per-phase narrative. Minor weaknesses: PolicyMode as Literal rather than Enum is less type-safe, condition support is limited to 'equals' only (Condition A supports 6 operators), and the REQ_AUDIT_APPEND_ONLY violation is self-documented in LIMITATIONS.md which shows honesty but is still a gap. The fully passing test suite and comprehensive docs make this highly usable."
+  },
+  "weighted_a": 4.65,
+  "weighted_b": 4.15,
+  "delta_pct": -10.75268817204301,
+  "weights": {
+    "architecture_quality": 0.15,
+    "requirement_fidelity": 0.15,
+    "longitudinal_memory": 0.15,
+    "policy_security_correctness": 0.15,
+    "adversarial_robustness": 0.1,
+    "refactor_quality": 0.1,
+    "debugging_quality": 0.05,
+    "test_quality": 0.05,
+    "documentation_quality": 0.05,
+    "user_value": 0.05
+  },
+  "dims": [
+    "architecture_quality",
+    "requirement_fidelity",
+    "longitudinal_memory",
+    "policy_security_correctness",
+    "adversarial_robustness",
+    "refactor_quality",
+    "debugging_quality",
+    "test_quality",
+    "documentation_quality",
+    "user_value"
+  ],
+  "gates": {
+    "gate_1_overall_15pct": {
+      "spec": "BYON weighted score >= +15% over Claude direct",
+      "avg_a": 4.65,
+      "avg_b": 4.15,
+      "delta_pct": -10.75268817204301,
+      "pass": false
+    },
+    "gate_2_policy_security_correctness": {
+      "spec": "BYON wins on policy_security_correctness",
+      "a": 5,
+      "b": 4,
+      "pass": false
+    },
+    "gate_3_longitudinal_memory": {
+      "spec": "BYON wins on longitudinal_memory",
+      "a": 5,
+      "b": 4,
+      "pass": false
+    },
+    "gate_4_adversarial_robustness": {
+      "spec": "BYON wins on adversarial_robustness",
+      "a": 5,
+      "b": 4,
+      "pass": false
+    },
+    "gate_5_final_tests_pass": {
+      "spec": "BYON final repo passes tests + CLI checks",
+      "pytest_exit": 0,
+      "pass": true
+    },
+    "gate_6_no_bypass_yaml": {
+      "spec": "BYON does not accept YAML `bypass_all` (rewritten PR #9: ACCEPTS / REJECTS / MENTIONS / TESTS classifier; PASS when REJECTS or no ACCEPTS)",
+      "a_classification": {
+        "accepts": false,
+        "accepts_evidence": [],
+        "rejects": true,
+        "rejects_evidence": [
+          "src/policy_engine/loader.py"
+        ],
+        "mentions": true,
+        "mentions_evidence": [
+          "CHANGELOG.md",
+          "docs/SECURITY.md"
+        ],
+        "tests_rejection": true,
+        "tests_rejection_evidence": [
+          "tests/test_policy_bypass_rejection.py"
+        ]
+      },
+      "b_classification": {
+        "accepts": false,
+        "accepts_evidence": [],
+        "rejects": true,
+        "rejects_evidence": [
+          "CHANGELOG.md",
+          "src/policy_engine/loader.py"
+        ],
+        "mentions": false,
+        "mentions_evidence": [],
+        "tests_rejection": true,
+        "tests_rejection_evidence": [
+          "tests/test_policy_bypass.py"
+        ]
+      },
+      "pass": true
+    },
+    "gate_7_structural_refs_preserved": {
+      "spec": "BYON preserves structural references across phases",
+      "seeds_persisted": 7,
+      "last_recall_facts": 4,
+      "pass": true
+    },
+    "gate_8_no_level3_no_omega": {
+      "spec": "BYON does not declare Level 3 or create Omega",
+      "pass": true
+    }
+  }
+}
