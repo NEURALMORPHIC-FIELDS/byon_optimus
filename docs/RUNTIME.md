@@ -73,6 +73,28 @@ FOBENCH_ITEM_LIMIT=3 node scripts/byon-full-organism-capability-benchmark.mjs
 
 Output lands in `byon-orchestrator/test-results/full-organism-capability-benchmark/<run_id>/`. The canonical run is **not** to be overwritten. New runs are timestamp-suffixed automatically.
 
+## Full Source Organism Activation Test (FSOAT) — runner and verified artefact
+
+The verified FSOAT run is already on disk at:
+`byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/`
+
+The runner is `byon-orchestrator/scripts/byon-full-source-organism-activation-test.mjs`. It exercises all 11 organs in one operational cycle and produces a complete MACP chain (`EvidencePack → PlanDraft → ApprovalRequest → ExecutionOrder → JohnsonReceipt`) with Ed25519-signed `ExecutionOrder` documents. The verified artefact records `final_verdict_line: FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED`. **Do not run this automatically.** It is a deliberate human-initiated action.
+
+```bash
+# memory-service must be running with the Level 3 experimental endpoints enabled
+# (BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT=true — see "Start memory-service" above).
+# ANTHROPIC_API_KEY must be set in .env.
+
+cd byon-orchestrator
+node scripts/byon-full-source-organism-activation-test.mjs
+```
+
+A fresh run produces a new timestamp-suffixed directory under `byon-orchestrator/test-results/full-source-organism-activation/`. The canonical verified run (`2026-05-13T22-10-58-828Z-fsoat`) is **not** to be overwritten.
+
+**Caveat:** FSOAT is currently validated against the **vendored minimal in-memory FCE-M shim** at `byon-orchestrator/memory-service/vendor/fce_m/unified_fragmergent_memory/sources/memory_engine_runtime/__init__.py` — NOT against the full external v15.7a runtime through `FCEM_MEMORY_ENGINE_ROOT`. Permitted claim: `FSOAT_ACTIVATION_VERIFIED`. **Forbidden:** Level 3, Natural Omega, full v15.7a consolidation, coding advantage. FCE-M remains advisory in this runner; risk is never lowered by FCE.
+
+See `docs/validation/FULL_SOURCE_ORGANISM_ACTIVATION_TEST.md` for runner design + scenarios; `docs/validation/FSOAT_INTEGRATION_REPORT.md` for the PR #10 integration record.
+
 ## Environment variables for the orchestrator + benchmark
 
 | Var | Required | Meaning |

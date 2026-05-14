@@ -1,16 +1,25 @@
 # BYON Optimus — Architecture
 
-> **Status:** Level 2 full-organism confirmed. The MACP / FCE-M / hybrid-memory snapshot below started as the v0.6.4 reference and remains accurate; commit 17 added structural references in the production pipeline, PR #3 validated the organism (BYON +34.94 % vs Claude Sonnet 4.6 direct, 7 / 7 gates PASS), PR #4 stabilized the test harness (586 / 586 tests pass).
+> **Status:** Level 2 full-organism confirmed. **Full Source Organism Activation: VERIFIED** (PR #10 → main, `54abf80…`). The MACP / FCE-M / hybrid-memory snapshot below started as the v0.6.4 reference and remains accurate; commit 17 added structural references in the production pipeline, PR #3 validated the organism (BYON +34.94 % vs Claude Sonnet 4.6 direct, 7 / 7 gates PASS), PR #4 stabilized the test harness, PR #7 shipped the Contextual Capability Archive, PR #8 shipped Code Workspace Memory, PR #10 verified end-to-end activation of all 11 organs in one operational cycle (`FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED`, 697 / 697 tests pass).
 >
 > - Operational level: **Level 2 of 4 — Morphogenetic Advisory Memory**
+> - Full Source Organism Activation: **VERIFIED** (vendored minimal in-memory FCE-M shim; full external v15.7a runtime via `FCEM_MEMORY_ENGINE_ROOT` **not proven**)
 > - Level 3: **not declared**
 > - Natural Omega: **not proven**
-> - `θ_s = 0.28`, `τ_coag = 12`: operator-locked
-> - Short status: [`LEVEL_STATUS.md`](LEVEL_STATUS.md) — End-to-end record: [`VALIDATION_SUMMARY.md`](VALIDATION_SUMMARY.md) — Research history (v0.6.0 → v0.6.4): [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
+> - Coding advantage: **not proven**
+> - `θ_s = 0.28`, `τ_coag = 12`: operator-locked, **unchanged**
+> - Worker → Auditor → Executor: **activated end-to-end** (PR #10 FSOAT)
+> - MACP chain: **EvidencePack → PlanDraft → ApprovalRequest → ExecutionOrder → JohnsonReceipt** complete (2 signed Ed25519 orders verified)
+> - FCE advisory + receipt assimilation: **active** (FCE-M remains advisory)
+> - Code Workspace Memory: **active**
+> - Structural reference memory: **active** (7 operator-seeded)
+> - Short status: [`LEVEL_STATUS.md`](LEVEL_STATUS.md) — End-to-end record: [`VALIDATION_SUMMARY.md`](VALIDATION_SUMMARY.md) — FSOAT record: [`validation/FSOAT_INTEGRATION_REPORT.md`](validation/FSOAT_INTEGRATION_REPORT.md), [`validation/FULL_SOURCE_ORGANISM_ACTIVATION_TEST.md`](validation/FULL_SOURCE_ORGANISM_ACTIVATION_TEST.md) — Research history (v0.6.0 → v0.6.4): [`RESEARCH_PROGRESS_v0.6.md`](RESEARCH_PROGRESS_v0.6.md).
 
 ## Active organism — input to telemetry
 
-The Contextual Capability Archive (v0.7 infrastructure, additive) sits between context-state classification and trust-ranked retrieval: it decides *which cognitive capacity is activated* — `software_engineer`, `novelist`, `philosopher`, `domain_analyst`, etc. — without replacing Contextual Pathway Stabilization. See [`CONTEXTUAL_CAPABILITY_ARCHIVE.md`](CONTEXTUAL_CAPABILITY_ARCHIVE.md). Nine manifests ship; most required modules (especially `software_engineer`'s workspace stack) remain `planned`, so coding is **not** declared solved.
+The Contextual Capability Archive (v0.7 infrastructure, additive) sits between context-state classification and trust-ranked retrieval: it decides *which cognitive capacity is activated* — `software_engineer`, `novelist`, `philosopher`, `domain_analyst`, etc. — without replacing Contextual Pathway Stabilization. See [`CONTEXTUAL_CAPABILITY_ARCHIVE.md`](CONTEXTUAL_CAPABILITY_ARCHIVE.md). After PR #8 the `software_engineer` pack's nine required workspace modules are `active` (Code Workspace Memory layer); coding advantage is still **not** proven empirically (PR #9 rerun delta −10.75 %).
+
+**Full Source Organism Activation (FSOAT)** — verified end-to-end in PR #10. The runner exercises all 11 organs in one operational cycle: `verbal_brain`, `macp_security_body`, `memory_substrate`, `trust_hierarchy`, `immune_system`, `controlled_hands`, `capability_routing`, `code_workspace_memory`, `compliance_post_check`, `receipt_assimilation`, `structural_reference_memory`. Worker / Auditor / Executor activated end-to-end with full MACP chain (EvidencePack → PlanDraft → ApprovalRequest → ExecutionOrder (Ed25519 signed) → JohnsonReceipt) across two scenarios. **FCE-M remains advisory** (advisory + receipt assimilation pass; risk never lowered by FCE). Validated against the vendored minimal in-memory FCE-M shim — the external v15.7a runtime via `FCEM_MEMORY_ENGINE_ROOT` is **not** validated. See [`validation/FSOAT_INTEGRATION_REPORT.md`](validation/FSOAT_INTEGRATION_REPORT.md).
 
 ```
 input

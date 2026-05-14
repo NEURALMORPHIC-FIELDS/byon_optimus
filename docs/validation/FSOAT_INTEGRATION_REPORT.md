@@ -1,5 +1,19 @@
 # FSOAT integration report
 
+## Post-merge note (PR #10)
+
+The FSOAT integration was opened as draft, CI completed **5 / 5 PASS** (Build Orchestrator 16 s, Lint & Test Orchestrator 24 s, Security Scan 17 s, Validate JSON Schemas 16 s, Docker Build 1 m 8 s), the operator authorised merge, and PR #10 was merged into `main` on `2026-05-14T00:19:26Z`.
+
+- **Merge commit:** `54abf80413a62dd84a7248674d97e2e0b1a7d1cb`
+- **`main` now contains FSOAT.** Local main was fast-forwarded; `git merge-base --is-ancestor 569c94d HEAD` returns 0.
+- **Post-merge suite on `main`:** `npm test` → **31 / 31 files, 697 / 697 tests pass**; `npm run build` exit 0; `npx tsc --noEmit` exit 0.
+- **Working tree clean** after a `git -c core.longpaths=true checkout HEAD -- ...` restore of two deep handoff receipt JSON paths that Windows MAX_PATH refused during the initial `pull --ff-only` (the files are in the merge commit on the remote; only their local checkout needed `core.longpaths=true`).
+- **No tag / release / branch deletion / cleanup** performed.
+- **`theta_s = 0.28` and `tau_coag = 12` unchanged** on `main`.
+- **No Level 3 / Omega claim** introduced. **FCE-M remains advisory.**
+
+---
+
 **Branch:** `integration/fsoat-full-source-organism-activation`
 **Base SHA:** `84e55c6ef653958bc548a7ac335bd0b29877530d` (main @ PR #8 merge)
 **Backup tag:** `backup/pre-fsoat-integration-20260514-015149` → same SHA

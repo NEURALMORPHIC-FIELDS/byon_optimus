@@ -35,17 +35,21 @@ This README documents the current state of integration: **a hybrid memory archit
   4. Self-applying memory (orchestrator autonomously adapts to FCE advisory without LLM mediation).
 - **RQ3 — Sufficient conditions for coagulation:** Under what input regimes can OmegaRecord coagulation be reached *through the BYON conversational loop*, given fixed coagulation thresholds (`θ_s=0.28`, `τ_coag=12`)?
 
-## Current state (post-PR #4)
+## Current state (post-PR #10)
 
 | Aspect | Status |
 |---|---|
 | Operational classification | **Level 2 of 4 — Morphogenetic Advisory Memory, full-organism confirmed** |
+| **Full Source Organism Activation (FSOAT)** | **VERIFIED** (PR #10 → main @ `54abf80`). `FSOAT_ACTIVATION_VERIFIED \| FULL_LEVEL3_NOT_DECLARED`. All **11 / 11 organs active** in one operational cycle. **Worker → Auditor → Executor activated end-to-end**; MACP chain `EvidencePack → PlanDraft → ApprovalRequest → ExecutionOrder → JohnsonReceipt` complete in both scenarios; 2 signed Ed25519 orders verified. FCE advisory + receipt assimilation active (advisory only — never lowers risk). Code Workspace Memory active. Structural reference memory active. |
 | Full-organism capability benchmark | **Passed.** 100 items × 12 categories × 211 BYON turns. BYON wins **11 / 12** categories; overall **+34.94 %** weighted advantage over Claude Sonnet 4.6 direct. All 7 operator-defined acceptance gates PASS. |
-| Test suite | **586 / 586 pass** across 27 test files (after PR #4 Vitest 4 shebang fix) |
+| Code Workspace Memory layer | **Active** (PR #8 → main): exact file state store + symbol index + requirements ledger + patch memory + test failure memory + architecture map + workspace diff guard + coding context builder. Coding advantage **not proven** (PR #9 rerun delta −10.75 %; gate 1 +15 % threshold unmet). |
+| Test suite | **697 / 697 pass** across 31 test files |
 | Regression vs v0.6.5 → commit 17 | **None.** All 7 previously validated capabilities ≥ 3.0 B-avg in the regression matrix. |
 | Structural reference memory in production pipeline | **Active.** 7 operator-seeded references persisted via `/level3/persist-structural-reference`, retrieved thread-scoped, included in trust-ranked prompts, 6/7 adversarially robust. |
 | Level 3 | **Not declared.** |
-| Natural Omega | **Not proven.** `θ_s = 0.28` and `τ_coag = 12` are operator-locked and never lowered. |
+| Natural Omega | **Not proven.** `θ_s = 0.28` and `τ_coag = 12` are operator-locked and **never lowered**. |
+| External FCE-M v15.7a runtime | **Not proven.** FSOAT was validated with the **vendored minimal in-memory FCE-M shim**, NOT against the external v15.7a runtime through `FCEM_MEMORY_ENGINE_ROOT`. |
+| Manual Omega / ReferenceField | **None.** No code path materialises Omega outside endogenous coagulation; no manual `ReferenceField`. |
 | Single category lost to Claude direct | K — Novel / contextual skill precursor (creative latitude reduced by structural constraints). Documented as a design trade-off, not a regression. |
 
 **Canonical artefacts:** [`byon-orchestrator/test-results/full-organism-capability-benchmark/2026-05-13T09-57-20-343Z-b39uv/`](byon-orchestrator/test-results/full-organism-capability-benchmark/2026-05-13T09-57-20-343Z-b39uv/) (`report.md`, `summary.json`, `per-item-scores.json`, `module-activation-matrix.json`, `capability-deltas.json`, `regression-matrix.json`, Condition A jsonl, Condition B jsonl).
