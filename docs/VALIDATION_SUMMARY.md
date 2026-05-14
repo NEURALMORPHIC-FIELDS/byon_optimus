@@ -13,6 +13,12 @@ End-to-end record of the validation work that produced the current `main` branch
 | Test-harness fix | branch `fix/post-merge-test-harness-stabilization` off `c01959b` | `stripShebangPlugin` in `vitest.config.ts` + ESM `__dirname` shim in 3 test files |
 | **PR #4** | `fix/post-merge-test-harness-stabilization` → `main` | merged 2026-05-13T13:42:05Z, merge commit `799c4b4` |
 | Canonical cleanup | branch `cleanup/canonical-docs-and-redundancy-removal` off `799c4b4` | this docset; 4 untracked smoke-run dirs deleted; no code deletion |
+| Capability archive | branch `feat/contextual-capability-archive` off cleanup head | 9 manifests + registry + router; coding modules marked `planned` |
+| **PR #7** | `feat/contextual-capability-archive` → `main` | merged; 610 / 610 tests after merge |
+| Code Workspace Memory | branch `feat/software-engineer-code-workspace-memory` off PR #7 head | exact file state store + symbol index + requirements ledger + ... ; 9 coding modules flipped `planned → active` |
+| **PR #8** | `feat/software-engineer-code-workspace-memory` → `main` | merged; 669 / 669 tests after merge |
+| FSOAT integration | branch `integration/fsoat-full-source-organism-activation` off PR #8 merge | `git apply` of operator-prepared `byon-fsoat-pr-package-20260513`; vendored minimal in-memory FCE-M shim modified, 16 `lib/fsoat/` modules, 2 FSOAT tests, verified artefact integrated |
+| **PR #10** | `integration/fsoat-full-source-organism-activation` → `main` | merged 2026-05-14T00:19:26Z, merge commit `54abf80`; 5 / 5 CI green; **`FSOAT_ACTIVATION_VERIFIED \| FULL_LEVEL3_NOT_DECLARED`** |
 
 ## PR #3 — full-organism capability benchmark
 
@@ -71,6 +77,21 @@ End-to-end record of the validation work that produced the current `main` branch
 - **Fix:** 30-line `stripShebangPlugin` (Vite plugin, `enforce: "pre"`) added to `byon-orchestrator/vitest.config.ts`. ESM `__dirname` shim added to 3 affected test files. Zero changes to any source `.mjs`, zero changes to `package.json` / `package-lock.json`, zero changes to BYON runtime logic.
 - **Result:** 489 / 489 → **586 / 586 tests pass, 27 / 27 test files load**.
 
+## PR #10 — Full Source Organism Activation (FSOAT)
+
+- **Title:** `validation(fsoat): integrate full source organism activation runner and verified artifacts`
+- **Verdict line:** `FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED`
+- **Verdict tokens:** `["FSOAT_ACTIVATION_VERIFIED", "FULL_LEVEL3_NOT_DECLARED"]`
+- **Active organs:** 11 / 11 — `verbal_brain`, `macp_security_body`, `memory_substrate`, `trust_hierarchy`, `immune_system`, `controlled_hands`, `capability_routing`, `code_workspace_memory`, `compliance_post_check`, `receipt_assimilation`, `structural_reference_memory`
+- **MACP chain:** complete in both scenarios (S1 coding, S2 trust conflict): `EvidencePack → PlanDraft → ApprovalRequest → ExecutionOrder → JohnsonReceipt`. Worker / Auditor / Executor activated end-to-end. 2 signed Ed25519 orders verified.
+- **FCE advisory + receipt assimilation:** PASS in both scenarios. FCE remains advisory; risk never lowered by it.
+- **Code Workspace Memory:** active (telemetry recorded in `output/code-workspace-telemetry.json`).
+- **Structural reference memory:** active; 7 operator-seeded references.
+- **Artefact:** `byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/`
+- **9 FSOAT gates:** all PASS (`G_ORGANS`, `G_MACP`, `G_SIGNATURE`, `G_AIRGAP`, `G_TRUST`, `G_FCE_ADVISORY`, `G_RECEIPT_ASSIMILATION`, `G_INVARIANTS`, `G_FORBIDDEN_TOKENS`). `G_NO_REGRESSION` covered by `npm test` (697 / 697 pass after merge).
+- **Caveat (in commit + integration report, NOT hidden):** validated with **vendored minimal in-memory FCE-M shim** (`memory_engine_runtime/__init__.py`), NOT with the **full external v15.7a runtime** through `FCEM_MEMORY_ENGINE_ROOT`. Permitted claim is `FSOAT_ACTIVATION_VERIFIED`. Forbidden: Level 3, Natural Omega, full v15.7a consolidation, coding advantage.
+- **What this PR does NOT prove:** Level 3, Natural Omega, full FCE-M v15.7a runtime, coding advantage. **FCE-M remains advisory.** No manual Omega. No manual ReferenceField.
+
 ## Category K — known trade-off
 
 | Category | A avg | B avg | Δ % |
@@ -92,6 +113,9 @@ This is the only category where Claude direct wins. The structural constraints a
 
 | Ref | SHA |
 | --- | --- |
+| **`main` after PR #10 (FSOAT integration)** | **`54abf80413a62dd84a7248674d97e2e0b1a7d1cb`** |
+| PR #10 head | `569c94dfdc38129abe65162b7e745e27d67ac672` |
+| Pre-FSOAT `main` (= PR #8 merge) | `84e55c6ef653958bc548a7ac335bd0b29877530d` (tag `backup/pre-fsoat-integration-20260514-015149`) |
 | `main` after PR #4 | `799c4b458d054ccf54e599570ce37853a08ec4d2` |
 | PR #3 head | `f45a0bacd5a129693b85d196343d9bf3eacbecf7` |
 | PR #4 head | `3ba1a0b17d01e05cdcba80077893c5dc81f4718e` |
@@ -109,3 +133,5 @@ This is the only category where Claude direct wins. The structural constraints a
 - [`docs/validation/CANONIZATION_APPROVAL_REPORT.md`](validation/CANONIZATION_APPROVAL_REPORT.md)
 - [`docs/validation/FINAL_ARTIFACT_REVIEW_CHECKLIST.md`](validation/FINAL_ARTIFACT_REVIEW_CHECKLIST.md)
 - [`docs/validation/POST_MERGE_TEST_HARNESS_STABILIZATION.md`](validation/POST_MERGE_TEST_HARNESS_STABILIZATION.md)
+- [`docs/validation/FSOAT_INTEGRATION_REPORT.md`](validation/FSOAT_INTEGRATION_REPORT.md) — FSOAT integration record (PR #10)
+- [`docs/validation/FULL_SOURCE_ORGANISM_ACTIVATION_TEST.md`](validation/FULL_SOURCE_ORGANISM_ACTIVATION_TEST.md) — FSOAT runner design + scenarios
