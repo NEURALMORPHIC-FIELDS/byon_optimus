@@ -1,0 +1,327 @@
+{
+  "timestamp": "2026-05-13T22:11:12.762Z",
+  "chain": {
+    "config": {
+      "algorithm": "sha256",
+      "genesisHash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "entries": [
+      {
+        "index": 0,
+        "timestamp": "2026-05-13T22:10:58.992Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710258991",
+        "document_type": "system_event",
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "data_hash": "7f88e360e1e6fc8b97512836424d9b23941edf9474c954c4874447c2eab3fa69",
+        "metadata": {
+          "event": "worker_started",
+          "worker_id": "fsoat_worker",
+          "config": {
+            "worker_id": "fsoat_worker",
+            "inbox": "REDACTED",
+            "enable_gmv": false,
+            "auto_start": false,
+            "audit_path": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/audit_logs/worker"
+          }
+        },
+        "hash": "cce41d3cd1e1303c9d1471f4711f56664b8034acd18cafd4b96496918ff418bf"
+      },
+      {
+        "index": 1,
+        "timestamp": "2026-05-13T22:10:59.047Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710259047",
+        "document_type": "system_event",
+        "previous_hash": "cce41d3cd1e1303c9d1471f4711f56664b8034acd18cafd4b96496918ff418bf",
+        "data_hash": "e5b90f18014b388b9656a58517a8fd69f7330b60b6bf8c9f1ed7916ae45a51ba",
+        "metadata": {
+          "event": "message_processing_started",
+          "message_id": "direct_1778710259047",
+          "source": "fsoat:2026-05-13T22-10-58-828Z-fsoat:S1_coding",
+          "timestamp": "2026-05-13T22:10:59.047Z"
+        },
+        "hash": "db7e3f067814628382666fd6aaae3df3eb2228420ac1a91a8d63813486bafef2"
+      },
+      {
+        "index": 2,
+        "timestamp": "2026-05-13T22:10:59.181Z",
+        "entry_type": "document_created",
+        "document_id": "1c80a040-068c-4259-b042-4db1845ee3e8",
+        "document_type": "EVIDENCE_PACK",
+        "previous_hash": "db7e3f067814628382666fd6aaae3df3eb2228420ac1a91a8d63813486bafef2",
+        "data_hash": "e271f263b9cf00df9a3a396b6112ab7cb8245a7ccd701e90291809be321776ea",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "dfed5ce7c8517cb5d4af06caee21416a87599285bcc8e3053ee0f8a11050d064"
+      },
+      {
+        "index": 3,
+        "timestamp": "2026-05-13T22:11:07.831Z",
+        "entry_type": "document_created",
+        "document_id": "plan_0ee6a285edeb4f569d0d25bee687739c",
+        "document_type": "PLAN_DRAFT",
+        "previous_hash": "dfed5ce7c8517cb5d4af06caee21416a87599285bcc8e3053ee0f8a11050d064",
+        "data_hash": "12553fb6217a16e601fb063c87461ec35095732d15a4ab6369b7a58c4788f190",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "105357d51235239b0be9cb3d6a1b1851c7e8d55a0dd6ed883fbb4739de3000d0"
+      },
+      {
+        "index": 4,
+        "timestamp": "2026-05-13T22:11:08.154Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710268154",
+        "document_type": "system_event",
+        "previous_hash": "105357d51235239b0be9cb3d6a1b1851c7e8d55a0dd6ed883fbb4739de3000d0",
+        "data_hash": "87c8afb08499e0483d31918eb5be8e75b9588d9bff0ce4b7682e2faec0fe5ff6",
+        "metadata": {
+          "event": "message_processing_started",
+          "message_id": "direct_1778710268154",
+          "source": "fsoat:2026-05-13T22-10-58-828Z-fsoat:S2_trust_conflict",
+          "timestamp": "2026-05-13T22:11:08.154Z"
+        },
+        "hash": "0ffecc8d0afb94f590b92374182e3653fc53b41a7f231b6ddabae69e64dceff6"
+      },
+      {
+        "index": 5,
+        "timestamp": "2026-05-13T22:11:08.203Z",
+        "entry_type": "document_created",
+        "document_id": "a69cd715-fe28-4b7a-bc9a-dd1f2494308b",
+        "document_type": "EVIDENCE_PACK",
+        "previous_hash": "0ffecc8d0afb94f590b92374182e3653fc53b41a7f231b6ddabae69e64dceff6",
+        "data_hash": "49d504ae325bc45806bbd144da2a344880ce52d1998bb6ecbd69dd701f1bf1e0",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "c33bd0fb6350e87c9726a9161ee14b0508153e43a5c41977e7f063e50534686c"
+      },
+      {
+        "index": 6,
+        "timestamp": "2026-05-13T22:11:12.668Z",
+        "entry_type": "document_created",
+        "document_id": "plan_b29bc2f501c84b088b1baafb72cb780a",
+        "document_type": "PLAN_DRAFT",
+        "previous_hash": "c33bd0fb6350e87c9726a9161ee14b0508153e43a5c41977e7f063e50534686c",
+        "data_hash": "36883138b3febb052f167dae740532f9c9b5d5667b47bf5328db2f1f7c3f86de",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "bf822165b58ab437efa8730d5905d6e9305bea18c24ae9d78e2c3879a0a7072e"
+      },
+      {
+        "index": 7,
+        "timestamp": "2026-05-13T22:11:12.762Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710272762",
+        "document_type": "system_event",
+        "previous_hash": "bf822165b58ab437efa8730d5905d6e9305bea18c24ae9d78e2c3879a0a7072e",
+        "data_hash": "adcdf212c7b960f5d5c4e44c1ada3fae88145572fb555bca77d879da66ec42ae",
+        "metadata": {
+          "event": "worker_stopped",
+          "status": "idle"
+        },
+        "hash": "bbbf446d3e96f8918eb6735c2115f9285fc3c7a9d7ef2bbd4ff4f7e2b0acf861"
+      }
+    ],
+    "headHash": "bbbf446d3e96f8918eb6735c2115f9285fc3c7a9d7ef2bbd4ff4f7e2b0acf861"
+  },
+  "documents": [
+    {
+      "document_id": "1c80a040-068c-4259-b042-4db1845ee3e8",
+      "document_type": "EVIDENCE_PACK",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-13T22:10:59.181Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-13T22:10:59.181Z",
+      "updated_at": "2026-05-13T22:10:59.181Z",
+      "is_deleted": false
+    },
+    {
+      "document_id": "plan_0ee6a285edeb4f569d0d25bee687739c",
+      "document_type": "PLAN_DRAFT",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-13T22:11:07.831Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-13T22:11:07.831Z",
+      "updated_at": "2026-05-13T22:11:07.831Z",
+      "is_deleted": false
+    },
+    {
+      "document_id": "a69cd715-fe28-4b7a-bc9a-dd1f2494308b",
+      "document_type": "EVIDENCE_PACK",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-13T22:11:08.203Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-13T22:11:08.203Z",
+      "updated_at": "2026-05-13T22:11:08.203Z",
+      "is_deleted": false
+    },
+    {
+      "document_id": "plan_b29bc2f501c84b088b1baafb72cb780a",
+      "document_type": "PLAN_DRAFT",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-13T22:11:12.668Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-13T22:11:12.668Z",
+      "updated_at": "2026-05-13T22:11:12.668Z",
+      "is_deleted": false
+    }
+  ],
+  "records": [
+    {
+      "record_id": "audit_0_1778710258992",
+      "timestamp": "2026-05-13T22:10:58.992Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710258992",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "worker_started",
+        "worker_id": "fsoat_worker",
+        "config": {
+          "worker_id": "fsoat_worker",
+          "inbox": "REDACTED",
+          "enable_gmv": false,
+          "auto_start": false,
+          "audit_path": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/audit_logs/worker"
+        }
+      },
+      "chain_hash": "cce41d3cd1e1303c9d1471f4711f56664b8034acd18cafd4b96496918ff418bf",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_1_1778710259047",
+      "timestamp": "2026-05-13T22:10:59.047Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710259047",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "message_processing_started",
+        "message_id": "direct_1778710259047",
+        "source": "fsoat:2026-05-13T22-10-58-828Z-fsoat:S1_coding",
+        "timestamp": "2026-05-13T22:10:59.047Z"
+      },
+      "chain_hash": "db7e3f067814628382666fd6aaae3df3eb2228420ac1a91a8d63813486bafef2",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_2_1778710259181",
+      "timestamp": "2026-05-13T22:10:59.181Z",
+      "event_type": "document_created",
+      "document_id": "1c80a040-068c-4259-b042-4db1845ee3e8",
+      "document_type": "EVIDENCE_PACK",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "e271f263b9cf00df9a3a396b6112ab7cb8245a7ccd701e90291809be321776ea"
+      },
+      "chain_hash": "dfed5ce7c8517cb5d4af06caee21416a87599285bcc8e3053ee0f8a11050d064",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_3_1778710267831",
+      "timestamp": "2026-05-13T22:11:07.831Z",
+      "event_type": "document_created",
+      "document_id": "plan_0ee6a285edeb4f569d0d25bee687739c",
+      "document_type": "PLAN_DRAFT",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "12553fb6217a16e601fb063c87461ec35095732d15a4ab6369b7a58c4788f190"
+      },
+      "chain_hash": "105357d51235239b0be9cb3d6a1b1851c7e8d55a0dd6ed883fbb4739de3000d0",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_4_1778710268154",
+      "timestamp": "2026-05-13T22:11:08.154Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710268154",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "message_processing_started",
+        "message_id": "direct_1778710268154",
+        "source": "fsoat:2026-05-13T22-10-58-828Z-fsoat:S2_trust_conflict",
+        "timestamp": "2026-05-13T22:11:08.154Z"
+      },
+      "chain_hash": "0ffecc8d0afb94f590b92374182e3653fc53b41a7f231b6ddabae69e64dceff6",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_5_1778710268203",
+      "timestamp": "2026-05-13T22:11:08.203Z",
+      "event_type": "document_created",
+      "document_id": "a69cd715-fe28-4b7a-bc9a-dd1f2494308b",
+      "document_type": "EVIDENCE_PACK",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "49d504ae325bc45806bbd144da2a344880ce52d1998bb6ecbd69dd701f1bf1e0"
+      },
+      "chain_hash": "c33bd0fb6350e87c9726a9161ee14b0508153e43a5c41977e7f063e50534686c",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_6_1778710272668",
+      "timestamp": "2026-05-13T22:11:12.668Z",
+      "event_type": "document_created",
+      "document_id": "plan_b29bc2f501c84b088b1baafb72cb780a",
+      "document_type": "PLAN_DRAFT",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "36883138b3febb052f167dae740532f9c9b5d5667b47bf5328db2f1f7c3f86de"
+      },
+      "chain_hash": "bf822165b58ab437efa8730d5905d6e9305bea18c24ae9d78e2c3879a0a7072e",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_7_1778710272762",
+      "timestamp": "2026-05-13T22:11:12.762Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710272762",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "worker_stopped",
+        "status": "idle"
+      },
+      "chain_hash": "bbbf446d3e96f8918eb6735c2115f9285fc3c7a9d7ef2bbd4ff4f7e2b0acf861",
+      "document_state": "executed"
+    }
+  ],
+  "verification": {
+    "valid": true,
+    "entriesVerified": 8,
+    "headHash": "bbbf446d3e96f8918eb6735c2115f9285fc3c7a9d7ef2bbd4ff4f7e2b0acf861"
+  }
+}

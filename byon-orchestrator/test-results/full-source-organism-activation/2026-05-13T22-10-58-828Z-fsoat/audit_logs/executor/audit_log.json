@@ -1,0 +1,396 @@
+{
+  "timestamp": "2026-05-13T22:11:12.757Z",
+  "chain": {
+    "config": {
+      "algorithm": "sha256",
+      "genesisHash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "entries": [
+      {
+        "index": 0,
+        "timestamp": "2026-05-13T22:10:59.008Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710259008",
+        "document_type": "system_event",
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "data_hash": "7dab0af64e40fc4b98e43c37febd02ff2c2268a5df5777ffaa2ee5121d5a0ea6",
+        "metadata": {
+          "event": "executor_started",
+          "executor_id": "fsoat_executor",
+          "config": {
+            "executor_id": "fsoat_executor",
+            "outbox_path": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/handoff/executor_to_worker",
+            "backup_enabled": false,
+            "backup_path": "./backups",
+            "dry_run": true,
+            "max_iterations": 10,
+            "timeout_ms": 1800000,
+            "audit_path": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/audit_logs/executor",
+            "project_root": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/project",
+            "auditor_public_key": "REDACTED"
+          }
+        },
+        "hash": "2e8f2a055ffdcdbef2a725a8ed2362126a4b824564689d0e33832297ec64324f"
+      },
+      {
+        "index": 1,
+        "timestamp": "2026-05-13T22:11:08.140Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710268140",
+        "document_type": "system_event",
+        "previous_hash": "2e8f2a055ffdcdbef2a725a8ed2362126a4b824564689d0e33832297ec64324f",
+        "data_hash": "9687ba1f913e2c409d9bb443cc43a2a1ede0cf34220a6da53ec2cda8d65384ab",
+        "metadata": {
+          "event": "execution_order_received",
+          "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9",
+          "based_on_plan": "plan_0ee6a285edeb4f569d0d25bee687739c",
+          "actions_count": 1,
+          "executor": "fsoat_executor"
+        },
+        "hash": "6fafaae55c2a4e199bd2d0bc043cde0376efcc4d9db077ce67543d05cff6f977"
+      },
+      {
+        "index": 2,
+        "timestamp": "2026-05-13T22:11:08.141Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710268141",
+        "document_type": "system_event",
+        "previous_hash": "6fafaae55c2a4e199bd2d0bc043cde0376efcc4d9db077ce67543d05cff6f977",
+        "data_hash": "ab0391ee0eae3d49f3ca1e4cac04f8aa8a00df6c68eef1f6e0e6caff8bd0d10e",
+        "metadata": {
+          "event": "order_verified",
+          "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9"
+        },
+        "hash": "0834710346f6ce860e5b1c7f55e6d360cfce07f4f17496f4c5bb86ddbb6698e7"
+      },
+      {
+        "index": 3,
+        "timestamp": "2026-05-13T22:11:08.142Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710268142",
+        "document_type": "system_event",
+        "previous_hash": "0834710346f6ce860e5b1c7f55e6d360cfce07f4f17496f4c5bb86ddbb6698e7",
+        "data_hash": "16bd8acdcd34a530fdcf416193bf113740cfc6def89aa618c845ad4f6f53c448",
+        "metadata": {
+          "event": "execution_started",
+          "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9",
+          "executor": "fsoat_executor",
+          "based_on_plan": "plan_0ee6a285edeb4f569d0d25bee687739c"
+        },
+        "hash": "c0fcc0772a8f41239c8b1ed35c4e3615790af670f91a85f2136c02455b9079ef"
+      },
+      {
+        "index": 4,
+        "timestamp": "2026-05-13T22:11:08.142Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710268142",
+        "document_type": "system_event",
+        "previous_hash": "c0fcc0772a8f41239c8b1ed35c4e3615790af670f91a85f2136c02455b9079ef",
+        "data_hash": "b897e3b84b7b39b802c97b6df52eea7642c7c4bec66dc2fcc6778164c294b54e",
+        "metadata": {
+          "event": "action_executed",
+          "action_id": "action_1778710268137",
+          "type": "file_create",
+          "status": "success",
+          "duration_ms": 0
+        },
+        "hash": "7c0a952a0d49903594283b3a9c5a9679a9fcf0a697899d3254f6458bd0b8b973"
+      },
+      {
+        "index": 5,
+        "timestamp": "2026-05-13T22:11:08.143Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710268143",
+        "document_type": "system_event",
+        "previous_hash": "7c0a952a0d49903594283b3a9c5a9679a9fcf0a697899d3254f6458bd0b8b973",
+        "data_hash": "aa447770fdfd5f86ebc7b623630ac947cbf97b5ad54ed14f475cf881727b874b",
+        "metadata": {
+          "event": "execution_completed",
+          "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9",
+          "executor": "fsoat_executor",
+          "receipt_id": "receipt_7c4366b888a543aa92a9ed0e2f6276ef",
+          "actions_completed": 1
+        },
+        "hash": "bc185520026d4f7e0245e523d03b8636c8a0fe713b5e0b59b1609344e09500a2"
+      },
+      {
+        "index": 6,
+        "timestamp": "2026-05-13T22:11:12.755Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710272755",
+        "document_type": "system_event",
+        "previous_hash": "bc185520026d4f7e0245e523d03b8636c8a0fe713b5e0b59b1609344e09500a2",
+        "data_hash": "0523e372ec2397e73a6a65ce549e8cbea8b4fa58970b24d459b3f8607c61938e",
+        "metadata": {
+          "event": "execution_order_received",
+          "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+          "based_on_plan": "plan_b29bc2f501c84b088b1baafb72cb780a",
+          "actions_count": 1,
+          "executor": "fsoat_executor"
+        },
+        "hash": "ab711e541636d6a3d75962fcd8ef96cb0fe2c254053ebf869c25236e3dbf37df"
+      },
+      {
+        "index": 7,
+        "timestamp": "2026-05-13T22:11:12.756Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710272756",
+        "document_type": "system_event",
+        "previous_hash": "ab711e541636d6a3d75962fcd8ef96cb0fe2c254053ebf869c25236e3dbf37df",
+        "data_hash": "492d8a20b58de08642b6e314121540d59013f8846b7e07f983b6c66abfb94251",
+        "metadata": {
+          "event": "order_verified",
+          "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca"
+        },
+        "hash": "c973dda9a9a968f682154262c7c1e619d358cff7f5394204e6b775f50bd37b84"
+      },
+      {
+        "index": 8,
+        "timestamp": "2026-05-13T22:11:12.756Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710272756",
+        "document_type": "system_event",
+        "previous_hash": "c973dda9a9a968f682154262c7c1e619d358cff7f5394204e6b775f50bd37b84",
+        "data_hash": "af80b502aacaf846f6496bc00ca09cd9a689fd2f991165999a714de5066fa9d0",
+        "metadata": {
+          "event": "execution_started",
+          "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+          "executor": "fsoat_executor",
+          "based_on_plan": "plan_b29bc2f501c84b088b1baafb72cb780a"
+        },
+        "hash": "70a1ca58c20a42b582c7a72c58cc31788c7be3178af082b9a27a152fa9f2db47"
+      },
+      {
+        "index": 9,
+        "timestamp": "2026-05-13T22:11:12.756Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710272756",
+        "document_type": "system_event",
+        "previous_hash": "70a1ca58c20a42b582c7a72c58cc31788c7be3178af082b9a27a152fa9f2db47",
+        "data_hash": "285bb24df3b596196cbb8dc123ce2963745fb29dc4a1face36975c9c5f03fa23",
+        "metadata": {
+          "event": "action_executed",
+          "action_id": "action_1",
+          "type": "file_write",
+          "status": "success",
+          "duration_ms": 0
+        },
+        "hash": "96d4cd342b08b895df61749d0a2a73a13fbf1cd19425a09b080760cbe4c570e0"
+      },
+      {
+        "index": 10,
+        "timestamp": "2026-05-13T22:11:12.757Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778710272757",
+        "document_type": "system_event",
+        "previous_hash": "96d4cd342b08b895df61749d0a2a73a13fbf1cd19425a09b080760cbe4c570e0",
+        "data_hash": "61b9542b3f36c49949718d3bfc72de0ba9d67cef7f1afb19d05ac2f9524a4c74",
+        "metadata": {
+          "event": "execution_completed",
+          "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+          "executor": "fsoat_executor",
+          "receipt_id": "receipt_8fb57305ade441bbb6babf64c613ef8e",
+          "actions_completed": 1
+        },
+        "hash": "281e88ecafcf5988cf27c9ff3276a3e30abb84ef6f7d0a9d976818bb9d0f2e42"
+      }
+    ],
+    "headHash": "281e88ecafcf5988cf27c9ff3276a3e30abb84ef6f7d0a9d976818bb9d0f2e42"
+  },
+  "documents": [],
+  "records": [
+    {
+      "record_id": "audit_0_1778710259008",
+      "timestamp": "2026-05-13T22:10:59.008Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710259008",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "executor_started",
+        "executor_id": "fsoat_executor",
+        "config": {
+          "executor_id": "fsoat_executor",
+          "outbox_path": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/handoff/executor_to_worker",
+          "backup_enabled": false,
+          "backup_path": "./backups",
+          "dry_run": true,
+          "max_iterations": 10,
+          "timeout_ms": 1800000,
+          "audit_path": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/audit_logs/executor",
+          "project_root": "/home/claude/byon_optimus/byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/project",
+          "auditor_public_key": "REDACTED"
+        }
+      },
+      "chain_hash": "2e8f2a055ffdcdbef2a725a8ed2362126a4b824564689d0e33832297ec64324f",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_1_1778710268140",
+      "timestamp": "2026-05-13T22:11:08.140Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710268140",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "execution_order_received",
+        "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9",
+        "based_on_plan": "plan_0ee6a285edeb4f569d0d25bee687739c",
+        "actions_count": 1,
+        "executor": "fsoat_executor"
+      },
+      "chain_hash": "6fafaae55c2a4e199bd2d0bc043cde0376efcc4d9db077ce67543d05cff6f977",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_2_1778710268141",
+      "timestamp": "2026-05-13T22:11:08.141Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710268141",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "order_verified",
+        "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9"
+      },
+      "chain_hash": "0834710346f6ce860e5b1c7f55e6d360cfce07f4f17496f4c5bb86ddbb6698e7",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_3_1778710268142",
+      "timestamp": "2026-05-13T22:11:08.142Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710268142",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "execution_started",
+        "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9",
+        "executor": "fsoat_executor",
+        "based_on_plan": "plan_0ee6a285edeb4f569d0d25bee687739c"
+      },
+      "chain_hash": "c0fcc0772a8f41239c8b1ed35c4e3615790af670f91a85f2136c02455b9079ef",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_4_1778710268142",
+      "timestamp": "2026-05-13T22:11:08.142Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710268142",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "action_executed",
+        "action_id": "action_1778710268137",
+        "type": "file_create",
+        "status": "success",
+        "duration_ms": 0
+      },
+      "chain_hash": "7c0a952a0d49903594283b3a9c5a9679a9fcf0a697899d3254f6458bd0b8b973",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_5_1778710268143",
+      "timestamp": "2026-05-13T22:11:08.143Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710268143",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "execution_completed",
+        "order_id": "order_3ff45d7efd56454188c3c6f47d9589a9",
+        "executor": "fsoat_executor",
+        "receipt_id": "receipt_7c4366b888a543aa92a9ed0e2f6276ef",
+        "actions_completed": 1
+      },
+      "chain_hash": "bc185520026d4f7e0245e523d03b8636c8a0fe713b5e0b59b1609344e09500a2",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_6_1778710272755",
+      "timestamp": "2026-05-13T22:11:12.755Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710272755",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "execution_order_received",
+        "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+        "based_on_plan": "plan_b29bc2f501c84b088b1baafb72cb780a",
+        "actions_count": 1,
+        "executor": "fsoat_executor"
+      },
+      "chain_hash": "ab711e541636d6a3d75962fcd8ef96cb0fe2c254053ebf869c25236e3dbf37df",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_7_1778710272756",
+      "timestamp": "2026-05-13T22:11:12.756Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710272756",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "order_verified",
+        "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca"
+      },
+      "chain_hash": "c973dda9a9a968f682154262c7c1e619d358cff7f5394204e6b775f50bd37b84",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_8_1778710272756",
+      "timestamp": "2026-05-13T22:11:12.756Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710272756",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "execution_started",
+        "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+        "executor": "fsoat_executor",
+        "based_on_plan": "plan_b29bc2f501c84b088b1baafb72cb780a"
+      },
+      "chain_hash": "70a1ca58c20a42b582c7a72c58cc31788c7be3178af082b9a27a152fa9f2db47",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_9_1778710272756",
+      "timestamp": "2026-05-13T22:11:12.756Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710272756",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "action_executed",
+        "action_id": "action_1",
+        "type": "file_write",
+        "status": "success",
+        "duration_ms": 0
+      },
+      "chain_hash": "96d4cd342b08b895df61749d0a2a73a13fbf1cd19425a09b080760cbe4c570e0",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_10_1778710272757",
+      "timestamp": "2026-05-13T22:11:12.757Z",
+      "event_type": "system_event",
+      "document_id": "system_1778710272757",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "execution_completed",
+        "order_id": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+        "executor": "fsoat_executor",
+        "receipt_id": "receipt_8fb57305ade441bbb6babf64c613ef8e",
+        "actions_completed": 1
+      },
+      "chain_hash": "281e88ecafcf5988cf27c9ff3276a3e30abb84ef6f7d0a9d976818bb9d0f2e42",
+      "document_state": "executed"
+    }
+  ],
+  "verification": {
+    "valid": true,
+    "entriesVerified": 11,
+    "headHash": "281e88ecafcf5988cf27c9ff3276a3e30abb84ef6f7d0a9d976818bb9d0f2e42"
+  }
+}

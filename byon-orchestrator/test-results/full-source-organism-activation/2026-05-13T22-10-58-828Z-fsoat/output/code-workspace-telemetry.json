@@ -1,0 +1,22 @@
+{
+  "scenarios": [
+    {
+      "scenario_id": "S1_coding",
+      "context_built": true,
+      "exact_files_included": 0,
+      "requirements_included": 0,
+      "has_anti_duplication_warning": true,
+      "phase_task": {
+        "prompt": "Build a tiny Python module `policy_gate.py` that contains exactly one PolicyEngine class with an `evaluate(action)` method returning True if the action's policy_gate field is not 'bypass_all', else False. Also produce `tests/test_policy_gate.py` with one passing test. Do NOT create two PolicyEngine classes.",
+        "phase_index": 0,
+        "language": "python"
+      }
+    },
+    {
+      "scenario_id": "S2_trust_conflict",
+      "not_applicable_to_scenario": true,
+      "reason": "scenario is non-coding"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,37 @@
+{
+  "document_type": "JOHNSON_RECEIPT",
+  "document_version": "1.0",
+  "receipt_id": "receipt_7c4366b888a543aa92a9ed0e2f6276ef",
+  "timestamp": "2026-05-13T22:11:08.143Z",
+  "based_on_order": "order_3ff45d7efd56454188c3c6f47d9589a9",
+  "execution_summary": {
+    "status": "success",
+    "actions_total": 1,
+    "actions_completed": 1,
+    "actions_failed": 0,
+    "iterations_used": 1,
+    "duration_ms": 1
+  },
+  "action_results": [
+    {
+      "action_id": "action_1778710268137",
+      "status": "success",
+      "output": "[DRY RUN] Would create: policy_gate.py",
+      "duration_ms": 0
+    }
+  ],
+  "errors": [],
+  "changes_made": {
+    "files_modified": [],
+    "files_created": [
+      "policy_gate.py"
+    ],
+    "files_deleted": []
+  },
+  "verification": {
+    "tests_passing": null,
+    "lint_passing": null,
+    "build_passing": null
+  },
+  "hash": "19e79155d2b0ef4a1dd14e6499c1f0bb75b0a3bca13402cdd6d0f8413aba6f2a"
+}

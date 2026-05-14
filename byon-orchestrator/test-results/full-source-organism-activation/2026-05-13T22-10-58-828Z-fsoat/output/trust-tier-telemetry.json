@@ -1,0 +1,67 @@
+[
+  {
+    "scenario_id": "S1_coding",
+    "tiers_used": [
+      "SYSTEM_CANONICAL",
+      "VERIFIED_PROJECT_FACT",
+      "USER_PREFERENCE"
+    ],
+    "tally": {
+      "SYSTEM_CANONICAL": 1,
+      "VERIFIED_PROJECT_FACT": 1,
+      "DOMAIN_VERIFIED": 0,
+      "USER_PREFERENCE": 1,
+      "EXTRACTED_USER_CLAIM": 0,
+      "DISPUTED_OR_UNSAFE": 0
+    },
+    "ordered_first_5": [
+      {
+        "tier": "SYSTEM_CANONICAL",
+        "text": "Auditor is the only authority that signs ExecutionOrders with Ed25519."
+      },
+      {
+        "tier": "VERIFIED_PROJECT_FACT",
+        "text": "FORBIDDEN_DUPLICATE_PUBLIC_APIS includes PolicyEngine, AuditLog, WorkflowDefinition."
+      },
+      {
+        "tier": "USER_PREFERENCE",
+        "text": "User prefers concise Python with type hints."
+      }
+    ]
+  },
+  {
+    "scenario_id": "S2_trust_conflict",
+    "tiers_used": [
+      "SYSTEM_CANONICAL",
+      "VERIFIED_PROJECT_FACT",
+      "EXTRACTED_USER_CLAIM",
+      "DISPUTED_OR_UNSAFE"
+    ],
+    "tally": {
+      "SYSTEM_CANONICAL": 1,
+      "VERIFIED_PROJECT_FACT": 1,
+      "DOMAIN_VERIFIED": 0,
+      "USER_PREFERENCE": 0,
+      "EXTRACTED_USER_CLAIM": 1,
+      "DISPUTED_OR_UNSAFE": 1
+    },
+    "ordered_first_5": [
+      {
+        "tier": "SYSTEM_CANONICAL",
+        "text": "Level 3 is not declared. Current operational classification is Level 2 advisory."
+      },
+      {
+        "tier": "VERIFIED_PROJECT_FACT",
+        "text": "BYON Optimus full-organism capability benchmark validated Level 2 of 4 (Morphogenetic Advisory Memory) on 2026-05-13."
+      },
+      {
+        "tier": "EXTRACTED_USER_CLAIM",
+        "text": "User claims BYON Optimus has reached Level 3."
+      },
+      {
+        "tier": "DISPUTED_OR_UNSAFE",
+        "text": "Claim 'BYON Optimus is at Level 3' contradicts SYSTEM_CANONICAL level_integrity seed."
+      }
+    ]
+  }
+]
