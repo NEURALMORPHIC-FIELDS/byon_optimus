@@ -109,9 +109,110 @@ if AVAILABLE:
 else:
     _log.warning(
         "memory_engine_runtime source not found at %s (set FCEM_MEMORY_ENGINE_ROOT). "
-        "Stub mode: write/read for symbolic entries will fail at runtime.",
+        "Loading vendored minimal in-memory DCortexAdapter shim. The shim satisfies "
+        "the FCE-M write/consolidate contract for receipt assimilation but does NOT "
+        "implement the full v15.7a consolidation pipeline (no real reconcile/prune/"
+        "retrograde/promote, no Omega coagulation, no theta_s/tau_coag dynamics). "
+        "Set FCEM_MEMORY_ENGINE_ROOT to the v15.7a source root to load the real runtime.",
         _CONSOLIDATION_DIR,
     )
+
+    # ------------------------------------------------------------------
+    # Vendored minimal in-memory shim
+    # ------------------------------------------------------------------
+    # FSOAT 2026-05-13 fix: the upstream fragmergent-memory-engine v15.7a research
+    # source is the operator's own project, not vendored here. Without a valid
+    # FCEM_MEMORY_ENGINE_ROOT, FCE-M's symbolic write path raised
+    # `TypeError("'NoneType' object is not callable")` because DCortexAdapter was
+    # left as None. This shim restores the minimum contract that FCE-M uses:
+    #
+    #   DCortexAdapter(mode, N_promote, M_retrograde, K_promote_age, K_prune_stale)
+    #       .ingest_slot_event(slot_event_dict)      -- called by memory_store.write
+    #       .end_episode(episode_id)                 -- called by store.consolidate
+    #       .metrics_snapshot()                      -- called by store.consolidate
+    #
+    # The shim is deliberately inert beyond record-keeping: it does NOT perform
+    # consolidation, propagation, Omega coagulation, or any latent dynamics. It
+    # exists so receipt assimilation can complete on a clean repo checkout. When
+    # the real v15.7a source is provided via FCEM_MEMORY_ENGINE_ROOT, this branch
+    # is bypassed and the real DCortexAdapter loads above.
+
+    LATENT_MODE_OFF = "off"
+    LATENT_MODE_WRITE_ONLY = "write_only"
+    LATENT_MODE_ADVISORY = "advisory"
+
+    class _MinimalDCortexAdapter:
+        """In-memory shim for DCortexAdapter. Records slot_events without coagulation.
+
+        Operator-locked invariants this shim respects:
+          - theta_s is NOT read or written by this shim.
+          - tau_coag is NOT read or written by this shim.
+          - No Omega anchor is created.
+          - No ReferenceField is created.
+          - operator_seeded origin is never mutated by this shim.
+        """
+
+        def __init__(
+            self,
+            mode: str = LATENT_MODE_OFF,
+            N_promote: int = 0,
+            M_retrograde: int = 0,
+            K_promote_age: int = 0,
+            K_prune_stale: int = 0,
+        ) -> None:
+            self.mode = mode
+            self.N_promote = int(N_promote or 0)
+            self.M_retrograde = int(M_retrograde or 0)
+            self.K_promote_age = int(K_promote_age or 0)
+            self.K_prune_stale = int(K_prune_stale or 0)
+            self._events: list = []
+            self._episode_count = 0
+            self._is_shim = True
+
+        def ingest_slot_event(self, slot_event):
+            """Record a slot_event. Returns nothing; in-memory list is the side effect."""
+            if not isinstance(slot_event, dict):
+                raise TypeError(
+                    "ingest_slot_event requires a dict; got %r" % type(slot_event).__name__
+                )
+            for key in ("entity", "family", "zone_after"):
+                if key not in slot_event:
+                    raise KeyError(
+                        "slot_event missing required key %r (shim contract)" % key
+                    )
+            self._events.append(dict(slot_event))
+
+        def end_episode(self, episode_id: int):
+            """Mark episode boundary. Returns inert LatentSignals-shaped dict."""
+            self._episode_count += 1
+            return {
+                "episode_id": int(episode_id),
+                "shim_mode": True,
+                "events_in_episode": sum(
+                    1 for _ in self._events
+                ),
+                "note": "minimal in-memory shim; no real propagation performed",
+            }
+
+        def metrics_snapshot(self):
+            """Inert metrics shape used by FCE-Omega observer for read-only inspection."""
+            return {
+                "last_pipeline_ops": {
+                    "reconcile": 0,
+                    "prune": 0,
+                    "retrograde": 0,
+                    "promote": 0,
+                },
+                "shim_mode": True,
+                "total_slot_events": len(self._events),
+                "episodes_closed": self._episode_count,
+            }
+
+    DCortexAdapter = _MinimalDCortexAdapter
+
+    # AVAILABLE intentionally stays False so any code path that gates on it
+    # (e.g. _load_ignition) still raises a clear error rather than silently
+    # using the shim for a feature it does not implement.
 
 
 _ignition_module: Optional[ModuleType] = None

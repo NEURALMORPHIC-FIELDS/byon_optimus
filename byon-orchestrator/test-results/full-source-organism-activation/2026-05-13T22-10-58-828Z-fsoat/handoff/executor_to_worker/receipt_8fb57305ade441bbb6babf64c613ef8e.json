@@ -1,0 +1,37 @@
+{
+  "document_type": "JOHNSON_RECEIPT",
+  "document_version": "1.0",
+  "receipt_id": "receipt_8fb57305ade441bbb6babf64c613ef8e",
+  "timestamp": "2026-05-13T22:11:12.757Z",
+  "based_on_order": "order_8fc22654a12147da9d16ca6a4d43a1ca",
+  "execution_summary": {
+    "status": "success",
+    "actions_total": 1,
+    "actions_completed": 1,
+    "actions_failed": 0,
+    "iterations_used": 1,
+    "duration_ms": 1
+  },
+  "action_results": [
+    {
+      "action_id": "action_1",
+      "status": "success",
+      "output": "[DRY RUN] Would write: output/ai_result.txt",
+      "duration_ms": 0
+    }
+  ],
+  "errors": [],
+  "changes_made": {
+    "files_modified": [
+      "output/ai_result.txt"
+    ],
+    "files_created": [],
+    "files_deleted": []
+  },
+  "verification": {
+    "tests_passing": null,
+    "lint_passing": null,
+    "build_passing": null
+  },
+  "hash": "9e6862ee1982dd41404f2dc25cefd62bae18144013ab0f22b6f16db466532149"
+}
