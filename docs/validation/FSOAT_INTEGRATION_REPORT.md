@@ -1,5 +1,30 @@
 # FSOAT integration report
 
+## External FCE-M v15.7a runtime validation (2026-05-14)
+
+The PR #10 caveat — "validated with the vendored minimal in-memory FCE-M shim, not the full external v15.7a runtime" — has been **lifted**.
+
+- **Branch:** `validation/fsoat-real-fcem-v15-runtime` (off `main` @ `f8b41b7`)
+- **FSOAT run id:** `2026-05-14T14-35-22-995Z-fsoat`
+- **Runtime root:** `C:\Users\Lucian\Desktop\fragmergent-memory-engine\13_v15_7a_consolidation`
+- **`runtime_source`:** `external_v15_7a` — **`shim_used`: `false`** — **`adapter_class`: `DCortexAdapter`** (the real adapter, not `_MinimalDCortexAdapter`)
+- **Fail-hard gate:** the run was executed with `FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME=true`; the FSOAT runner would have early-exited with `FULL_EXTERNAL_FCEM_RUNTIME_NOT_PROVEN` had the shim been detected. It was not.
+- **Preflight probes (real runtime):** `fce_state` OK, `fce_advisory` OK, synthetic JohnsonReceipt assimilation OK.
+- **FSOAT verdict:** `FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED`, 11/11 organs active, all FSOAT gates PASS.
+- **Omega / ReferenceField:** count 0 before and after — no manual Omega, no manual ReferenceField. `theta_s=0.28`, `tau_coag=12` untouched.
+- **Proof artefact:** `byon-orchestrator/test-results/full-source-organism-activation/2026-05-14T14-35-22-995Z-fsoat/output/real-fcem-runtime-proof.json` (`fcem_runtime_proven: true`).
+
+Code touched for this validation (non-runtime-behaviour, instrumentation + path resolution only):
+- `byon-orchestrator/memory-service/vendor/fce_m/.../memory_engine_runtime/__init__.py` — flexible `FCEM_MEMORY_ENGINE_ROOT` resolution (accepts parent dir OR the `13_v15_7a_consolidation` dir directly) + `RUNTIME_SOURCE` / `SHIM_USED` / `ADAPTER_CLASS_NAME` / `RUNTIME_ROOT` exports + `runtime_provenance()` helper.
+- `byon-orchestrator/memory-service/fcem_backend.py` — `runtime_provenance()` method; `fcem_runtime` block added to `state()`.
+- `byon-orchestrator/memory-service/server.py` — `/health` now returns the `fcem_runtime` block.
+- `byon-orchestrator/scripts/byon-full-source-organism-activation-test.mjs` — `FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME` fail-hard gate, FCE-M preflight probes, `real-fcem-runtime-proof.json` artefact.
+- `byon-orchestrator/scripts/lib/fsoat/fce-receipt-assimilation-observer.mjs` — captures `fcem_runtime` from `/health`; tracks preflight / in-run probe results.
+
+**Still NOT proven:** Level 3, Natural Omega, full v15.7a *consolidation* dynamics (endogenous Omega coagulation), coding advantage. FSOAT proves the external runtime *participates* in receipt assimilation. **FCE-M remains advisory.**
+
+---
+
 ## Post-merge note (PR #10)
 
 The FSOAT integration was opened as draft, CI completed **5 / 5 PASS** (Build Orchestrator 16 s, Lint & Test Orchestrator 24 s, Security Scan 17 s, Validate JSON Schemas 16 s, Docker Build 1 m 8 s), the operator authorised merge, and PR #10 was merged into `main` on `2026-05-14T00:19:26Z`.

@@ -558,11 +558,21 @@ async def health_check():
     if PROMETHEUS_AVAILABLE:
         UPTIME_SECONDS.set(uptime)
 
+    # FSOAT 2026-05-14: surface FCE-M runtime-source provenance so the
+    # external-runtime validation can confirm the real v15.7a runtime is
+    # loaded (shim_used == False) rather than the vendored minimal shim.
+    fcem_runtime = None
+    try:
+        fcem_runtime = get_fcem().runtime_provenance()
+    except Exception as exc:  # pragma: no cover - diagnostic only
+        fcem_runtime = {"runtime_source": "unknown", "error": repr(exc)}
+
     return {
         "status": "healthy",
         "service": "byon-memory-service",
         "backend": "FAISS-IndexFlatIP",
-        "uptime_seconds": uptime
+        "uptime_seconds": uptime,
+        "fcem_runtime": fcem_runtime,
     }
 
 

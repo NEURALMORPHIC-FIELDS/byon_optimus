@@ -18,12 +18,35 @@ from typing import Any, Optional
 _log = logging.getLogger("unified_fragmergent_memory.sources.memory_engine_runtime")
 
 _DEFAULT_ROOT = Path("c:/Users/Lucian/Desktop/fragmergent-memory-engine")
-_SOURCE_ROOT: Path = Path(
+_ENV_ROOT: Path = Path(
     os.environ.get("FCEM_MEMORY_ENGINE_ROOT", str(_DEFAULT_ROOT))
 )
-_CONSOLIDATION_DIR = _SOURCE_ROOT / "13_v15_7a_consolidation"
+
+# FSOAT 2026-05-14: FCEM_MEMORY_ENGINE_ROOT may point EITHER at the parent
+# `fragmergent-memory-engine` dir OR directly at the `13_v15_7a_consolidation`
+# subdir. Resolve both: if the env path itself contains `d_cortex/__init__.py`
+# it IS the consolidation dir; otherwise append the v15.7a subdir.
+if (_ENV_ROOT / "d_cortex" / "__init__.py").exists():
+    _CONSOLIDATION_DIR = _ENV_ROOT
+    _SOURCE_ROOT = _ENV_ROOT.parent
+elif (_ENV_ROOT / "13_v15_7a_consolidation" / "d_cortex" / "__init__.py").exists():
+    _SOURCE_ROOT = _ENV_ROOT
+    _CONSOLIDATION_DIR = _ENV_ROOT / "13_v15_7a_consolidation"
+else:
+    # Neither layout resolved — keep the historical behaviour so the
+    # shim-not-found warning still names a sensible path.
+    _SOURCE_ROOT = _ENV_ROOT
+    _CONSOLIDATION_DIR = _ENV_ROOT / "13_v15_7a_consolidation"
 
 AVAILABLE: bool = (_CONSOLIDATION_DIR / "d_cortex" / "__init__.py").exists()
+
+# FSOAT 2026-05-14: runtime-source provenance, exported so memory-service and
+# the FSOAT runner can prove whether the EXTERNAL v15.7a runtime was loaded or
+# the vendored minimal in-memory shim was used. Set definitively below.
+RUNTIME_SOURCE: str = "external_v15_7a" if AVAILABLE else "vendored_minimal_shim"
+SHIM_USED: bool = not AVAILABLE
+RUNTIME_ROOT: str = str(_CONSOLIDATION_DIR)
+ADAPTER_CLASS_NAME: str = "unknown"  # set after adapter selection below
 
 # Public exports — set to None in stub mode; populated below if AVAILABLE.
 v15_7a_core: Optional[ModuleType] = None
@@ -99,6 +122,16 @@ if AVAILABLE:
         LATENT_MODE_ADVISORY = _adapter.LATENT_MODE_ADVISORY
         LatentRationalMemoryReceptor = _receptor.LatentRationalMemoryReceptor
         LatentDecisionPressure = _receptor.LatentDecisionPressure
+
+        # FSOAT 2026-05-14: real external v15.7a runtime loaded.
+        RUNTIME_SOURCE = "external_v15_7a"
+        SHIM_USED = False
+        ADAPTER_CLASS_NAME = getattr(DCortexAdapter, "__name__", "DCortexAdapter")
+        _log.info(
+            "memory_engine_runtime: EXTERNAL v15.7a runtime loaded from %s "
+            "(adapter=%s, shim_used=False)",
+            _CONSOLIDATION_DIR, ADAPTER_CLASS_NAME,
+        )
     except ImportError as _e:
         _log.warning(
             "memory_engine_runtime path exists but d_cortex import failed: %s. "
@@ -106,6 +139,8 @@ if AVAILABLE:
             _e,
         )
         AVAILABLE = False
+        RUNTIME_SOURCE = "vendored_minimal_shim"
+        SHIM_USED = True
 else:
     _log.warning(
         "memory_engine_runtime source not found at %s (set FCEM_MEMORY_ENGINE_ROOT). "
@@ -210,6 +245,11 @@ else:
 
     DCortexAdapter = _MinimalDCortexAdapter
 
+    # FSOAT 2026-05-14: shim path — runtime-source provenance is explicit.
+    RUNTIME_SOURCE = "vendored_minimal_shim"
+    SHIM_USED = True
+    ADAPTER_CLASS_NAME = "_MinimalDCortexAdapter"
+
     # AVAILABLE intentionally stays False so any code path that gates on it
     # (e.g. _load_ignition) still raises a clear error rather than silently
     # using the shim for a feature it does not implement.
@@ -285,4 +325,25 @@ __all__ = [
     "LatentRationalMemoryReceptor",
     "LatentDecisionPressure",
     "SOURCE_ROOT",
+    "RUNTIME_SOURCE",
+    "SHIM_USED",
+    "RUNTIME_ROOT",
+    "ADAPTER_CLASS_NAME",
 ]
+
+
+def runtime_provenance() -> dict:
+    """FSOAT 2026-05-14: machine-readable proof of which FCE-M runtime loaded.
+
+    Returns the four provenance fields the FSOAT external-runtime validation
+    consumes. `shim_used == True` means the vendored minimal in-memory shim is
+    active and the external v15.7a runtime was NOT loaded.
+    """
+    return {
+        "enabled": True,
+        "runtime_source": RUNTIME_SOURCE,
+        "runtime_root": RUNTIME_ROOT,
+        "shim_used": SHIM_USED,
+        "adapter_class": ADAPTER_CLASS_NAME,
+        "available": AVAILABLE,
+    }

@@ -1,0 +1,327 @@
+{
+  "timestamp": "2026-05-14T14:35:50.318Z",
+  "chain": {
+    "config": {
+      "algorithm": "sha256",
+      "genesisHash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "entries": [
+      {
+        "index": 0,
+        "timestamp": "2026-05-14T14:35:23.269Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778769323269",
+        "document_type": "system_event",
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "data_hash": "56cb511e3eea63b2f43b3b9795ff99e46cf9e1fad7f7af5398ee2a484369d4ce",
+        "metadata": {
+          "event": "worker_started",
+          "worker_id": "fsoat_worker",
+          "config": {
+            "worker_id": "fsoat_worker",
+            "inbox": "REDACTED",
+            "enable_gmv": false,
+            "auto_start": false,
+            "audit_path": "C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\byon-orchestrator\\test-results\\full-source-organism-activation\\2026-05-14T14-35-22-995Z-fsoat\\audit_logs\\worker"
+          }
+        },
+        "hash": "831b3aa137adb5b9eee5632f3a9b7479d1421ed3c5e0054698ed181c9e8755e7"
+      },
+      {
+        "index": 1,
+        "timestamp": "2026-05-14T14:35:23.334Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778769323334",
+        "document_type": "system_event",
+        "previous_hash": "831b3aa137adb5b9eee5632f3a9b7479d1421ed3c5e0054698ed181c9e8755e7",
+        "data_hash": "7d3afe408e6de22b7d5e8a4a24a3e36e8b43e7c7e6d0407ee6b92a2e23cbcb99",
+        "metadata": {
+          "event": "message_processing_started",
+          "message_id": "direct_1778769323333",
+          "source": "fsoat:2026-05-14T14-35-22-995Z-fsoat:S1_coding",
+          "timestamp": "2026-05-14T14:35:23.334Z"
+        },
+        "hash": "f44811437ed819132a825e9e6e692a296b8b6a65d460a2403b95adecc034f277"
+      },
+      {
+        "index": 2,
+        "timestamp": "2026-05-14T14:35:23.557Z",
+        "entry_type": "document_created",
+        "document_id": "f4d64791-aaaf-4fa1-86f4-cc0bb2992728",
+        "document_type": "EVIDENCE_PACK",
+        "previous_hash": "f44811437ed819132a825e9e6e692a296b8b6a65d460a2403b95adecc034f277",
+        "data_hash": "88a58d66177cffd5a405ad169b9815f788e04d3fa442ba160f1e5fe9378a5801",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "44c597e2b533c4e1f9bf626bbf29d3cc23ce90e8634667118ce334abf8cd6750"
+      },
+      {
+        "index": 3,
+        "timestamp": "2026-05-14T14:35:32.715Z",
+        "entry_type": "document_created",
+        "document_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+        "document_type": "PLAN_DRAFT",
+        "previous_hash": "44c597e2b533c4e1f9bf626bbf29d3cc23ce90e8634667118ce334abf8cd6750",
+        "data_hash": "200a236ae6d4eccffc6c51698184adfffdcfe2bf2bb56b60a3ed5bbce9f6cde2",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "3d62f860c6b9e1dfde60d3f833e69809c7c77e35f8fdee82c05939646b12b78e"
+      },
+      {
+        "index": 4,
+        "timestamp": "2026-05-14T14:35:33.147Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778769333147",
+        "document_type": "system_event",
+        "previous_hash": "3d62f860c6b9e1dfde60d3f833e69809c7c77e35f8fdee82c05939646b12b78e",
+        "data_hash": "b6b8d2e75a7ea8976c4778fa29728d0f5ea0c59a269445f160071a5130889acd",
+        "metadata": {
+          "event": "message_processing_started",
+          "message_id": "direct_1778769333147",
+          "source": "fsoat:2026-05-14T14-35-22-995Z-fsoat:S2_trust_conflict",
+          "timestamp": "2026-05-14T14:35:33.147Z"
+        },
+        "hash": "ce5fb80c315ad69952090769663e48c9fcd970531c34333e20500c4284440d80"
+      },
+      {
+        "index": 5,
+        "timestamp": "2026-05-14T14:35:33.178Z",
+        "entry_type": "document_created",
+        "document_id": "4ce0385d-616a-4b79-977b-593b99d975f1",
+        "document_type": "EVIDENCE_PACK",
+        "previous_hash": "ce5fb80c315ad69952090769663e48c9fcd970531c34333e20500c4284440d80",
+        "data_hash": "880928ac21e7745a2ad4b0a19f06350a25aefd3e4eea465b2cd483f88a1a3734",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "abde8e77c1dcfdb5366895e0ade39ed0a7128c15f385ff8ecb0315330e799313"
+      },
+      {
+        "index": 6,
+        "timestamp": "2026-05-14T14:35:50.229Z",
+        "entry_type": "document_created",
+        "document_id": "plan_bbc1265a05594826978c34cfef796c89",
+        "document_type": "PLAN_DRAFT",
+        "previous_hash": "abde8e77c1dcfdb5366895e0ade39ed0a7128c15f385ff8ecb0315330e799313",
+        "data_hash": "96db0e126ad755addb7330bf889bdd073d778e5ac7a33fb7106d2b82159dc194",
+        "metadata": {
+          "actor": "fsoat_worker"
+        },
+        "hash": "639058fdae73b9ac8c6ca1293c78a355312fbb684374942acad82bf39545fa3f"
+      },
+      {
+        "index": 7,
+        "timestamp": "2026-05-14T14:35:50.318Z",
+        "entry_type": "checkpoint",
+        "document_id": "system_1778769350318",
+        "document_type": "system_event",
+        "previous_hash": "639058fdae73b9ac8c6ca1293c78a355312fbb684374942acad82bf39545fa3f",
+        "data_hash": "adcdf212c7b960f5d5c4e44c1ada3fae88145572fb555bca77d879da66ec42ae",
+        "metadata": {
+          "event": "worker_stopped",
+          "status": "idle"
+        },
+        "hash": "05570a396cb1ac56ced5c9eac523c7b7c434a561ac01f3b50a67ffa1a09a6d41"
+      }
+    ],
+    "headHash": "05570a396cb1ac56ced5c9eac523c7b7c434a561ac01f3b50a67ffa1a09a6d41"
+  },
+  "documents": [
+    {
+      "document_id": "f4d64791-aaaf-4fa1-86f4-cc0bb2992728",
+      "document_type": "EVIDENCE_PACK",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-14T14:35:23.557Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-14T14:35:23.557Z",
+      "updated_at": "2026-05-14T14:35:23.557Z",
+      "is_deleted": false
+    },
+    {
+      "document_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+      "document_type": "PLAN_DRAFT",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-14T14:35:32.715Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-14T14:35:32.715Z",
+      "updated_at": "2026-05-14T14:35:32.715Z",
+      "is_deleted": false
+    },
+    {
+      "document_id": "4ce0385d-616a-4b79-977b-593b99d975f1",
+      "document_type": "EVIDENCE_PACK",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-14T14:35:33.178Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-14T14:35:33.178Z",
+      "updated_at": "2026-05-14T14:35:33.178Z",
+      "is_deleted": false
+    },
+    {
+      "document_id": "plan_bbc1265a05594826978c34cfef796c89",
+      "document_type": "PLAN_DRAFT",
+      "state": "draft",
+      "state_history": [
+        {
+          "from": "draft",
+          "to": "draft",
+          "timestamp": "2026-05-14T14:35:50.229Z",
+          "reason": "Document created",
+          "actor": "system"
+        }
+      ],
+      "created_at": "2026-05-14T14:35:50.229Z",
+      "updated_at": "2026-05-14T14:35:50.229Z",
+      "is_deleted": false
+    }
+  ],
+  "records": [
+    {
+      "record_id": "audit_0_1778769323269",
+      "timestamp": "2026-05-14T14:35:23.269Z",
+      "event_type": "system_event",
+      "document_id": "system_1778769323269",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "worker_started",
+        "worker_id": "fsoat_worker",
+        "config": {
+          "worker_id": "fsoat_worker",
+          "inbox": "REDACTED",
+          "enable_gmv": false,
+          "auto_start": false,
+          "audit_path": "C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\byon-orchestrator\\test-results\\full-source-organism-activation\\2026-05-14T14-35-22-995Z-fsoat\\audit_logs\\worker"
+        }
+      },
+      "chain_hash": "831b3aa137adb5b9eee5632f3a9b7479d1421ed3c5e0054698ed181c9e8755e7",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_1_1778769323334",
+      "timestamp": "2026-05-14T14:35:23.334Z",
+      "event_type": "system_event",
+      "document_id": "system_1778769323334",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "message_processing_started",
+        "message_id": "direct_1778769323333",
+        "source": "fsoat:2026-05-14T14-35-22-995Z-fsoat:S1_coding",
+        "timestamp": "2026-05-14T14:35:23.334Z"
+      },
+      "chain_hash": "f44811437ed819132a825e9e6e692a296b8b6a65d460a2403b95adecc034f277",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_2_1778769323557",
+      "timestamp": "2026-05-14T14:35:23.557Z",
+      "event_type": "document_created",
+      "document_id": "f4d64791-aaaf-4fa1-86f4-cc0bb2992728",
+      "document_type": "EVIDENCE_PACK",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "88a58d66177cffd5a405ad169b9815f788e04d3fa442ba160f1e5fe9378a5801"
+      },
+      "chain_hash": "44c597e2b533c4e1f9bf626bbf29d3cc23ce90e8634667118ce334abf8cd6750",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_3_1778769332715",
+      "timestamp": "2026-05-14T14:35:32.715Z",
+      "event_type": "document_created",
+      "document_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+      "document_type": "PLAN_DRAFT",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "200a236ae6d4eccffc6c51698184adfffdcfe2bf2bb56b60a3ed5bbce9f6cde2"
+      },
+      "chain_hash": "3d62f860c6b9e1dfde60d3f833e69809c7c77e35f8fdee82c05939646b12b78e",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_4_1778769333147",
+      "timestamp": "2026-05-14T14:35:33.147Z",
+      "event_type": "system_event",
+      "document_id": "system_1778769333147",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "message_processing_started",
+        "message_id": "direct_1778769333147",
+        "source": "fsoat:2026-05-14T14-35-22-995Z-fsoat:S2_trust_conflict",
+        "timestamp": "2026-05-14T14:35:33.147Z"
+      },
+      "chain_hash": "ce5fb80c315ad69952090769663e48c9fcd970531c34333e20500c4284440d80",
+      "document_state": "executed"
+    },
+    {
+      "record_id": "audit_5_1778769333178",
+      "timestamp": "2026-05-14T14:35:33.178Z",
+      "event_type": "document_created",
+      "document_id": "4ce0385d-616a-4b79-977b-593b99d975f1",
+      "document_type": "EVIDENCE_PACK",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "880928ac21e7745a2ad4b0a19f06350a25aefd3e4eea465b2cd483f88a1a3734"
+      },
+      "chain_hash": "abde8e77c1dcfdb5366895e0ade39ed0a7128c15f385ff8ecb0315330e799313",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_6_1778769350229",
+      "timestamp": "2026-05-14T14:35:50.229Z",
+      "event_type": "document_created",
+      "document_id": "plan_bbc1265a05594826978c34cfef796c89",
+      "document_type": "PLAN_DRAFT",
+      "actor": "fsoat_worker",
+      "details": {
+        "document_hash": "96db0e126ad755addb7330bf889bdd073d778e5ac7a33fb7106d2b82159dc194"
+      },
+      "chain_hash": "639058fdae73b9ac8c6ca1293c78a355312fbb684374942acad82bf39545fa3f",
+      "document_state": "draft"
+    },
+    {
+      "record_id": "audit_7_1778769350318",
+      "timestamp": "2026-05-14T14:35:50.318Z",
+      "event_type": "system_event",
+      "document_id": "system_1778769350318",
+      "document_type": "system_event",
+      "actor": "system",
+      "details": {
+        "event": "worker_stopped",
+        "status": "idle"
+      },
+      "chain_hash": "05570a396cb1ac56ced5c9eac523c7b7c434a561ac01f3b50a67ffa1a09a6d41",
+      "document_state": "executed"
+    }
+  ],
+  "verification": {
+    "valid": true,
+    "entriesVerified": 8,
+    "headHash": "05570a396cb1ac56ced5c9eac523c7b7c434a561ac01f3b50a67ffa1a09a6d41"
+  }
+}

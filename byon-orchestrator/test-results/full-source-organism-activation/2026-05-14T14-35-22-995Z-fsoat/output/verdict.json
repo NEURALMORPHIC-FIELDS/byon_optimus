@@ -1,0 +1,227 @@
+{
+  "run_id": "2026-05-14T14-35-22-995Z-fsoat",
+  "built_at": "2026-05-14T14:35:50.312Z",
+  "level_3_declared": false,
+  "operator_invariants": {
+    "theta_s": 0.28,
+    "tau_coag": 12,
+    "touched_by_run": false
+  },
+  "activation_summary": {
+    "run_id": "2026-05-14T14-35-22-995Z-fsoat",
+    "started_at": "2026-05-14T14:35:23.011Z",
+    "ended_at": "2026-05-14T14:35:50.311Z",
+    "organs": {
+      "verbal_brain": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:33.128Z",
+        "last_proof_at": "2026-05-14T14:35:50.300Z"
+      },
+      "macp_security_body": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 8,
+        "first_proof_at": "2026-05-14T14:35:33.128Z",
+        "last_proof_at": "2026-05-14T14:35:50.308Z"
+      },
+      "memory_substrate": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 4,
+        "first_proof_at": "2026-05-14T14:35:23.057Z",
+        "last_proof_at": "2026-05-14T14:35:33.147Z"
+      },
+      "trust_hierarchy": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:23.308Z",
+        "last_proof_at": "2026-05-14T14:35:33.142Z"
+      },
+      "immune_system": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 7,
+        "first_proof_at": "2026-05-14T14:35:33.130Z",
+        "last_proof_at": "2026-05-14T14:35:50.300Z"
+      },
+      "controlled_hands": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 3,
+        "first_proof_at": "2026-05-14T14:35:23.305Z",
+        "last_proof_at": "2026-05-14T14:35:50.307Z"
+      },
+      "capability_routing": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:23.307Z",
+        "last_proof_at": "2026-05-14T14:35:33.142Z"
+      },
+      "code_workspace_memory": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 1,
+        "first_proof_at": "2026-05-14T14:35:23.333Z",
+        "last_proof_at": "2026-05-14T14:35:23.333Z"
+      },
+      "compliance_post_check": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 4,
+        "first_proof_at": "2026-05-14T14:35:33.142Z",
+        "last_proof_at": "2026-05-14T14:35:50.310Z"
+      },
+      "receipt_assimilation": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 3,
+        "first_proof_at": "2026-05-14T14:35:23.075Z",
+        "last_proof_at": "2026-05-14T14:35:50.310Z"
+      },
+      "structural_reference_memory": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:23.325Z",
+        "last_proof_at": "2026-05-14T14:35:33.144Z"
+      }
+    },
+    "active_count": 11,
+    "inactive_count": 0,
+    "not_applicable_count": 0,
+    "active_organs": [
+      "verbal_brain",
+      "macp_security_body",
+      "memory_substrate",
+      "trust_hierarchy",
+      "immune_system",
+      "controlled_hands",
+      "capability_routing",
+      "code_workspace_memory",
+      "compliance_post_check",
+      "receipt_assimilation",
+      "structural_reference_memory"
+    ],
+    "inactive_organs": [],
+    "not_applicable_organs": []
+  },
+  "macp_chain_summary": {
+    "S1_coding": {
+      "has_evidence_pack": true,
+      "has_plan_draft": true,
+      "has_approval_request": true,
+      "has_execution_order": true,
+      "has_rejection": false,
+      "has_receipt": true,
+      "signed_orders": 1,
+      "rejections": 0,
+      "receipts": 1,
+      "chain_complete": true,
+      "document_count": 5
+    },
+    "S2_trust_conflict": {
+      "has_evidence_pack": true,
+      "has_plan_draft": true,
+      "has_approval_request": true,
+      "has_execution_order": true,
+      "has_rejection": false,
+      "has_receipt": true,
+      "signed_orders": 1,
+      "rejections": 0,
+      "receipts": 1,
+      "chain_complete": true,
+      "document_count": 5
+    }
+  },
+  "structural_invariants": {
+    "seed_count": 7,
+    "invariant_violations": [],
+    "mode": "offline"
+  },
+  "gates": {
+    "G_ORGANS": {
+      "pass": true,
+      "inactive_organs": [],
+      "note": "all organs active or acceptably N/A"
+    },
+    "G_MACP": {
+      "pass": true,
+      "total_scenarios": 2,
+      "scenarios_with_complete_chain": 2,
+      "per_scenario": {
+        "S1_coding": {
+          "has_evidence_pack": true,
+          "has_plan_draft": true,
+          "has_approval_request": true,
+          "has_execution_order": true,
+          "has_rejection": false,
+          "has_receipt": true,
+          "signed_orders": 1,
+          "rejections": 0,
+          "receipts": 1,
+          "chain_complete": true,
+          "document_count": 5
+        },
+        "S2_trust_conflict": {
+          "has_evidence_pack": true,
+          "has_plan_draft": true,
+          "has_approval_request": true,
+          "has_execution_order": true,
+          "has_rejection": false,
+          "has_receipt": true,
+          "signed_orders": 1,
+          "rejections": 0,
+          "receipts": 1,
+          "chain_complete": true,
+          "document_count": 5
+        }
+      }
+    },
+    "G_SIGNATURE": {
+      "pass": true,
+      "signed_orders": 2,
+      "verified_events": 2
+    },
+    "G_AIRGAP": {
+      "pass": true,
+      "airgap_events": 1
+    },
+    "G_TRUST": {
+      "pass": true,
+      "events": 2
+    },
+    "G_FCE_ADVISORY": {
+      "pass": true,
+      "events": 3,
+      "note": "FCE-M advisory is advisory; risk never lowered by it"
+    },
+    "G_RECEIPT_ASSIMILATION": {
+      "pass": true,
+      "events": 3
+    },
+    "G_INVARIANTS": {
+      "pass": true,
+      "violations": [],
+      "theta_s_expected": 0.28,
+      "tau_coag_expected": 12
+    },
+    "G_FORBIDDEN_TOKENS": {
+      "pass": true,
+      "hits": []
+    },
+    "G_NO_REGRESSION": {
+      "pass": null,
+      "note": "evaluated by `npm test` outside FSOAT; runner records test result alongside this verdict"
+    }
+  },
+  "verdict_tokens": [
+    "FSOAT_ACTIVATION_VERIFIED",
+    "FULL_LEVEL3_NOT_DECLARED"
+  ],
+  "primary_verdict": "FSOAT_ACTIVATION_VERIFIED",
+  "final_verdict_line": "FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED"
+}
