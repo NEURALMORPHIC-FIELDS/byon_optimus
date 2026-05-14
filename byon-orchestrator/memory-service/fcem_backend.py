@@ -355,10 +355,49 @@ class FcemBackend:
 
     # ---- read path ----------------------------------------------------------
 
+    def runtime_provenance(self) -> Dict[str, Any]:
+        """FSOAT 2026-05-14: machine-readable proof of which FCE-M runtime loaded.
+
+        Reports whether the EXTERNAL fragmergent-memory-engine v15.7a runtime
+        was loaded (via FCEM_MEMORY_ENGINE_ROOT) or the vendored minimal
+        in-memory shim. The FSOAT external-runtime validation gates on
+        `shim_used == False` and `runtime_source == "external_v15_7a"`.
+        """
+        try:
+            from unified_fragmergent_memory.sources import (  # type: ignore
+                memory_engine_runtime as _mer,
+            )
+            if hasattr(_mer, "runtime_provenance"):
+                prov = dict(_mer.runtime_provenance())
+            else:  # older vendored module without the helper
+                prov = {
+                    "enabled": True,
+                    "runtime_source": getattr(_mer, "RUNTIME_SOURCE", "unknown"),
+                    "runtime_root": getattr(_mer, "RUNTIME_ROOT", str(getattr(_mer, "SOURCE_ROOT", ""))),
+                    "shim_used": bool(getattr(_mer, "SHIM_USED", not getattr(_mer, "AVAILABLE", False))),
+                    "adapter_class": getattr(_mer, "ADAPTER_CLASS_NAME", "unknown"),
+                    "available": bool(getattr(_mer, "AVAILABLE", False)),
+                }
+            prov["env_fcem_memory_engine_root"] = os.environ.get("FCEM_MEMORY_ENGINE_ROOT")
+            return prov
+        except Exception as exc:  # pragma: no cover - runtime diagnostic
+            logger.warning("FCE-M runtime_provenance() failed: %s", exc)
+            return {
+                "enabled": self.enabled,
+                "runtime_source": "unknown",
+                "shim_used": None,
+                "error": repr(exc),
+                "env_fcem_memory_engine_root": os.environ.get("FCEM_MEMORY_ENGINE_ROOT"),
+            }
+
     def state(self) -> Dict[str, Any]:
         """Full snapshot — small, safe to ship to TypeScript."""
         if not self.enabled or self._store is None:
-            return {"enabled": False, "init_error": self._init_error}
+            return {
+                "enabled": False,
+                "init_error": self._init_error,
+                "fcem_runtime": self.runtime_provenance(),
+            }
         try:
             return {
                 "enabled": True,
@@ -369,10 +408,12 @@ class FcemBackend:
                 # v0.6.4c — dedup observability
                 "dedup": dict(self.dedup_stats),
                 "coherent_repeat_threshold": self.coherent_repeat_threshold,
+                # FSOAT 2026-05-14 — runtime-source provenance
+                "fcem_runtime": self.runtime_provenance(),
             }
         except Exception as exc:
             logger.warning("FCE-M state() failed: %s", exc)
-            return {"enabled": True, "error": repr(exc)}
+            return {"enabled": True, "error": repr(exc), "fcem_runtime": self.runtime_provenance()}
 
     def advisory(self) -> List[Dict[str, Any]]:
         if not self.enabled or self._store is None:

@@ -1,0 +1,23 @@
+{
+  "mode": "offline",
+  "retrieved_records": [
+    {
+      "scenario_id": "S1_coding",
+      "mode": "offline",
+      "record_count": 7,
+      "origins": {
+        "operator_seeded": 7
+      }
+    },
+    {
+      "scenario_id": "S2_trust_conflict",
+      "mode": "offline",
+      "record_count": 7,
+      "origins": {
+        "operator_seeded": 7
+      }
+    }
+  ],
+  "invariant_violations": [],
+  "seed_count": 7
+}

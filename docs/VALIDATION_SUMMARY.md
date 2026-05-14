@@ -89,8 +89,20 @@ End-to-end record of the validation work that produced the current `main` branch
 - **Structural reference memory:** active; 7 operator-seeded references.
 - **Artefact:** `byon-orchestrator/test-results/full-source-organism-activation/2026-05-13T22-10-58-828Z-fsoat/`
 - **9 FSOAT gates:** all PASS (`G_ORGANS`, `G_MACP`, `G_SIGNATURE`, `G_AIRGAP`, `G_TRUST`, `G_FCE_ADVISORY`, `G_RECEIPT_ASSIMILATION`, `G_INVARIANTS`, `G_FORBIDDEN_TOKENS`). `G_NO_REGRESSION` covered by `npm test` (697 / 697 pass after merge).
-- **Caveat (in commit + integration report, NOT hidden):** validated with **vendored minimal in-memory FCE-M shim** (`memory_engine_runtime/__init__.py`), NOT with the **full external v15.7a runtime** through `FCEM_MEMORY_ENGINE_ROOT`. Permitted claim is `FSOAT_ACTIVATION_VERIFIED`. Forbidden: Level 3, Natural Omega, full v15.7a consolidation, coding advantage.
-- **What this PR does NOT prove:** Level 3, Natural Omega, full FCE-M v15.7a runtime, coding advantage. **FCE-M remains advisory.** No manual Omega. No manual ReferenceField.
+- **Caveat at PR #10 time (now superseded):** PR #10 validated FSOAT with the **vendored minimal in-memory FCE-M shim**. That caveat was lifted by the external-runtime validation below.
+- **What PR #10 did NOT prove:** Level 3, Natural Omega, full FCE-M v15.7a runtime, coding advantage. **FCE-M remains advisory.** No manual Omega. No manual ReferenceField.
+
+## External FCE-M v15.7a runtime validation
+
+- **Branch:** `validation/fsoat-real-fcem-v15-runtime` (off `main` @ `f8b41b7`)
+- **Run id:** `2026-05-14T14-35-22-995Z-fsoat`
+- **Objective:** prove FSOAT runs against the **real external FCE-M v15.7a runtime**, not the vendored minimal in-memory shim.
+- **How:** memory-service started with `FCEM_MEMORY_ENGINE_ROOT` pointed at `C:\Users\Lucian\Desktop\fragmergent-memory-engine\13_v15_7a_consolidation`; the vendored `memory_engine_runtime/__init__.py` path resolver was made flexible (accepts the env path being EITHER the parent dir OR the `13_v15_7a_consolidation` dir directly) and now exports `runtime_provenance()`. memory-service `/health` and `fce_state` surface a `fcem_runtime` block. The FSOAT runner gained `FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME=true` — a fail-hard gate that emits `FULL_EXTERNAL_FCEM_RUNTIME_NOT_PROVEN` and early-exits if the shim is detected.
+- **Result:** `runtime_source=external_v15_7a`, `shim_used=false`, `adapter_class=DCortexAdapter` (the real adapter, not `_MinimalDCortexAdapter`). FSOAT verdict held: **`FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED`**, 11/11 organs active, all FSOAT gates PASS.
+- **Preflight probes against the real runtime:** `fce_state` OK, `fce_advisory` OK, synthetic JohnsonReceipt assimilation OK. In-run receipt assimilation passed for both scenarios.
+- **Omega / ReferenceField:** registry count 0 before and after — no manual Omega, no manual ReferenceField. `theta_s=0.28`, `tau_coag=12` untouched.
+- **Proof artefact:** `byon-orchestrator/test-results/full-source-organism-activation/2026-05-14T14-35-22-995Z-fsoat/output/real-fcem-runtime-proof.json` (`fcem_runtime_proven: true`).
+- **Still NOT proven:** Level 3, Natural Omega, full v15.7a *consolidation* dynamics, coding advantage. FSOAT proves the external runtime *participates* in receipt assimilation; it does not prove endogenous Omega coagulation. **FCE-M remains advisory.**
 
 ## Category K — known trade-off
 

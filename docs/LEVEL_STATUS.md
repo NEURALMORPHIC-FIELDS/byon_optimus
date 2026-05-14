@@ -20,9 +20,10 @@ Test suite:                         697 / 697 pass (31 / 31 test files).
 Test-harness stabilization:         PR #4 → main, shebang plugin in vitest.config.ts.
 Level 3:                            not declared.
 Natural Omega:                      not proven.
-External FCE-M v15.7a runtime:      not proven (FSOAT used vendored minimal
-                                    in-memory FCE-M shim, NOT v15.7a via
-                                    FCEM_MEMORY_ENGINE_ROOT).
+External FCE-M v15.7a runtime:      PROVEN in FSOAT run 2026-05-14T14-35-22-995Z-fsoat
+                                    (runtime_source=external_v15_7a, shim_used=false,
+                                    adapter_class=DCortexAdapter, loaded via
+                                    FCEM_MEMORY_ENGINE_ROOT). FCE-M remains advisory.
 Coding advantage:                   not proven.
 ReferenceField:                     not manually created.
 theta_s = 0.28                      unchanged (operator-locked).
@@ -41,7 +42,7 @@ tau_coag = 12                       unchanged (operator-locked).
 
 - **Level 3 is not declared.** The full-organism benchmark proves that BYON outperforms Claude direct on memory / trust / safety / structural categories, *not* that the system has reached autonomous identity coagulation. FSOAT *activates* all 11 organs in one cycle; it does NOT establish Level 3.
 - **Natural Omega is not proven.** No `OmegaRecord` has emerged endogenously through the conversational loop within the documented runs. `θ_s ≥ 0.28` for `τ_coag ≥ 12` is the criterion; this criterion has not been crossed under controlled conditions.
-- **Full external FCE-M v15.7a runtime is not proven.** FSOAT was validated against the *vendored minimal in-memory FCE-M shim* under `byon-orchestrator/memory-service/vendor/fce_m/unified_fragmergent_memory/sources/memory_engine_runtime/__init__.py` — NOT against the external v15.7a runtime through `FCEM_MEMORY_ENGINE_ROOT`. Permitted claim: `FSOAT_ACTIVATION_VERIFIED`. Forbidden: Level 3, Natural Omega, full v15.7a consolidation.
+- **Full external FCE-M v15.7a runtime is PROVEN** (FSOAT run `2026-05-14T14-35-22-995Z-fsoat`). FSOAT was re-run with `FCEM_MEMORY_ENGINE_ROOT` pointed at the real `13_v15_7a_consolidation` source and `FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME=true` (fail-hard-on-shim). memory-service `/health` reported `runtime_source=external_v15_7a`, `shim_used=false`, `adapter_class=DCortexAdapter`. Preflight `fce_state` / `fce_advisory` / synthetic-receipt-assimilation all passed against the real runtime; in-run receipt assimilation passed for both scenarios. See `byon-orchestrator/test-results/full-source-organism-activation/2026-05-14T14-35-22-995Z-fsoat/output/real-fcem-runtime-proof.json`. **The vendored minimal shim remains in the tree for portability but is no longer the validation basis.** Still NOT proven: Level 3, Natural Omega, full v15.7a *consolidation* dynamics (FSOAT proves runtime participation in receipt assimilation, not endogenous Omega coagulation).
 - **Coding advantage is not proven.** PR #9 hardening rerun closed the gap from −46.32 % to −10.75 %, BYON now ships pytest exit=0 while Claude direct ships pytest exit=2 (collection error), but the weighted-score Gate 1 (+15 %) threshold is not met. See PR #9 record.
 - **ReferenceField is not created manually.** Where structural reference logic exists, it is operator-seeded and stays `origin=operator_seeded`. The operator-seeded structural reference *is not* an endogenous Omega anchor — see `docs/STRUCTURAL_REFERENCE_MEMORY.md`.
 - **No manual Omega.** No code path calls `OmegaRegistry.register(...)` to materialise an `OmegaRecord` outside the FCE-M endogenous coagulation rule.
@@ -66,6 +67,7 @@ These tokens are allowed only inside the forbidden-list itself (which lives in `
 | --- | --- |
 | **`main` after PR #10 (FSOAT integration)** | **`54abf80413a62dd84a7248674d97e2e0b1a7d1cb`** |
 | FSOAT integration head (PR #10 head) | `569c94dfdc38129abe65162b7e745e27d67ac672` |
+| External FCE-M v15.7a runtime validation run | `2026-05-14T14-35-22-995Z-fsoat` (branch `validation/fsoat-real-fcem-v15-runtime`) |
 | `main` after PR #4 | `799c4b458d054ccf54e599570ce37853a08ec4d2` |
 | Canonical benchmark commit (PR #3 head) | `f45a0bacd5a129693b85d196343d9bf3eacbecf7` |
 | Test-harness stabilization (PR #4 head) | `3ba1a0b17d01e05cdcba80077893c5dc81f4718e` |

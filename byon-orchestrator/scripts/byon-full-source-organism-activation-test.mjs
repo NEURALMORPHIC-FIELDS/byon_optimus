@@ -266,6 +266,64 @@ async function main() {
         await fce.probeFaissSearch();
     }
 
+    // ------------------------------------------------------------------ FCE-M runtime gate
+    // FSOAT 2026-05-14: external FCE-M v15.7a runtime validation.
+    // When FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME=true the run FAILS HARD if the
+    // vendored minimal in-memory shim is detected. The shim is acceptable for
+    // portability but NOT accepted as proof for this validation.
+    const requireExternalFcem =
+        (process.env.FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME || "false").toLowerCase() === "true";
+    const prov = fce.runtimeProvenance || null;
+    const provSource = prov?.runtime_source ?? "unknown";
+    const provShimUsed = prov?.shim_used;
+    console.log(`[FSOAT] FCE-M runtime: source=${provSource} shim_used=${provShimUsed} adapter=${prov?.adapter_class ?? "?"}`);
+    console.log(`[FSOAT]   FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME = ${requireExternalFcem}`);
+    if (requireExternalFcem) {
+        const externalOk = provSource === "external_v15_7a" && provShimUsed === false;
+        if (!externalOk) {
+            emitInactiveAndExit({
+                tracker, chain, fce, capObserver, codeWs, trust, structural, runId, workspace,
+                scenariosToRun,
+                reason:
+                    "FULL_EXTERNAL_FCEM_RUNTIME_NOT_PROVEN: FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME=true " +
+                    `but memory-service reports runtime_source=${provSource}, shim_used=${provShimUsed}. ` +
+                    "The vendored minimal in-memory FCE-M shim is NOT accepted as proof for this " +
+                    "validation. Set FCEM_MEMORY_ENGINE_ROOT to the real v15.7a consolidation dir.",
+                extraVerdict: {
+                    full_external_fcem_runtime_proven: false,
+                    fcem_runtime: prov,
+                    require_external_fcem_runtime: true,
+                },
+            });
+            return;
+        }
+        console.log("[FSOAT]   external FCE-M v15.7a runtime CONFIRMED (shim_used=false)");
+    }
+
+    // ------------------------------------------------------------ FCE-M preflight probes
+    // FSOAT 2026-05-14: direct FCE-M probes against the (external) runtime
+    // BEFORE the scenarios run — fce_state + fce_advisory snapshot, plus a
+    // synthetic preflight JohnsonReceipt assimilation. Results feed
+    // real-fcem-runtime-proof.json.
+    if (fce.healthOk === true) {
+        console.log("[FSOAT] FCE-M preflight: fce_state + fce_advisory");
+        await fce.probeFceAdvisory({
+            scenarioId: "preflight",
+            threadId: `fsoat_${runId}_preflight`,
+            scope: "thread",
+        });
+        console.log(`[FSOAT]   preflight_fce_state_ok = ${fce.preflightFceStateOk}`);
+        console.log(`[FSOAT]   preflight_fce_advisory_ok = ${fce.preflightFceAdvisoryOk}`);
+        console.log("[FSOAT] FCE-M preflight: synthetic JohnsonReceipt assimilation");
+        await fce.assimilateReceipt("preflight", {
+            receipt_id: `fsoat_preflight_${runId}`,
+            based_on_order: `fsoat_preflight_order_${runId}`,
+            status: "success",
+            execution_summary: { status: "success" },
+        });
+        console.log(`[FSOAT]   preflight_receipt_assimilation_ok = ${fce.preflightReceiptAssimilationOk}`);
+    }
+
     console.log("[FSOAT] initializing trust tier observer");
     const trustInit = await trust.init();
     console.log(`[FSOAT]   production formatter available: ${trustInit.formatter_available}`);
@@ -514,6 +572,22 @@ async function main() {
 
     fs.writeFileSync(path.join(out, "verdict.json"), JSON.stringify(verdict, null, 2));
 
+    // FSOAT 2026-05-14: real-fcem-runtime-proof.json — operator-mandated proof
+    // file for the external FCE-M v15.7a runtime validation.
+    const realFcemProof = buildRealFcemRuntimeProof(
+        { fce, workspace },
+        verdict,
+        { earlyExit: false }
+    );
+    fs.writeFileSync(
+        path.join(out, "real-fcem-runtime-proof.json"),
+        JSON.stringify(realFcemProof, null, 2)
+    );
+    console.log(
+        `[FSOAT] real-fcem-runtime-proof: fcem_runtime_proven=${realFcemProof.fcem_runtime_proven} ` +
+        `source=${realFcemProof.runtime_source} shim_used=${realFcemProof.shim_used}`
+    );
+
     const summaryMd = verdictBuilder.renderSummaryMarkdown(verdict, {
         notes:
             "FSOAT smoke run. ANTHROPIC_API_KEY status: " +
@@ -592,13 +666,66 @@ function emitInactiveAndExit(ctx) {
     });
     const verdict = verdictBuilder.build();
     verdict.early_exit = { reason: ctx.reason };
+    if (ctx.extraVerdict && typeof ctx.extraVerdict === "object") {
+        Object.assign(verdict, ctx.extraVerdict);
+        // FSOAT 2026-05-14: when the early exit is the external-FCEM-runtime
+        // gate, surface the dedicated verdict token alongside the standard line.
+        if (ctx.extraVerdict.full_external_fcem_runtime_proven === false) {
+            verdict.full_external_fcem_runtime_verdict = "FULL_EXTERNAL_FCEM_RUNTIME_NOT_PROVEN";
+        }
+    }
     fs.writeFileSync(path.join(out, "verdict.json"), JSON.stringify(verdict, null, 2));
+    // FSOAT 2026-05-14: always emit the runtime-proof artifact, even on the
+    // shim-detected early exit, so the failure is machine-readable.
+    fs.writeFileSync(
+        path.join(out, "real-fcem-runtime-proof.json"),
+        JSON.stringify(buildRealFcemRuntimeProof(ctx, verdict, { earlyExit: true }), null, 2)
+    );
     fs.writeFileSync(path.join(out, "summary.md"), verdictBuilder.renderSummaryMarkdown(verdict, {
         notes: `early exit: ${ctx.reason}`
     }));
     console.error(`[FSOAT] EARLY EXIT: ${ctx.reason}`);
     console.error(`[FSOAT] verdict: ${verdict.final_verdict_line}`);
     process.exit(1);
+}
+
+/**
+ * FSOAT 2026-05-14: build the `real-fcem-runtime-proof.json` artifact.
+ * Records whether the EXTERNAL fragmergent-memory-engine v15.7a runtime was
+ * loaded (shim_used === false) versus the vendored minimal in-memory shim,
+ * plus the preflight probe results and Omega/ReferenceField before/after
+ * counts. This is the operator-mandated proof file for the external-runtime
+ * validation.
+ */
+function buildRealFcemRuntimeProof(ctx, verdict, opts = {}) {
+    const prov = ctx.fce?.runtimeProvenance || {};
+    const fceObs = ctx.fce || {};
+    const externalProven =
+        prov.runtime_source === "external_v15_7a" && prov.shim_used === false;
+    return {
+        fcem_runtime_proven: !!externalProven,
+        runtime_source: prov.runtime_source ?? "unknown",
+        runtime_root: prov.runtime_root ?? process.env.FCEM_MEMORY_ENGINE_ROOT ?? null,
+        shim_used: prov.shim_used ?? null,
+        adapter_class: prov.adapter_class ?? "unknown",
+        env_fcem_memory_engine_root: process.env.FCEM_MEMORY_ENGINE_ROOT ?? null,
+        require_external_fcem_runtime:
+            (process.env.FSOAT_REQUIRE_EXTERNAL_FCEM_RUNTIME || "false").toLowerCase() === "true",
+        preflight_fce_state_ok: !!fceObs.preflightFceStateOk,
+        preflight_fce_advisory_ok: !!fceObs.preflightFceAdvisoryOk,
+        preflight_receipt_assimilation_ok: !!fceObs.preflightReceiptAssimilationOk,
+        fsoat_receipt_assimilation_ok: !!fceObs.fsoatReceiptAssimilationOk,
+        omega_registry_count_before: fceObs.omegaCountBefore ?? 0,
+        omega_registry_count_after: fceObs.omegaCountAfter ?? 0,
+        reference_field_count_before: fceObs.referenceFieldCountBefore ?? 0,
+        reference_field_count_after: fceObs.referenceFieldCountAfter ?? 0,
+        level_3_declared: false,
+        theta_s: 0.28,
+        tau_coag: 12,
+        early_exit: !!opts.earlyExit,
+        verdict_line: verdict?.final_verdict_line ?? null,
+        captured_at: new Date().toISOString(),
+    };
 }
 
 // ---------------------------------------------------------------------------

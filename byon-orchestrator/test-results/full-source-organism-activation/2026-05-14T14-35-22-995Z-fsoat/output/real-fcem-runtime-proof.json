@@ -1,0 +1,23 @@
+{
+  "fcem_runtime_proven": true,
+  "runtime_source": "external_v15_7a",
+  "runtime_root": "C:\\Users\\Lucian\\Desktop\\fragmergent-memory-engine\\13_v15_7a_consolidation",
+  "shim_used": false,
+  "adapter_class": "DCortexAdapter",
+  "env_fcem_memory_engine_root": "C:/Users/Lucian/Desktop/fragmergent-memory-engine/13_v15_7a_consolidation",
+  "require_external_fcem_runtime": true,
+  "preflight_fce_state_ok": true,
+  "preflight_fce_advisory_ok": true,
+  "preflight_receipt_assimilation_ok": true,
+  "fsoat_receipt_assimilation_ok": true,
+  "omega_registry_count_before": 0,
+  "omega_registry_count_after": 0,
+  "reference_field_count_before": 0,
+  "reference_field_count_after": 0,
+  "level_3_declared": false,
+  "theta_s": 0.28,
+  "tau_coag": 12,
+  "early_exit": false,
+  "verdict_line": "FSOAT_ACTIVATION_VERIFIED | FULL_LEVEL3_NOT_DECLARED",
+  "captured_at": "2026-05-14T14:35:50.316Z"
+}

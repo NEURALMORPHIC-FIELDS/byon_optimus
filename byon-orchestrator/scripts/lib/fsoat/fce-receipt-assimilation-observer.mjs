@@ -35,6 +35,20 @@ export class FceReceiptAssimilationObserver {
         this.stateDeltas = [];
         this.healthCheckedAt = null;
         this.healthOk = null;
+        // FSOAT 2026-05-14: FCE-M runtime-source provenance, captured from the
+        // /health body. Lets the runner prove the EXTERNAL v15.7a runtime was
+        // loaded (shim_used === false) rather than the vendored minimal shim.
+        this.runtimeProvenance = null;
+        // FSOAT 2026-05-14: probe-result tracking for real-fcem-runtime-proof.json.
+        this.preflightFceStateOk = false;
+        this.preflightFceAdvisoryOk = false;
+        this.preflightReceiptAssimilationOk = false;
+        this.fsoatReceiptAssimilationOk = false;
+        this.omegaCountBefore = 0;
+        this.omegaCountAfter = 0;
+        this.referenceFieldCountBefore = 0;
+        this.referenceFieldCountAfter = 0;
+        this._omegaCountSeen = false;
     }
 
     /**
@@ -51,6 +65,10 @@ export class FceReceiptAssimilationObserver {
             if (resp.ok) {
                 const body = await resp.json().catch(() => ({}));
                 this.healthOk = true;
+                // FSOAT 2026-05-14: capture FCE-M runtime provenance from /health.
+                if (body && typeof body === "object" && body.fcem_runtime) {
+                    this.runtimeProvenance = body.fcem_runtime;
+                }
                 this.tracker.recordProof("memory_substrate", "memory_service.health", {
                     base_url: this.baseUrl,
                     body
@@ -192,6 +210,22 @@ export class FceReceiptAssimilationObserver {
         const omegaCount = stateBody?.state?.omega_registry?.count ?? null;
         const refsCount = stateBody?.state?.reference_fields_count ?? null;
         const enabled = stateBody?.state?.enabled ?? null;
+        // FSOAT 2026-05-14: track probe results for real-fcem-runtime-proof.json.
+        if (stateIsValidSnapshot) this.preflightFceStateOk = true;
+        if (advisoryIsValidStructure && advisorySuccessFlag && !advisoryErrorMarker) {
+            this.preflightFceAdvisoryOk = true;
+        }
+        if (stateIsValidSnapshot && !this._omegaCountSeen) {
+            // First valid FCE state snapshot — capture the "before" counts.
+            this.omegaCountBefore = typeof omegaCount === "number" ? omegaCount : 0;
+            this.referenceFieldCountBefore = typeof refsCount === "number" ? refsCount : 0;
+            this._omegaCountSeen = true;
+        }
+        if (stateIsValidSnapshot) {
+            // Every subsequent valid snapshot updates the "after" counts.
+            this.omegaCountAfter = typeof omegaCount === "number" ? omegaCount : this.omegaCountAfter;
+            this.referenceFieldCountAfter = typeof refsCount === "number" ? refsCount : this.referenceFieldCountAfter;
+        }
         if (passesValidation) {
             this.tracker.recordProof("memory_substrate", "memory_service.fce_advisory", {
                 base_url: this.baseUrl,
@@ -276,6 +310,15 @@ export class FceReceiptAssimilationObserver {
             const fceStatus = body?.fce_status || body?.fce?.fce_status || "unknown";
             const fceLayerOk = fceStatus === "assimilated_receipt" || fceStatus === "ok" || fceStatus === "success";
             if (resp.ok && fceLayerOk) {
+                // FSOAT 2026-05-14: track receipt-assimilation success for the
+                // real-fcem-runtime-proof artifact. A preflight scenario id
+                // (prefixed `preflight`) sets the preflight flag; any other
+                // scenario sets the in-run FSOAT flag.
+                if (String(scenarioId || "").toLowerCase().startsWith("preflight")) {
+                    this.preflightReceiptAssimilationOk = true;
+                } else {
+                    this.fsoatReceiptAssimilationOk = true;
+                }
                 this.tracker.recordProof("receipt_assimilation", "memory_service.fce_assimilate_receipt", {
                     scenario: scenarioId,
                     receipt_id: receipt.receipt_id,

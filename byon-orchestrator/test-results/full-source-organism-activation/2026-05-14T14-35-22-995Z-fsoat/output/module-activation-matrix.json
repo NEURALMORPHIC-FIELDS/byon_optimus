@@ -1,0 +1,1303 @@
+{
+  "run_id": "2026-05-14T14-35-22-995Z-fsoat",
+  "activation": {
+    "run_id": "2026-05-14T14-35-22-995Z-fsoat",
+    "started_at": "2026-05-14T14:35:23.011Z",
+    "ended_at": "2026-05-14T14:35:50.311Z",
+    "organs": {
+      "verbal_brain": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:33.128Z",
+        "last_proof_at": "2026-05-14T14:35:50.300Z"
+      },
+      "macp_security_body": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 8,
+        "first_proof_at": "2026-05-14T14:35:33.128Z",
+        "last_proof_at": "2026-05-14T14:35:50.308Z"
+      },
+      "memory_substrate": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 4,
+        "first_proof_at": "2026-05-14T14:35:23.057Z",
+        "last_proof_at": "2026-05-14T14:35:33.147Z"
+      },
+      "trust_hierarchy": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:23.308Z",
+        "last_proof_at": "2026-05-14T14:35:33.142Z"
+      },
+      "immune_system": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 7,
+        "first_proof_at": "2026-05-14T14:35:33.130Z",
+        "last_proof_at": "2026-05-14T14:35:50.300Z"
+      },
+      "controlled_hands": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 3,
+        "first_proof_at": "2026-05-14T14:35:23.305Z",
+        "last_proof_at": "2026-05-14T14:35:50.307Z"
+      },
+      "capability_routing": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:23.307Z",
+        "last_proof_at": "2026-05-14T14:35:33.142Z"
+      },
+      "code_workspace_memory": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 1,
+        "first_proof_at": "2026-05-14T14:35:23.333Z",
+        "last_proof_at": "2026-05-14T14:35:23.333Z"
+      },
+      "compliance_post_check": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 4,
+        "first_proof_at": "2026-05-14T14:35:33.142Z",
+        "last_proof_at": "2026-05-14T14:35:50.310Z"
+      },
+      "receipt_assimilation": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 3,
+        "first_proof_at": "2026-05-14T14:35:23.075Z",
+        "last_proof_at": "2026-05-14T14:35:50.310Z"
+      },
+      "structural_reference_memory": {
+        "active": true,
+        "not_applicable_to_scenario": false,
+        "proof_count": 2,
+        "first_proof_at": "2026-05-14T14:35:23.325Z",
+        "last_proof_at": "2026-05-14T14:35:33.144Z"
+      }
+    },
+    "active_count": 11,
+    "inactive_count": 0,
+    "not_applicable_count": 0,
+    "active_organs": [
+      "verbal_brain",
+      "macp_security_body",
+      "memory_substrate",
+      "trust_hierarchy",
+      "immune_system",
+      "controlled_hands",
+      "capability_routing",
+      "code_workspace_memory",
+      "compliance_post_check",
+      "receipt_assimilation",
+      "structural_reference_memory"
+    ],
+    "inactive_organs": [],
+    "not_applicable_organs": []
+  },
+  "proof_detail": {
+    "verbal_brain": [
+      {
+        "ts": "2026-05-14T14:35:33.128Z",
+        "proof_type": "anthropic.api.call",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "provider": "anthropic",
+          "model": "claude-sonnet-4-6",
+          "tokens_used": 814,
+          "ai_actions": 1
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "anthropic.api.call",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "provider": "anthropic",
+          "model": "claude-sonnet-4-6",
+          "tokens_used": 321,
+          "ai_actions": 1
+        }
+      }
+    ],
+    "macp_security_body": [
+      {
+        "ts": "2026-05-14T14:35:33.128Z",
+        "proof_type": "worker.evidence_pack.written",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "evidence_id": "f4d64791-aaaf-4fa1-86f4-cc0bb2992728",
+          "scenario": "S1_coding"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.128Z",
+        "proof_type": "worker.plan_draft.written",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+          "risk_level": "medium",
+          "actions": 1,
+          "scenario": "S1_coding"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.131Z",
+        "proof_type": "auditor.execution_order.signed",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "order_id": "order_0bf272b2d0c64312b4a7bdf77a28db6a",
+          "signed": true,
+          "approval_path": "user_simulated_in_test_runner"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.140Z",
+        "proof_type": "executor.receipt.written",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "receipt_id": "receipt_4828cd4255f24103b233053bd4ccbd38",
+          "status": "success"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "worker.evidence_pack.written",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "evidence_id": "4ce0385d-616a-4b79-977b-593b99d975f1",
+          "scenario": "S2_trust_conflict"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "worker.plan_draft.written",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "plan_id": "plan_bbc1265a05594826978c34cfef796c89",
+          "risk_level": "medium",
+          "actions": 1,
+          "scenario": "S2_trust_conflict"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "auditor.execution_order.signed",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "order_id": "order_2fe6565115ff41bc8a5c66ac5f710390",
+          "signed": true,
+          "approval_path": "user_simulated_in_test_runner"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.308Z",
+        "proof_type": "executor.receipt.written",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "receipt_id": "receipt_df1d99300b034201a0c19c9fe1200aa8",
+          "status": "success"
+        }
+      }
+    ],
+    "memory_substrate": [
+      {
+        "ts": "2026-05-14T14:35:23.057Z",
+        "proof_type": "memory_service.health",
+        "recognised": true,
+        "scenario": null,
+        "evidence": {
+          "base_url": "http://127.0.0.1:8000",
+          "body": {
+            "status": "healthy",
+            "service": "byon-memory-service",
+            "backend": "FAISS-IndexFlatIP",
+            "uptime_seconds": 375.1371760368347,
+            "fcem_runtime": {
+              "enabled": true,
+              "runtime_source": "external_v15_7a",
+              "runtime_root": "C:\\Users\\Lucian\\Desktop\\fragmergent-memory-engine\\13_v15_7a_consolidation",
+              "shim_used": false,
+              "adapter_class": "DCortexAdapter",
+              "available": true,
+              "env_fcem_memory_engine_root": "C:/Users/Lucian/Desktop/fragmergent-memory-engine/13_v15_7a_consolidation"
+            }
+          }
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:23.071Z",
+        "proof_type": "memory_service.fce_advisory",
+        "recognised": true,
+        "scenario": null,
+        "evidence": {
+          "base_url": "http://127.0.0.1:8000",
+          "scenario": "preflight",
+          "advisory_mode": "priority_only",
+          "advisory_lowers_risk": false,
+          "advisory_count": 0,
+          "omega_registry_count": 0,
+          "reference_fields_count": 0,
+          "fce_enabled": true,
+          "advisory_keys_sample": []
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:23.330Z",
+        "proof_type": "memory_service.fce_advisory",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "base_url": "http://127.0.0.1:8000",
+          "scenario": "S1_coding",
+          "advisory_mode": "priority_only",
+          "advisory_lowers_risk": false,
+          "advisory_count": 0,
+          "omega_registry_count": 0,
+          "reference_fields_count": 0,
+          "fce_enabled": true,
+          "advisory_keys_sample": []
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.147Z",
+        "proof_type": "memory_service.fce_advisory",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "base_url": "http://127.0.0.1:8000",
+          "scenario": "S2_trust_conflict",
+          "advisory_mode": "priority_only",
+          "advisory_lowers_risk": false,
+          "advisory_count": 3,
+          "omega_registry_count": 0,
+          "reference_fields_count": 0,
+          "fce_enabled": true,
+          "advisory_keys_sample": [
+            "feedback_id",
+            "center_key",
+            "kind",
+            "priority_delta",
+            "recommended_action",
+            "reason",
+            "source_trace_ids",
+            "source_omega_ids"
+          ]
+        }
+      }
+    ],
+    "trust_hierarchy": [
+      {
+        "ts": "2026-05-14T14:35:23.308Z",
+        "proof_type": "trust_ranked_formatter.tiers_used",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "tiers_used": [
+            "SYSTEM_CANONICAL",
+            "VERIFIED_PROJECT_FACT",
+            "USER_PREFERENCE"
+          ],
+          "tally": {
+            "SYSTEM_CANONICAL": 1,
+            "VERIFIED_PROJECT_FACT": 1,
+            "DOMAIN_VERIFIED": 0,
+            "USER_PREFERENCE": 1,
+            "EXTRACTED_USER_CLAIM": 0,
+            "DISPUTED_OR_UNSAFE": 0
+          },
+          "total_facts": 3
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.142Z",
+        "proof_type": "trust_ranked_formatter.tiers_used",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "tiers_used": [
+            "SYSTEM_CANONICAL",
+            "VERIFIED_PROJECT_FACT",
+            "EXTRACTED_USER_CLAIM",
+            "DISPUTED_OR_UNSAFE"
+          ],
+          "tally": {
+            "SYSTEM_CANONICAL": 1,
+            "VERIFIED_PROJECT_FACT": 1,
+            "DOMAIN_VERIFIED": 0,
+            "USER_PREFERENCE": 0,
+            "EXTRACTED_USER_CLAIM": 1,
+            "DISPUTED_OR_UNSAFE": 1
+          },
+          "total_facts": 4
+        }
+      }
+    ],
+    "immune_system": [
+      {
+        "ts": "2026-05-14T14:35:33.130Z",
+        "proof_type": "auditor.policy.forbidden_path.checked",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.130Z",
+        "proof_type": "auditor.policy.forbidden_pattern.checked",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.130Z",
+        "proof_type": "auditor.policy.risk_assessment",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.142Z",
+        "proof_type": "disputed_or_unsafe.rail.checked",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "disputed_count": 1
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "auditor.policy.forbidden_path.checked",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "plan_id": "plan_bbc1265a05594826978c34cfef796c89"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "auditor.policy.forbidden_pattern.checked",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "plan_id": "plan_bbc1265a05594826978c34cfef796c89"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.300Z",
+        "proof_type": "auditor.policy.risk_assessment",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "plan_id": "plan_bbc1265a05594826978c34cfef796c89",
+          "risk_level": "medium"
+        }
+      }
+    ],
+    "controlled_hands": [
+      {
+        "ts": "2026-05-14T14:35:23.305Z",
+        "proof_type": "executor.container.airgap",
+        "recognised": true,
+        "scenario": null,
+        "evidence": {
+          "mode": "dry_run",
+          "project_root": "C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\byon-orchestrator\\test-results\\full-source-organism-activation\\2026-05-14T14-35-22-995Z-fsoat\\project",
+          "note": "in-process executor; FSOAT does not require docker network_mode=none for smoke validation, but the production deploy still enforces it"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.139Z",
+        "proof_type": "executor.signature.verified",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "order_id": "order_0bf272b2d0c64312b4a7bdf77a28db6a"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.307Z",
+        "proof_type": "executor.signature.verified",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "order_id": "order_2fe6565115ff41bc8a5c66ac5f710390"
+        }
+      }
+    ],
+    "capability_routing": [
+      {
+        "ts": "2026-05-14T14:35:23.307Z",
+        "proof_type": "capability_router.activation_plan",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "primary": "software_engineer",
+          "secondaries": [
+            "security_auditor",
+            "construction_advisor"
+          ],
+          "missing_required_modules": []
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.142Z",
+        "proof_type": "capability_router.activation_plan",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "primary": "domain_analyst",
+          "secondaries": [
+            "construction_advisor",
+            "legal_analyst"
+          ],
+          "missing_required_modules": [
+            "domain_verified_facts",
+            "verified_project_fact",
+            "citation_validator",
+            "jurisdiction_resolver"
+          ]
+        }
+      }
+    ],
+    "code_workspace_memory": [
+      {
+        "ts": "2026-05-14T14:35:23.333Z",
+        "proof_type": "code_workspace_memory.context_built",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "exact_files": 0,
+          "requirements": 0,
+          "anti_duplication_warning": true
+        }
+      }
+    ],
+    "compliance_post_check": [
+      {
+        "ts": "2026-05-14T14:35:33.142Z",
+        "proof_type": "compliance_guard.evaluated",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "extracted_fact_count": 6
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.142Z",
+        "proof_type": "post_generation_checker.evaluated",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "via": "evidence_pack.extracted_facts"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.310Z",
+        "proof_type": "compliance_guard.evaluated",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "extracted_fact_count": 1
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.310Z",
+        "proof_type": "post_generation_checker.evaluated",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "via": "evidence_pack.extracted_facts"
+        }
+      }
+    ],
+    "receipt_assimilation": [
+      {
+        "ts": "2026-05-14T14:35:23.075Z",
+        "proof_type": "memory_service.fce_assimilate_receipt",
+        "recognised": true,
+        "scenario": null,
+        "evidence": {
+          "scenario": "preflight",
+          "receipt_id": "fsoat_preflight_2026-05-14T14-35-22-995Z-fsoat",
+          "status_token": "success",
+          "fce_status": "assimilated_receipt",
+          "server_response": {
+            "success": true,
+            "fce_status": "assimilated_receipt",
+            "entity_id": "exec::unknown",
+            "attr_type": "execution_result",
+            "status": "",
+            "label": 0,
+            "summary": {},
+            "write_result": {
+              "target": "memory_engine_runtime",
+              "ingested": "slot_event"
+            },
+            "field_signature_injected": true,
+            "consolidated": false
+          }
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.142Z",
+        "proof_type": "memory_service.fce_assimilate_receipt",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "receipt_id": "receipt_4828cd4255f24103b233053bd4ccbd38",
+          "status_token": "success",
+          "fce_status": "assimilated_receipt",
+          "server_response": {
+            "success": true,
+            "fce_status": "assimilated_receipt",
+            "entity_id": "exec::unknown",
+            "attr_type": "execution_result",
+            "status": "",
+            "label": 0,
+            "summary": {},
+            "write_result": {
+              "target": "memory_engine_runtime",
+              "ingested": "slot_event"
+            },
+            "field_signature_injected": true,
+            "consolidated": false
+          }
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:50.310Z",
+        "proof_type": "memory_service.fce_assimilate_receipt",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "receipt_id": "receipt_df1d99300b034201a0c19c9fe1200aa8",
+          "status_token": "success",
+          "fce_status": "assimilated_receipt",
+          "server_response": {
+            "success": true,
+            "fce_status": "assimilated_receipt",
+            "entity_id": "exec::unknown",
+            "attr_type": "execution_result",
+            "status": "",
+            "label": 0,
+            "summary": {},
+            "write_result": {
+              "target": "memory_engine_runtime",
+              "ingested": "slot_event"
+            },
+            "field_signature_injected": true,
+            "consolidated": false
+          }
+        }
+      }
+    ],
+    "structural_reference_memory": [
+      {
+        "ts": "2026-05-14T14:35:23.325Z",
+        "proof_type": "level3.structural_references.retrieved",
+        "recognised": true,
+        "scenario": "S1_coding",
+        "evidence": {
+          "scenario": "S1_coding",
+          "mode": "offline",
+          "record_count": 7,
+          "origins": {
+            "operator_seeded": 7
+          },
+          "note": "memory-service unavailable or BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT=false; exercised in-process seeds"
+        }
+      },
+      {
+        "ts": "2026-05-14T14:35:33.144Z",
+        "proof_type": "level3.structural_references.retrieved",
+        "recognised": true,
+        "scenario": "S2_trust_conflict",
+        "evidence": {
+          "scenario": "S2_trust_conflict",
+          "mode": "offline",
+          "record_count": 7,
+          "origins": {
+            "operator_seeded": 7
+          },
+          "note": "memory-service unavailable or BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT=false; exercised in-process seeds"
+        }
+      }
+    ]
+  },
+  "event_log": [
+    {
+      "ts": "2026-05-14T14:35:23.057Z",
+      "level": "info",
+      "organ": "memory_substrate",
+      "proof_type": "memory_service.health",
+      "evidence": {
+        "base_url": "http://127.0.0.1:8000",
+        "body": {
+          "status": "healthy",
+          "service": "byon-memory-service",
+          "backend": "FAISS-IndexFlatIP",
+          "uptime_seconds": 375.1371760368347,
+          "fcem_runtime": {
+            "enabled": true,
+            "runtime_source": "external_v15_7a",
+            "runtime_root": "C:\\Users\\Lucian\\Desktop\\fragmergent-memory-engine\\13_v15_7a_consolidation",
+            "shim_used": false,
+            "adapter_class": "DCortexAdapter",
+            "available": true,
+            "env_fcem_memory_engine_root": "C:/Users/Lucian/Desktop/fragmergent-memory-engine/13_v15_7a_consolidation"
+          }
+        }
+      },
+      "scenario": null,
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.071Z",
+      "level": "info",
+      "organ": "memory_substrate",
+      "proof_type": "memory_service.fce_advisory",
+      "evidence": {
+        "base_url": "http://127.0.0.1:8000",
+        "scenario": "preflight",
+        "advisory_mode": "priority_only",
+        "advisory_lowers_risk": false,
+        "advisory_count": 0,
+        "omega_registry_count": 0,
+        "reference_fields_count": 0,
+        "fce_enabled": true,
+        "advisory_keys_sample": []
+      },
+      "scenario": null,
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.075Z",
+      "level": "info",
+      "organ": "receipt_assimilation",
+      "proof_type": "memory_service.fce_assimilate_receipt",
+      "evidence": {
+        "scenario": "preflight",
+        "receipt_id": "fsoat_preflight_2026-05-14T14-35-22-995Z-fsoat",
+        "status_token": "success",
+        "fce_status": "assimilated_receipt",
+        "server_response": {
+          "success": true,
+          "fce_status": "assimilated_receipt",
+          "entity_id": "exec::unknown",
+          "attr_type": "execution_result",
+          "status": "",
+          "label": 0,
+          "summary": {},
+          "write_result": {
+            "target": "memory_engine_runtime",
+            "ingested": "slot_event"
+          },
+          "field_signature_injected": true,
+          "consolidated": false
+        }
+      },
+      "scenario": null,
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.305Z",
+      "level": "info",
+      "organ": "controlled_hands",
+      "proof_type": "executor.container.airgap",
+      "evidence": {
+        "mode": "dry_run",
+        "project_root": "C:\\Users\\Lucian\\Desktop\\byon_omni_fragmergent-causal-exponentiation-memory\\byon_optimus-main\\byon_optimus-main\\byon-orchestrator\\test-results\\full-source-organism-activation\\2026-05-14T14-35-22-995Z-fsoat\\project",
+        "note": "in-process executor; FSOAT does not require docker network_mode=none for smoke validation, but the production deploy still enforces it"
+      },
+      "scenario": null,
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.307Z",
+      "level": "info",
+      "organ": "capability_routing",
+      "proof_type": "capability_router.activation_plan",
+      "evidence": {
+        "scenario": "S1_coding",
+        "primary": "software_engineer",
+        "secondaries": [
+          "security_auditor",
+          "construction_advisor"
+        ],
+        "missing_required_modules": []
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.308Z",
+      "level": "info",
+      "organ": "trust_hierarchy",
+      "proof_type": "trust_ranked_formatter.tiers_used",
+      "evidence": {
+        "scenario": "S1_coding",
+        "tiers_used": [
+          "SYSTEM_CANONICAL",
+          "VERIFIED_PROJECT_FACT",
+          "USER_PREFERENCE"
+        ],
+        "tally": {
+          "SYSTEM_CANONICAL": 1,
+          "VERIFIED_PROJECT_FACT": 1,
+          "DOMAIN_VERIFIED": 0,
+          "USER_PREFERENCE": 1,
+          "EXTRACTED_USER_CLAIM": 0,
+          "DISPUTED_OR_UNSAFE": 0
+        },
+        "total_facts": 3
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.325Z",
+      "level": "info",
+      "organ": "structural_reference_memory",
+      "proof_type": "level3.structural_references.retrieved",
+      "evidence": {
+        "scenario": "S1_coding",
+        "mode": "offline",
+        "record_count": 7,
+        "origins": {
+          "operator_seeded": 7
+        },
+        "note": "memory-service unavailable or BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT=false; exercised in-process seeds"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.330Z",
+      "level": "info",
+      "organ": "memory_substrate",
+      "proof_type": "memory_service.fce_advisory",
+      "evidence": {
+        "base_url": "http://127.0.0.1:8000",
+        "scenario": "S1_coding",
+        "advisory_mode": "priority_only",
+        "advisory_lowers_risk": false,
+        "advisory_count": 0,
+        "omega_registry_count": 0,
+        "reference_fields_count": 0,
+        "fce_enabled": true,
+        "advisory_keys_sample": []
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:23.333Z",
+      "level": "info",
+      "organ": "code_workspace_memory",
+      "proof_type": "code_workspace_memory.context_built",
+      "evidence": {
+        "scenario": "S1_coding",
+        "exact_files": 0,
+        "requirements": 0,
+        "anti_duplication_warning": true
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.128Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "worker.evidence_pack.written",
+      "evidence": {
+        "evidence_id": "f4d64791-aaaf-4fa1-86f4-cc0bb2992728",
+        "scenario": "S1_coding"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.128Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "worker.plan_draft.written",
+      "evidence": {
+        "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+        "risk_level": "medium",
+        "actions": 1,
+        "scenario": "S1_coding"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.128Z",
+      "level": "info",
+      "organ": "verbal_brain",
+      "proof_type": "anthropic.api.call",
+      "evidence": {
+        "scenario": "S1_coding",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "tokens_used": 814,
+        "ai_actions": 1
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.130Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "auditor.policy.forbidden_path.checked",
+      "evidence": {
+        "scenario": "S1_coding",
+        "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.130Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "auditor.policy.forbidden_pattern.checked",
+      "evidence": {
+        "scenario": "S1_coding",
+        "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.130Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "auditor.policy.risk_assessment",
+      "evidence": {
+        "scenario": "S1_coding",
+        "plan_id": "plan_4964fa1ffb9e4c99b37bcf3857fcec3a",
+        "risk_level": "medium"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.131Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "auditor.execution_order.signed",
+      "evidence": {
+        "scenario": "S1_coding",
+        "order_id": "order_0bf272b2d0c64312b4a7bdf77a28db6a",
+        "signed": true,
+        "approval_path": "user_simulated_in_test_runner"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.139Z",
+      "level": "info",
+      "organ": "controlled_hands",
+      "proof_type": "executor.signature.verified",
+      "evidence": {
+        "scenario": "S1_coding",
+        "order_id": "order_0bf272b2d0c64312b4a7bdf77a28db6a"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.140Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "executor.receipt.written",
+      "evidence": {
+        "scenario": "S1_coding",
+        "receipt_id": "receipt_4828cd4255f24103b233053bd4ccbd38",
+        "status": "success"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.142Z",
+      "level": "info",
+      "organ": "receipt_assimilation",
+      "proof_type": "memory_service.fce_assimilate_receipt",
+      "evidence": {
+        "scenario": "S1_coding",
+        "receipt_id": "receipt_4828cd4255f24103b233053bd4ccbd38",
+        "status_token": "success",
+        "fce_status": "assimilated_receipt",
+        "server_response": {
+          "success": true,
+          "fce_status": "assimilated_receipt",
+          "entity_id": "exec::unknown",
+          "attr_type": "execution_result",
+          "status": "",
+          "label": 0,
+          "summary": {},
+          "write_result": {
+            "target": "memory_engine_runtime",
+            "ingested": "slot_event"
+          },
+          "field_signature_injected": true,
+          "consolidated": false
+        }
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.142Z",
+      "level": "info",
+      "organ": "compliance_post_check",
+      "proof_type": "compliance_guard.evaluated",
+      "evidence": {
+        "scenario": "S1_coding",
+        "extracted_fact_count": 6
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.142Z",
+      "level": "info",
+      "organ": "compliance_post_check",
+      "proof_type": "post_generation_checker.evaluated",
+      "evidence": {
+        "scenario": "S1_coding",
+        "via": "evidence_pack.extracted_facts"
+      },
+      "scenario": "S1_coding",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.142Z",
+      "level": "info",
+      "organ": "capability_routing",
+      "proof_type": "capability_router.activation_plan",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "primary": "domain_analyst",
+        "secondaries": [
+          "construction_advisor",
+          "legal_analyst"
+        ],
+        "missing_required_modules": [
+          "domain_verified_facts",
+          "verified_project_fact",
+          "citation_validator",
+          "jurisdiction_resolver"
+        ]
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.142Z",
+      "level": "info",
+      "organ": "trust_hierarchy",
+      "proof_type": "trust_ranked_formatter.tiers_used",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "tiers_used": [
+          "SYSTEM_CANONICAL",
+          "VERIFIED_PROJECT_FACT",
+          "EXTRACTED_USER_CLAIM",
+          "DISPUTED_OR_UNSAFE"
+        ],
+        "tally": {
+          "SYSTEM_CANONICAL": 1,
+          "VERIFIED_PROJECT_FACT": 1,
+          "DOMAIN_VERIFIED": 0,
+          "USER_PREFERENCE": 0,
+          "EXTRACTED_USER_CLAIM": 1,
+          "DISPUTED_OR_UNSAFE": 1
+        },
+        "total_facts": 4
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.142Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "disputed_or_unsafe.rail.checked",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "disputed_count": 1
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.144Z",
+      "level": "info",
+      "organ": "structural_reference_memory",
+      "proof_type": "level3.structural_references.retrieved",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "mode": "offline",
+        "record_count": 7,
+        "origins": {
+          "operator_seeded": 7
+        },
+        "note": "memory-service unavailable or BYON_LEVEL3_FULL_ORGANISM_EXPERIMENT=false; exercised in-process seeds"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:33.147Z",
+      "level": "info",
+      "organ": "memory_substrate",
+      "proof_type": "memory_service.fce_advisory",
+      "evidence": {
+        "base_url": "http://127.0.0.1:8000",
+        "scenario": "S2_trust_conflict",
+        "advisory_mode": "priority_only",
+        "advisory_lowers_risk": false,
+        "advisory_count": 3,
+        "omega_registry_count": 0,
+        "reference_fields_count": 0,
+        "fce_enabled": true,
+        "advisory_keys_sample": [
+          "feedback_id",
+          "center_key",
+          "kind",
+          "priority_delta",
+          "recommended_action",
+          "reason",
+          "source_trace_ids",
+          "source_omega_ids"
+        ]
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "worker.evidence_pack.written",
+      "evidence": {
+        "evidence_id": "4ce0385d-616a-4b79-977b-593b99d975f1",
+        "scenario": "S2_trust_conflict"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "worker.plan_draft.written",
+      "evidence": {
+        "plan_id": "plan_bbc1265a05594826978c34cfef796c89",
+        "risk_level": "medium",
+        "actions": 1,
+        "scenario": "S2_trust_conflict"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "verbal_brain",
+      "proof_type": "anthropic.api.call",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "tokens_used": 321,
+        "ai_actions": 1
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "auditor.policy.forbidden_path.checked",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "plan_id": "plan_bbc1265a05594826978c34cfef796c89"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "auditor.policy.forbidden_pattern.checked",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "plan_id": "plan_bbc1265a05594826978c34cfef796c89"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "immune_system",
+      "proof_type": "auditor.policy.risk_assessment",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "plan_id": "plan_bbc1265a05594826978c34cfef796c89",
+        "risk_level": "medium"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.300Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "auditor.execution_order.signed",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "order_id": "order_2fe6565115ff41bc8a5c66ac5f710390",
+        "signed": true,
+        "approval_path": "user_simulated_in_test_runner"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.307Z",
+      "level": "info",
+      "organ": "controlled_hands",
+      "proof_type": "executor.signature.verified",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "order_id": "order_2fe6565115ff41bc8a5c66ac5f710390"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.308Z",
+      "level": "info",
+      "organ": "macp_security_body",
+      "proof_type": "executor.receipt.written",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "receipt_id": "receipt_df1d99300b034201a0c19c9fe1200aa8",
+        "status": "success"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.310Z",
+      "level": "info",
+      "organ": "receipt_assimilation",
+      "proof_type": "memory_service.fce_assimilate_receipt",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "receipt_id": "receipt_df1d99300b034201a0c19c9fe1200aa8",
+        "status_token": "success",
+        "fce_status": "assimilated_receipt",
+        "server_response": {
+          "success": true,
+          "fce_status": "assimilated_receipt",
+          "entity_id": "exec::unknown",
+          "attr_type": "execution_result",
+          "status": "",
+          "label": 0,
+          "summary": {},
+          "write_result": {
+            "target": "memory_engine_runtime",
+            "ingested": "slot_event"
+          },
+          "field_signature_injected": true,
+          "consolidated": false
+        }
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.310Z",
+      "level": "info",
+      "organ": "compliance_post_check",
+      "proof_type": "compliance_guard.evaluated",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "extracted_fact_count": 1
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    },
+    {
+      "ts": "2026-05-14T14:35:50.310Z",
+      "level": "info",
+      "organ": "compliance_post_check",
+      "proof_type": "post_generation_checker.evaluated",
+      "evidence": {
+        "scenario": "S2_trust_conflict",
+        "via": "evidence_pack.extracted_facts"
+      },
+      "scenario": "S2_trust_conflict",
+      "recognised": true
+    }
+  ]
+}
